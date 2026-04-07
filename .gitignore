@@ -1,0 +1,61 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ---- Node / Vite ----
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+.eslintcache
+
+# ---- Env / secrets ----
+.env
+.env.*
+!.env.example
+
+# ---- Data ----
+# Gaia DR3 subset is large and downloaded via scripts/ingest_gaia.py
+server/data/gaia_dr3_g8.parquet
+server/data/*.csv
+server/data/*.fits
+!server/data/constellations.json
+!server/data/.gitkeep
+
+# Astropy cache
+.astropy/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Editors ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---- Logs ----
+*.log
+logs/
+
+# ---- Build output ----
+build/
+out/
