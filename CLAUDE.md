@@ -220,6 +220,28 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 ---
 
+## Resume Here — Next Session
+
+**Paused:** 2026-04-06, end of initialization. Repo is live at https://github.com/AndrewRobalino/skyvault, initial commit pushed.
+
+**Next up:** Phase 1 kickoff, backend first. Specifically, in order:
+
+1. Scaffold `server/` directory:
+   - `server/app/main.py` — minimal FastAPI app with `/health` endpoint and CORS setup
+   - `server/app/config.py` — Pydantic Settings (paths, mag limit default, Gaia subset cutoff)
+   - `server/app/routers/`, `server/app/services/`, `server/app/models/`, `server/app/services/enrichment/` (empty stubs with TODO markers for Phase 3/4)
+   - `server/data/.gitkeep`, `server/scripts/`, `server/tests/`
+   - `server/requirements.txt` — fastapi, uvicorn[standard], astropy, astroquery, numpy, pandas, pyarrow, pydantic, pydantic-settings, pytest
+   - `server/.env.example`
+2. Write `server/scripts/ingest_gaia.py` — Gaia DR3 TAP query via astroquery, G<8 cutoff, save to `server/data/gaia_dr3_g8.parquet`. Log row count, file size, cutoff used.
+3. Run the ingest script locally — verify ~230k rows and parquet file on disk. This is the first "real data on disk" milestone.
+4. `services/star_catalog.py` — load parquet on startup, expose a `query_visible_stars(observer, time, mag_limit)` function (no AltAz transform yet, just magnitude filtering).
+5. Commit after each logical step. Conventional commits.
+
+**Do not start until Andrew says go.** He's asleep.
+
+---
+
 ## Guardrails for Claude Code
 
 When working in this repo:
