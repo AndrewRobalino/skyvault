@@ -1,13 +1,59 @@
 """Pydantic request/response schemas for the SkyVault API.
 
-TODO(phase-1): flesh out Observer, Star, Planet, SkyResponse, PlanetResponse.
-Kept as stubs so routers can import symbols without breaking on empty modules.
+Every astronomical object returned by the API carries a ``source`` field
+identifying the institutional dataset it came from — that's a product
+requirement, not a nice-to-have.
 """
 
-from pydantic import BaseModel
+from __future__ import annotations
+
+from pydantic import BaseModel, Field
 
 
 class Observer(BaseModel):
-    lat: float
-    lon: float
-    datetime: str  # ISO 8601 UTC
+    """Observer location + time echoed back to the client."""
+
+    lat: float = Field(..., ge=-90.0, le=90.0, description="Latitude in degrees")
+    lon: float = Field(..., ge=-180.0, le=180.0, description="Longitude in degrees")
+    datetime: str = Field(..., description="Observation time (ISO 8601 UTC)")
+
+
+class Star(BaseModel):
+    """A single star in the rendered sky.
+
+    Alt/Az are in the observer's local horizontal frame. RA/Dec are the
+    original ICRS positions from Gaia (epoch J2016.0); proper-motion-corrected
+    positions live implicitly in alt/az.
+    """
+
+    source_id: int
+    ra: float
+    dec: float
+    alt: float
+    az: float
+    magnitude: float
+    bp_rp: float | None = None
+    parallax_mas: float | None = None
+    distance_ly: float | None = None
+    teff_k: float | None = None
+    source: str = "Gaia DR3"
+
+
+class SkyResponse(BaseModel):
+    observer: Observer
+    stars: list[Star]
+    count: int
+
+
+class Planet(BaseModel):
+    name: str
+    alt: float
+    az: float
+    distance_au: float
+    source: str = "JPL DE421 via Astropy"
+
+
+class PlanetsResponse(BaseModel):
+    observer: Observer
+    planets: list[Planet]
+    count: int

@@ -34,6 +34,7 @@ dist-ssr/
 server/data/gaia_dr3_*.parquet
 server/data/*.csv
 server/data/*.fits
+server/data/*.bsp
 !server/data/constellations.json
 !server/data/.gitkeep
 

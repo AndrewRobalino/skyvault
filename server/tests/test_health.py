@@ -16,13 +16,12 @@ def test_health_returns_ok():
     assert body["service"] == "skyvault-api"
 
 
-def test_sky_route_mounted():
+def test_sky_route_requires_observer_params():
+    # Route is mounted; without required query params it should 422.
     response = client.get("/api/v1/sky")
-    assert response.status_code == 200
-    assert "stars" in response.json()
+    assert response.status_code == 422
 
 
-def test_planets_route_mounted():
+def test_planets_route_requires_observer_params():
     response = client.get("/api/v1/planets")
-    assert response.status_code == 200
-    assert "planets" in response.json()
+    assert response.status_code == 422
