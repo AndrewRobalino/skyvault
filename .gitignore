@@ -31,7 +31,7 @@ dist-ssr/
 
 # ---- Data ----
 # Gaia DR3 subset is large and downloaded via scripts/ingest_gaia.py
-server/data/gaia_dr3_g8.parquet
+server/data/gaia_dr3_*.parquet
 server/data/*.csv
 server/data/*.fits
 !server/data/constellations.json
