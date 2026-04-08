@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     gaia_mag_cutoff: float = 9.0
     gaia_parquet_path: Path = DATA_DIR / "gaia_dr3_g9.parquet"
 
+    # JPL DE421 planetary ephemeris (downloaded once via download_ephemeris.py)
+    ephemeris_kernel_path: Path = DATA_DIR / "de421.bsp"
+
     # Sky query defaults
     default_mag_limit: float = 6.5
 
