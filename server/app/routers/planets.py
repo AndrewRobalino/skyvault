@@ -34,6 +34,9 @@ async def get_planets(
             alt=body["alt"],
             az=body["az"],
             distance_au=body["distance_au"],
+            phase_angle=body.get("phase_angle"),
+            illumination=body.get("illumination"),
+            phase_name=body.get("phase_name"),
             source=body["source"],
         )
         for body in results
