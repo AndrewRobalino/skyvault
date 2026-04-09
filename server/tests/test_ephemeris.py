@@ -7,6 +7,8 @@ principles or pull from a cited source.
 
 from __future__ import annotations
 
+import math
+
 import pytest
 
 from app.config import settings
@@ -169,8 +171,6 @@ def test_moon_illumination_matches_phase_angle_identity():
     (new), k = 0. If this relationship fails we're computing one of the two
     incorrectly.
     """
-    import math
-
     results = ephemeris.compute_planet_positions(
         observer_lat=MIAMI_LAT,
         observer_lon=MIAMI_LON,
@@ -185,7 +185,7 @@ def test_moon_illumination_matches_phase_angle_identity():
 def test_moon_full_near_2026_01_03():
     """2026-01-03 ~18:00 UTC is near a full moon per published almanacs
     (e.g. timeanddate.com). Illumination should be > 0.97 and phase name
-    should be 'full moon' or 'waning gibbous' (close-to-full ambiguity is OK).
+    should be 'full moon', 'waxing gibbous', or 'waning gibbous' (close-to-full ambiguity is OK).
     """
     results = ephemeris.compute_planet_positions(
         observer_lat=MIAMI_LAT,
