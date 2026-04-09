@@ -211,10 +211,14 @@ This project lives or dies on accuracy. Non-negotiable:
 
 ## Phase Status
 
-- [ ] **Phase 1** — Foundation: Gaia ingest script, backend API serves accurate star + planet positions
-- [ ] **Phase 2** — Star Map: Three.js rendering of stars and planets
-- [ ] **Phase 3** — Constellations + Info Cards: IAU overlays, SIMBAD + NASA Exoplanet Archive enrichment
-- [ ] **Phase 4** — Polish + Deploy: JPL Horizons presets, landing page, live URL
+- [x] **Phase 1** — Foundation: Gaia ingest script, backend API serves accurate star + planet positions (Gaia DR3 + JPL DE421, real data, tests green)
+- [ ] **Phase 2a** — Frontend Foundation: Vite + React shell, intro animation, controls strip, info panels (no sky chart yet) — **SPEC + PLAN READY, AWAITING EXECUTION**
+- [ ] **Phase 2b** — 2D Sky Chart: Canvas 2D stereographic projection inside the hero placeholder
+- [ ] **Phase 3** — Constellations + Enrichment: IAU overlays, SIMBAD + NASA Exoplanet Archive
+- [ ] **Phase 4** — Explore Mode: Three.js 3D flyable celestial sphere (behind the "Explore in 3D" button)
+- [ ] **Phase 5** — Polish + Deploy: landing, about, docker-compose, live URL
+
+**Rendering pivot:** Three.js is no longer the Phase 2 engine. Canvas 2D ships first in Phase 2b. Three.js is deferred to Phase 4 as a differentiated 3D flythrough. See `SKYVAULT_ROADMAP.md` for the rationale (will be rewritten in Task H2 of the Phase 2a plan).
 
 See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
@@ -222,23 +226,27 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 ## Resume Here — Next Session
 
-**Paused:** 2026-04-06, end of initialization. Repo is live at https://github.com/AndrewRobalino/skyvault, initial commit pushed.
+**Paused:** 2026-04-09, end of Phase 2a brainstorming + planning session.
 
-**Next up:** Phase 1 kickoff, backend first. Specifically, in order:
+**Current state:** Phase 1 is complete. Backend serves `/api/v1/sky` (Gaia DR3) and `/api/v1/planets` (JPL DE421) with real data. Phase 2a design spec and implementation plan are committed under `docs/superpowers/`:
 
-1. Scaffold `server/` directory:
-   - `server/app/main.py` — minimal FastAPI app with `/health` endpoint and CORS setup
-   - `server/app/config.py` — Pydantic Settings (paths, mag limit default, Gaia subset cutoff)
-   - `server/app/routers/`, `server/app/services/`, `server/app/models/`, `server/app/services/enrichment/` (empty stubs with TODO markers for Phase 3/4)
-   - `server/data/.gitkeep`, `server/scripts/`, `server/tests/`
-   - `server/requirements.txt` — fastapi, uvicorn[standard], astropy, astroquery, numpy, pandas, pyarrow, pydantic, pydantic-settings, pytest
-   - `server/.env.example`
-2. Write `server/scripts/ingest_gaia.py` — Gaia DR3 TAP query via astroquery, G<8 cutoff, save to `server/data/gaia_dr3_g8.parquet`. Log row count, file size, cutoff used.
-3. Run the ingest script locally — verify ~230k rows and parquet file on disk. This is the first "real data on disk" milestone.
-4. `services/star_catalog.py` — load parquet on startup, expose a `query_visible_stars(observer, time, mag_limit)` function (no AltAz transform yet, just magnitude filtering).
-5. Commit after each logical step. Conventional commits.
+- Spec: `docs/superpowers/specs/2026-04-08-phase-2a-frontend-foundation-design.md`
+- Plan: `docs/superpowers/plans/2026-04-09-phase-2a-frontend-foundation.md` (42 tasks across Parts A–H)
 
-**Do not start until Andrew says go.** He's asleep.
+**Next up:** Execute the Phase 2a plan. Recommended approach: `superpowers:subagent-driven-development` (fresh subagent per task, review between tasks). Alternative: `superpowers:executing-plans` (inline batch execution with checkpoints).
+
+Execution order follows the plan's parts:
+
+- **Part A** — Backend extensions: Moon phase on `/api/v1/planets`, new `/api/v1/geocode` (Photon proxy)
+- **Part B** — Frontend scaffold: Vite + React + Tailwind under `client/`, palette, global.css, api client
+- **Part C** — State + hooks + utilities: Zustand stores, React Query hooks, idle/intro FSMs
+- **Part D** — Layout shell: background, frame, header, footer, intro orchestrator
+- **Part E** — Controls strip: location search, "Use my location", date/time, submit
+- **Part F** — Hero + info panels: dynamic title, Moon SVG, Lunar/Planets/Stars panels
+- **Part G** — Frontend tests: store, hook, component, smoke tests
+- **Part H** — Assets + docs: ESO Milky Way background, roadmap + CLAUDE.md updates
+
+**Do not start execution until Andrew says go.**
 
 ---
 
