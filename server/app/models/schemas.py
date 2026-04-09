@@ -58,7 +58,7 @@ class Planet(BaseModel):
     alt: float
     az: float
     distance_au: float
-    phase_angle: float | None = None        # degrees; 0 = new, 180 = full
+    phase_angle: float | None = None        # degrees; 0 = full moon, 180 = new moon
     illumination: float | None = None       # [0, 1] fraction illuminated
     phase_name: str | None = None           # e.g. "waxing crescent"
     source: str = "JPL DE421 via Astropy"
