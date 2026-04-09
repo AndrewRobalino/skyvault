@@ -136,3 +136,78 @@ def test_horizon_only_filter_removes_below_horizon_bodies():
     )
     assert len(visible) <= len(full)
     assert all(body["alt"] >= 0 for body in visible)
+
+
+def test_moon_has_phase_fields():
+    """The Moon entry should include phase_angle, illumination, and phase_name."""
+    results = ephemeris.compute_planet_positions(
+        observer_lat=MIAMI_LAT,
+        observer_lon=MIAMI_LON,
+        observer_time="2026-01-15T02:00:00Z",
+    )
+    moon = _by_name(results)["moon"]
+    assert moon["phase_angle"] is not None
+    assert moon["illumination"] is not None
+    assert moon["phase_name"] is not None
+
+
+def test_moon_phase_angle_in_valid_range():
+    """Phase angle is the Sun-Moon-Earth angle at the observer. Always [0°, 180°]."""
+    results = ephemeris.compute_planet_positions(
+        observer_lat=MIAMI_LAT,
+        observer_lon=MIAMI_LON,
+        observer_time="2026-01-15T02:00:00Z",
+    )
+    moon = _by_name(results)["moon"]
+    assert 0.0 <= moon["phase_angle"] <= 180.0
+
+
+def test_moon_illumination_matches_phase_angle_identity():
+    """Physics identity: fractional illumination k = (1 + cos(phase_angle)) / 2.
+
+    At phase_angle = 0 (full), k = 1. At phase_angle = 90, k = 0.5. At 180
+    (new), k = 0. If this relationship fails we're computing one of the two
+    incorrectly.
+    """
+    import math
+
+    results = ephemeris.compute_planet_positions(
+        observer_lat=MIAMI_LAT,
+        observer_lon=MIAMI_LON,
+        observer_time="2026-01-15T02:00:00Z",
+    )
+    moon = _by_name(results)["moon"]
+    phase_rad = math.radians(moon["phase_angle"])
+    expected_k = (1.0 + math.cos(phase_rad)) / 2.0
+    assert abs(moon["illumination"] - expected_k) < 1e-6
+
+
+def test_moon_full_near_2026_01_03():
+    """2026-01-03 ~18:00 UTC is near a full moon per published almanacs
+    (e.g. timeanddate.com). Illumination should be > 0.97 and phase name
+    should be 'full moon' or 'waning gibbous' (close-to-full ambiguity is OK).
+    """
+    results = ephemeris.compute_planet_positions(
+        observer_lat=MIAMI_LAT,
+        observer_lon=MIAMI_LON,
+        observer_time="2026-01-03T18:00:00Z",
+    )
+    moon = _by_name(results)["moon"]
+    assert moon["illumination"] > 0.97
+    assert moon["phase_name"] in {"full moon", "waxing gibbous", "waning gibbous"}
+
+
+def test_non_moon_bodies_have_null_phase_fields():
+    """Sun, Mercury, Mars, etc. should return None for phase fields — we
+    intentionally only populate them for the Moon in v1."""
+    results = ephemeris.compute_planet_positions(
+        observer_lat=MIAMI_LAT,
+        observer_lon=MIAMI_LON,
+        observer_time="2026-01-15T02:00:00Z",
+    )
+    for body in results:
+        if body["name"] == "moon":
+            continue
+        assert body.get("phase_angle") is None, f"{body['name']} has phase_angle"
+        assert body.get("illumination") is None, f"{body['name']} has illumination"
+        assert body.get("phase_name") is None, f"{body['name']} has phase_name"
