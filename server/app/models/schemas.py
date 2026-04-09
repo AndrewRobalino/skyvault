@@ -46,10 +46,21 @@ class SkyResponse(BaseModel):
 
 
 class Planet(BaseModel):
+    """A single solar system body in the observer's sky.
+
+    ``phase_angle``, ``illumination``, and ``phase_name`` are populated only
+    for the Moon. They're ``None`` for every other body (the Sun has no phase
+    against itself; the naked-eye planets have phases but they're tiny and
+    not useful at v1's visual fidelity).
+    """
+
     name: str
     alt: float
     az: float
     distance_au: float
+    phase_angle: float | None = None        # degrees; 0 = new, 180 = full
+    illumination: float | None = None       # [0, 1] fraction illuminated
+    phase_name: str | None = None           # e.g. "waxing crescent"
     source: str = "JPL DE421 via Astropy"
 
 
