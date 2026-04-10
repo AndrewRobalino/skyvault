@@ -110,7 +110,7 @@ body.ui-hidden .hero {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url("/milky-way.webp");
+  background-image: url("/milky-way.jpg");
   background-size: cover;
   background-position: center;
   opacity: var(--intro-galaxy-opacity);
