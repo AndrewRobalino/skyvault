@@ -19,8 +19,8 @@
 ### Frontend (`client/`)
 - **React 18** + **Vite** (JavaScript, not TypeScript for v1 — keep velocity high)
 - **Tailwind CSS** — dark-first design system
-- **Three.js** via **@react-three/fiber** + **@react-three/drei**
-- **Zustand** for global state (date, time, location, selected object, UI toggles)
+- **Canvas 2D** for sky chart rendering (Phase 2b); **Three.js** deferred to Phase 4 Explore Mode
+- **Zustand** for global state (two stores: `observerStore` semantic + `uiStateStore` visual)
 - **@tanstack/react-query** for API data fetching and caching
 
 ### Backend (`server/`)
@@ -212,7 +212,7 @@ This project lives or dies on accuracy. Non-negotiable:
 ## Phase Status
 
 - [x] **Phase 1** — Foundation: Gaia ingest script, backend API serves accurate star + planet positions (Gaia DR3 + JPL DE421, real data, tests green)
-- [ ] **Phase 2a** — Frontend Foundation: Vite + React shell, intro animation, controls strip, info panels (no sky chart yet) — **SPEC + PLAN READY, AWAITING EXECUTION**
+- [x] **Phase 2a** — Frontend Foundation: Vite + React shell, intro animation, controls strip, info panels, 32 frontend tests + 52 backend tests passing
 - [ ] **Phase 2b** — 2D Sky Chart: Canvas 2D stereographic projection inside the hero placeholder
 - [ ] **Phase 3** — Constellations + Enrichment: IAU overlays, SIMBAD + NASA Exoplanet Archive
 - [ ] **Phase 4** — Explore Mode: Three.js 3D flyable celestial sphere (behind the "Explore in 3D" button)
@@ -226,27 +226,16 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 ## Resume Here — Next Session
 
-**Paused:** 2026-04-09, end of Phase 2a brainstorming + planning session.
+**Paused:** 2026-04-10, Phase 2a complete (Parts A–H shipped).
 
-**Current state:** Phase 1 is complete. Backend serves `/api/v1/sky` (Gaia DR3) and `/api/v1/planets` (JPL DE421) with real data. Phase 2a design spec and implementation plan are committed under `docs/superpowers/`:
+**Current state:** Phase 1 + Phase 2a are complete. The full frontend foundation is live on `feat/phase-2a-backend`:
+- Backend: `/api/v1/sky` (Gaia DR3), `/api/v1/planets` (JPL DE421 + Moon phase), `/api/v1/geocode` (Photon proxy) — 52 backend tests passing
+- Frontend: Vite + React 18 + Tailwind dark shell, Zustand stores, React Query hooks, controls strip with geocoder, info panels (Lunar/Planets/Stars), intro + idle FSMs — 32 frontend tests passing
+- Milky Way background asset: **not yet downloaded** — Task H1 requires manually downloading the ESO image (see `docs/superpowers/plans/2026-04-09-phase-2a-frontend-foundation.md` Task H1 for instructions)
 
-- Spec: `docs/superpowers/specs/2026-04-08-phase-2a-frontend-foundation-design.md`
-- Plan: `docs/superpowers/plans/2026-04-09-phase-2a-frontend-foundation.md` (42 tasks across Parts A–H)
+**Next up:** Phase 2b — 2D Sky Chart. Canvas 2D stereographic projection inside the hero placeholder. Needs a new spec + plan before execution.
 
-**Next up:** Execute the Phase 2a plan. Recommended approach: `superpowers:subagent-driven-development` (fresh subagent per task, review between tasks). Alternative: `superpowers:executing-plans` (inline batch execution with checkpoints).
-
-Execution order follows the plan's parts:
-
-- **Part A** — Backend extensions: Moon phase on `/api/v1/planets`, new `/api/v1/geocode` (Photon proxy)
-- **Part B** — Frontend scaffold: Vite + React + Tailwind under `client/`, palette, global.css, api client
-- **Part C** — State + hooks + utilities: Zustand stores, React Query hooks, idle/intro FSMs
-- **Part D** — Layout shell: background, frame, header, footer, intro orchestrator
-- **Part E** — Controls strip: location search, "Use my location", date/time, submit
-- **Part F** — Hero + info panels: dynamic title, Moon SVG, Lunar/Planets/Stars panels
-- **Part G** — Frontend tests: store, hook, component, smoke tests
-- **Part H** — Assets + docs: ESO Milky Way background, roadmap + CLAUDE.md updates
-
-**Do not start execution until Andrew says go.**
+**Rendering pivot:** Three.js is **not** the Phase 2 rendering engine. Canvas 2D ships first in Phase 2b. Three.js is deferred to Phase 4 ("Explore Mode"). See `SKYVAULT_ROADMAP.md` for the full rationale.
 
 ---
 
