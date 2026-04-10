@@ -15,6 +15,7 @@ export function useIntroSequence() {
   const { introState, setIntroState, setReducedMotion, markGlass, markActive } =
     useUiStateStore();
 
+  // Effect 1: decide whether to play or skip (runs once when pending)
   useEffect(() => {
     if (introState !== "pending") return;
 
@@ -38,8 +39,13 @@ export function useIntroSequence() {
     }
 
     setIntroState("playing");
+  }, [introState, setIntroState, setReducedMotion, markActive, markGlass]);
 
-    // Total sequence ~4500ms (1500ms black -> 2000ms galaxy fade -> 1000ms overlap)
+  // Effect 2: run the timer while playing (cleanup only fires when
+  // introState leaves "playing", not when it enters it)
+  useEffect(() => {
+    if (introState !== "playing") return;
+
     const doneTimer = setTimeout(() => {
       setIntroState("done");
       markGlass();
@@ -51,5 +57,5 @@ export function useIntroSequence() {
     }, 4500);
 
     return () => clearTimeout(doneTimer);
-  }, [introState, setIntroState, setReducedMotion, markActive, markGlass]);
+  }, [introState, setIntroState, markGlass]);
 }
