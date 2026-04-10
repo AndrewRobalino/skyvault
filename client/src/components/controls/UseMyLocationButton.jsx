@@ -4,13 +4,13 @@ import { useObserverStore } from "../../stores/observerStore.js";
 
 export default function UseMyLocationButton() {
   const { position, error, isLoading, request } = useGeolocation();
-  const useCurrentLocation = useObserverStore((s) => s.useCurrentLocation);
+  const setCurrentLocation = useObserverStore((s) => s.useCurrentLocation);
 
   useEffect(() => {
     if (position) {
-      useCurrentLocation(position.lat, position.lon, "Current location");
+      setCurrentLocation(position.lat, position.lon, "Current location");
     }
-  }, [position, useCurrentLocation]);
+  }, [position, setCurrentLocation]);
 
   return (
     <div className="flex flex-col">
