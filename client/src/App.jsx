@@ -3,7 +3,9 @@ import IntroSequence from "./components/layout/IntroSequence.jsx";
 import FrameContainer from "./components/layout/FrameContainer.jsx";
 import Header from "./components/layout/Header.jsx";
 import Footer from "./components/layout/Footer.jsx";
+import HeroRegion from "./components/hero/HeroRegion.jsx";
 import ControlsStrip from "./components/controls/ControlsStrip.jsx";
+import InfoPanelsGrid from "./components/info/InfoPanelsGrid.jsx";
 
 export default function App() {
   return (
@@ -13,23 +15,9 @@ export default function App() {
         <FrameContainer>
           <Header />
           <main className="space-y-10">
-            {/* HeroRegion placeholder — real content in Part F */}
-            <section className="hero flex aspect-[16/9] w-full items-center justify-center border border-rule bg-bg/60 md:aspect-[16/9]">
-              <p className="font-serif italic text-ink-dim text-lg">
-                Interactive sky chart · arrives next session
-              </p>
-            </section>
-
+            <HeroRegion />
             <ControlsStrip />
-
-            {/* InfoPanelsGrid placeholder — real content in Part F */}
-            <section className="space-y-6">
-              <div className="panel border border-rule bg-bg/60 p-6 text-ink-dim">
-                <p className="font-mono text-xs uppercase tracking-widest">
-                  Info panels placeholder
-                </p>
-              </div>
-            </section>
+            <InfoPanelsGrid />
           </main>
           <Footer />
         </FrameContainer>
