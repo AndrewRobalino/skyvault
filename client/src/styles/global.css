@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS variables for things Tailwind's color scale doesn't handle cleanly. */
+:root {
+  --bg-panel: rgba(10, 14, 28, 0.55);
+  --intro-galaxy-opacity: 0.28;
+  --intro-content-opacity: 1;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #05060d;
+  color: #dce1f0;
+  font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Idle state machine controls — set by useIdle on document.body */
+body.ui-normal .panel,
+body.ui-normal .controls-strip,
+body.ui-normal .header,
+body.ui-normal .footer,
+body.ui-normal .hero {
+  opacity: 1;
+  transition: opacity 600ms ease, filter 600ms ease;
+}
+body.ui-glass .panel,
+body.ui-glass .controls-strip,
+body.ui-glass .header,
+body.ui-glass .footer,
+body.ui-glass .hero {
+  opacity: 0.55;
+  filter: blur(0) saturate(0.9);
+  transition: opacity 600ms ease, filter 600ms ease;
+}
+body.ui-hidden .panel,
+body.ui-hidden .controls-strip,
+body.ui-hidden .header,
+body.ui-hidden .footer,
+body.ui-hidden .hero {
+  opacity: 0;
+  transition: opacity 800ms ease;
+}
+
+/* Reduced motion — kill transitions */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Intro animation keyframes */
+@keyframes galaxyFadeIn {
+  from { opacity: 0; }
+  to   { opacity: var(--intro-galaxy-opacity); }
+}
+@keyframes contentFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.intro-playing .app-background::before {
+  animation: galaxyFadeIn 2000ms ease-out 1500ms both;
+}
+.intro-playing .intro-content {
+  animation: contentFadeIn 1800ms ease-out 2700ms both;
+}
+.intro-done .app-background::before {
+  opacity: var(--intro-galaxy-opacity);
+}
+
+/* Gold corner brackets on the frame */
+.frame { position: relative; }
+.frame::before, .frame::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #6a5329;
+  pointer-events: none;
+}
+.frame::before {
+  top: -1px; left: -1px;
+  border-right: 0;
+  border-bottom: 0;
+}
+.frame::after {
+  bottom: -1px; right: -1px;
+  border-left: 0;
+  border-top: 0;
+}
+
+/* Full-viewport Milky Way background with vignette */
+.app-background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: #05060d;
+  isolation: isolate;
+}
+.app-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/milky-way.webp");
+  background-size: cover;
+  background-position: center;
+  opacity: var(--intro-galaxy-opacity);
+  mix-blend-mode: screen;
+}
+.app-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(5, 6, 13, 0.7) 100%
+  );
+  pointer-events: none;
+}
