@@ -87,111 +87,78 @@ Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD �
 
 ---
 
-## Phase 2 — Star Map Rendering
+## Phase 2a — Frontend Foundation
 
-**Goal:** Interactive 3D star field rendered from real Gaia data.
+**Goal:** Ship a full interactive shell around the existing Phase 1 APIs with a cinematic dark galactic theme, place-name search, styled info panels, and an intro animation / idle-aware chrome state machine — **without** a sky chart. This is the frontend skeleton that Phase 2b drops a canvas into.
 
-### Frontend — Three.js Scene
-- [ ] Celestial sphere setup via `@react-three/fiber`
-  - Camera at center (observer), stars plotted on sphere interior
-  - AltAz → Three.js coordinates mapping
-- [ ] Star rendering:
-  - Point cloud geometry (InstancedMesh or Points)
-  - Size mapped to apparent magnitude (brighter = larger)
-  - Color mapped to BP-RP color index → realistic star colors (blue-white → yellow → orange → red)
-  - Fade dimmer stars for realism
-- [ ] Camera controls:
-  - OrbitControls — drag to look around the sky
-  - Scroll to zoom (wide field → narrow field)
-  - Smooth damping
-- [ ] Planet rendering:
-  - Slightly larger points or small sprites with labels
-  - Distinct from stars visually
-- [ ] Ground plane or horizon line — subtle visual anchor
-- [ ] Dark immersive background — no harsh UI chrome on the viewport
+**In scope:**
+- Vite + React 18 + Tailwind scaffold under `client/`
+- Zustand (`observerStore`, `uiStateStore`) + React Query hooks (`useGeocode`, `useSky`, `usePlanets`)
+- Photon (OSM) geocoder proxied via a new `GET /api/v1/geocode?q=` backend route
+- Moon-phase extensions to `/api/v1/planets` (phase name, illumination, phase angle)
+- Layout shell: fixed Milky Way background (ESO/S. Brunier CC-BY), bordered frame with gold corner brackets, header, footer
+- Controls strip: location search with "Did you mean?" dropdown, "Use my location", date/time, UTC/Local toggle, submit
+- Hero region: dynamic eyebrow + title ("The sky above <place>"), placeholder for Phase 2b sky chart, stubbed "Explore in 3D" button
+- Info panels: Lunar (with inline phase-accurate SVG), Planets (struck-through below-horizon), Stars (top 30 by magnitude with BP-RP color dots)
+- Intro FSM: galaxy fade → content fade → hand-off to idle FSM (sessionStorage-gated, `?replay` override, `prefers-reduced-motion` honored)
+- Idle FSM: normal → glass (15s) → hidden (5s more), focused-input immunity
+- Frontend unit + component tests (Vitest + RTL)
 
-### Deliverable
-> Enter a date/location → see a realistic, interactive 3D star field you can rotate and zoom. Stars are real Gaia DR3 data, colors are real, planets are real.
+**Out of scope (explicitly Phase 2b):**
+- The 2D sky chart itself (Canvas 2D stereographic projection)
+- Star click handling, tooltips, hover states on celestial objects
 
 ---
 
-## Phase 3 — Constellations + Object Info (Enrichment activation)
+## Phase 2b — 2D Sky Chart (Canvas 2D)
 
-**Goal:** Constellations overlaid, clicking any object shows real data from multiple NASA/ESA/IAU sources.
+**Goal:** Render the actual night sky inside the hero placeholder from Phase 2a using an HTML Canvas 2D stereographic projection.
 
-### Backend
-- [ ] **`GET /constellations`** endpoint:
-  - Returns IAU constellation stick-figure line segments
-  - Each segment: `[star_source_id_1, star_source_id_2]`
-  - Includes constellation label position (centroid)
-- [ ] **`GET /objects/{id}`** — enrichment endpoint:
-  - `services/enrichment/simbad.py` — query SIMBAD via astroquery for object metadata (alternate names, spectral class, object type)
-  - `services/enrichment/exoplanet_archive.py` — lookup in NASA Exoplanet Archive, flag exoplanet hosts with planet count + names
-  - Combine Gaia data + SIMBAD + Exoplanet Archive into unified response
-  - LRU cache on service methods, in-memory TTL
-  - Every field includes its `source`
+**In scope:**
+- Canvas-based stereographic sky projection centered on zenith
+- Star rendering: size from magnitude, color from BP-RP, subtle halo/glow for brightest
+- Planet rendering: larger markers with labels
+- Cardinal direction labels (N/S/E/W)
+- Horizon circle
+- Hover/click interaction → selects an object and shows its info panel
+- Smooth re-draws on observer change (debounced)
 
-### Frontend — Constellations
-- [ ] Render constellation lines (Three.js Line segments, subtle white/blue, low opacity)
-- [ ] Toggle: constellations on/off
-- [ ] Constellation labels — HTML overlays or sprite text at centroids
-- [ ] Hover effect — highlight full constellation when hovering any member star
-
-### Frontend — Info Cards
-- [ ] Click/tap any star → slide-in info panel:
-  - Common name + designation (e.g., "Sirius — α Canis Majoris") — from SIMBAD
-  - Apparent magnitude, BP-RP color — from Gaia DR3
-  - Distance (light-years, from Gaia parallax)
-  - Spectral class + object type — from SIMBAD
-  - Constellation membership — from IAU
-  - Exoplanet host badge + planet count (if applicable) — from NASA Exoplanet Archive
-  - **Data source badges**: `"Position: Gaia DR3"`, `"Metadata: SIMBAD/CDS"`, `"Exoplanets: NASA Exoplanet Archive"`
-- [ ] Click/tap any planet → similar panel:
-  - Current AltAz coordinates, distance from Earth
-  - **Data source badge**: `"Ephemeris: NASA JPL DE421 via Astropy"`
-
-### Deliverable
-> Full interactive sky with constellations. Click Sirius, get Gaia position + SIMBAD metadata + exoplanet data (if any) with source attribution for each field. Click a Gaia exoplanet host and see "has 3 confirmed exoplanets — NASA Exoplanet Archive".
+**Out of scope:**
+- Zooming / panning (deferred)
+- Constellation stick figures (Phase 3)
+- 3D flying camera (Phase 4)
 
 ---
 
-## Phase 4 — Polish, Attribution + Deploy
+## Phase 3 — Constellations + Enrichment
 
-**Goal:** Production-ready, deployed, portfolio-worthy. JPL Horizons live queries activated.
+**Goal:** IAU constellation stick figures overlayed on the Canvas 2D sky, plus click-to-enrich any star with SIMBAD + NASA Exoplanet Archive data.
 
-### Backend — JPL Horizons
-- [ ] `services/enrichment/horizons.py` — query JPL Horizons via astroquery for small bodies
-- [ ] **`GET /small-bodies`** endpoint — returns currently visible asteroids/comets above magnitude threshold
-- [ ] Aggressive caching (Horizons is rate-limited; cache per body per day)
+- `/api/v1/constellations` — IAU stick-figure line segments
+- `/api/v1/objects/{id}` — SIMBAD lookup + exoplanet archive cross-match, server-side cached
+- Info-panel tabs for "Catalog data" (Gaia) and "Enrichment" (SIMBAD / NASA)
+- Constellation-name labels drawn on the Canvas 2D chart
 
-### UI Polish
-- [ ] Landing page — dark, cinematic hero with subtle star particle animation
-- [ ] Smooth loading state (skeleton → star field fade-in)
-- [ ] Responsive — works on tablet + mobile (touch controls for Three.js)
-- [ ] Input UX improvements:
-  - Location autocomplete (geocoding API or simple city list)
-  - "Use my location" button
-  - Quick presets: "Tonight", "My birthday", "Apollo 11 launch", "Tonight's visible asteroids" (uses Horizons)
-- [ ] Keyboard shortcuts (R to reset view, C to toggle constellations, etc.)
+---
 
-### Data Attribution
-- [ ] Persistent footer badge: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD · NASA Exoplanet Archive"*
-- [ ] Dedicated `/about` page:
-  - Each data source explained in plain language
-  - Institution, dataset version, link to original
-  - Accuracy notes + methodology (coordinate frames, epoch handling, proper motion)
-  - Tech stack overview
+## Phase 4 — Explore Mode (Three.js 3D)
 
-### DevOps
-- [ ] Dockerize frontend + backend
-- [ ] GitHub Actions CI: lint, test on push
-- [ ] Deploy frontend → Vercel
-- [ ] Deploy backend → Railway or Fly.io
-- [ ] Environment config (.env) for API URLs
-- [ ] Gaia ingest runs at build time (or checked-in parquet if small enough)
+**Goal:** The stubbed "EXPLORE IN 3D" button from Phase 2a routes to an immersive full-window Three.js experience — a flyable celestial sphere where you can drift around, orbit specific stars, and fly to Mars or Jupiter using real JPL Horizons small-body data.
 
-### Deliverable
-> Live URL. Share it. It works. It's real. Five real institutional sources attributed on every data point.
+- React Three Fiber + drei
+- Full-window canvas (no frame, no chrome — the explore mode owns the screen)
+- Real star distances (from Gaia parallax) used for meaningful 3D placement
+- Free-cam controls + object-focus camera transitions
+- Preset tours: "Tonight's visible asteroids" (JPL Horizons), "Nearest stars", "Bright exoplanet hosts"
+
+---
+
+## Phase 5 — Polish + Deploy
+
+- Landing page, about page with all source attributions
+- `/docker-compose.yml` production build
+- Live URL (Vercel frontend + Fly.io/Railway backend or equivalent)
+- README screenshots, short demo video
 
 ---
 
@@ -212,7 +179,7 @@ Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD �
 
 2. **Why G<8 subset (~230k stars)?** — Matches naked-eye + binocular visibility. Keeps data in-memory friendly (~80MB parquet). Deeper subsets possible post-launch with LOD rendering.
 
-3. **Why Three.js over D3/Canvas2D?** — A celestial sphere is inherently 3D. Projecting to 2D loses the immersion. Three.js gives us free camera rotation, zoom, and future extensibility (deep sky objects, satellite orbits).
+3. **Rendering decision — Canvas 2D for v1, Three.js deferred to Phase 4.** Original plan was Three.js from day one. Reversed after scoping Phase 2a: Canvas 2D can render ≤5000 stars comfortably, ships faster, and the realistic v1 experience is "beautiful 2D sky chart + rich info panels + place-name search." Three.js moves to Phase 4 Explore Mode as the differentiated "wow" experience (flyable 3D universe), rather than the default rendering path.
 
 4. **Why Astropy on the backend instead of in-browser JS?** — Astropy's ephemeris calculations are battle-tested and accurate to arcsecond precision. No JS library comes close. The tradeoff is an API call, but star data for a single sky view is ~50-100KB — fast enough.
 
