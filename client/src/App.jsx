@@ -3,6 +3,7 @@ import IntroSequence from "./components/layout/IntroSequence.jsx";
 import FrameContainer from "./components/layout/FrameContainer.jsx";
 import Header from "./components/layout/Header.jsx";
 import Footer from "./components/layout/Footer.jsx";
+import ControlsStrip from "./components/controls/ControlsStrip.jsx";
 
 export default function App() {
   return (
@@ -19,12 +20,7 @@ export default function App() {
               </p>
             </section>
 
-            {/* ControlsStrip placeholder — real content in Part E */}
-            <section className="controls-strip border border-rule bg-bg/60 p-6 text-ink-dim">
-              <p className="font-mono text-xs uppercase tracking-widest">
-                Controls strip placeholder
-              </p>
-            </section>
+            <ControlsStrip />
 
             {/* InfoPanelsGrid placeholder — real content in Part F */}
             <section className="space-y-6">
