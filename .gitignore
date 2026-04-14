@@ -60,3 +60,6 @@ logs/
 # ---- Build output ----
 build/
 out/
+
+# ---- Superpowers brainstorming session artifacts ----
+.superpowers/
