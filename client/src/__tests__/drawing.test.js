@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { magnitudeToGlow } from "../utils/drawing.js";
+import { describe, it, expect, vi } from "vitest";
+import { magnitudeToGlow, drawStar, drawPlanet } from "../utils/drawing.js";
 
 describe("magnitudeToGlow", () => {
   it("brightest tier (mag <= 0) returns bold halo", () => {
@@ -35,5 +35,65 @@ describe("magnitudeToGlow", () => {
     expect(magnitudeToGlow(null)).toEqual({ core: 1.0, halo: 0 });
     expect(magnitudeToGlow(undefined)).toEqual({ core: 1.0, halo: 0 });
     expect(magnitudeToGlow(NaN)).toEqual({ core: 1.0, halo: 0 });
+  });
+});
+
+function makeMockCtx() {
+  return {
+    save: vi.fn(),
+    restore: vi.fn(),
+    beginPath: vi.fn(),
+    arc: vi.fn(),
+    ellipse: vi.fn(),
+    fill: vi.fn(),
+    stroke: vi.fn(),
+    createRadialGradient: vi.fn(() => ({
+      addColorStop: vi.fn(),
+    })),
+    fillRect: vi.fn(),
+    set fillStyle(_) {},
+    set strokeStyle(_) {},
+    set lineWidth(_) {},
+    set globalCompositeOperation(_) {},
+  };
+}
+
+describe("drawStar", () => {
+  it("draws a filled rect (1px) for dim stars with halo=0", () => {
+    const ctx = makeMockCtx();
+    drawStar(ctx, { x: 100, y: 100, magnitude: 7, bp_rp: null });
+    expect(ctx.fillRect).toHaveBeenCalled();
+    // No gradient for dim stars
+    expect(ctx.createRadialGradient).not.toHaveBeenCalled();
+  });
+
+  it("draws a radial gradient halo for bright stars", () => {
+    const ctx = makeMockCtx();
+    drawStar(ctx, { x: 400, y: 200, magnitude: -1.46, bp_rp: 0.02 });
+    expect(ctx.createRadialGradient).toHaveBeenCalled();
+    expect(ctx.arc).toHaveBeenCalled();
+    expect(ctx.fill).toHaveBeenCalled();
+  });
+});
+
+describe("drawPlanet", () => {
+  it("draws planet marker with ring for non-Moon bodies", () => {
+    const ctx = makeMockCtx();
+    drawPlanet(ctx, { x: 400, y: 200, name: "Jupiter" });
+    expect(ctx.createRadialGradient).toHaveBeenCalled();
+    expect(ctx.stroke).toHaveBeenCalled();
+  });
+
+  it("Moon uses custom path with illumination shadow", () => {
+    const ctx = makeMockCtx();
+    drawPlanet(ctx, {
+      x: 400,
+      y: 200,
+      name: "Moon",
+      illumination: 0.5,
+      phase_name: "first quarter",
+    });
+    expect(ctx.arc).toHaveBeenCalled();
+    expect(ctx.fill).toHaveBeenCalled();
   });
 });
