@@ -1,19 +1,18 @@
 import ExploreIn3DButton from "./ExploreIn3DButton.jsx";
+import SkyChart from "./SkyChart.jsx";
 
-/**
- * Reserved 16:9 slot for the Canvas 2D sky chart (Phase 2b).
- * In Phase 2a it holds a "coming soon" placeholder + 3D button stub.
- */
 export default function HeroRegion() {
   return (
-    <section className="hero relative aspect-[4/3] w-full overflow-hidden border border-rule bg-bg/80 md:aspect-[16/9]">
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 text-center">
-        <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent-dim">
-          Interactive Sky Chart
-        </p>
-        <p className="font-serif italic text-ink text-xl md:text-2xl">
-          Arrives next session
-        </p>
+    <section
+      className="
+        relative w-full overflow-hidden border border-rule bg-bg/80
+        h-[min(56.25vw,calc(100vh-14rem))]
+        min-h-[260px]
+      "
+    >
+      <SkyChart />
+
+      <div className="absolute bottom-4 right-4 z-10 pointer-events-auto">
         <ExploreIn3DButton />
       </div>
     </section>
