@@ -110,7 +110,9 @@ Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD �
 
 ---
 
-## Phase 2b — 2D Sky Chart (Canvas 2D)
+## Phase 2b — 2D Sky Chart (Canvas 2D) ✅ COMPLETE
+
+> **Shipped:** rectangular full-bleed stereographic projection, star rendering with magnitude/color-calibrated glow, planet rendering with distinct amber markers, Moon with illumination shadow, cardinal labels, hover + click-to-tooltip progressive disclosure, viewport-capped sizing. See `docs/superpowers/specs/2026-04-13-phase-2b-sky-chart-design.md` and `docs/superpowers/plans/2026-04-13-phase-2b-sky-chart.md`.
 
 **Goal:** Render the actual night sky inside the hero placeholder from Phase 2a using an HTML Canvas 2D stereographic projection.
 
