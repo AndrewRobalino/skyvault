@@ -213,7 +213,7 @@ This project lives or dies on accuracy. Non-negotiable:
 
 - [x] **Phase 1** — Foundation: Gaia ingest script, backend API serves accurate star + planet positions (Gaia DR3 + JPL DE421, real data, tests green)
 - [x] **Phase 2a** — Frontend Foundation: Vite + React shell, intro animation, controls strip, info panels, 32 frontend tests + 52 backend tests passing
-- [ ] **Phase 2b** — 2D Sky Chart: Canvas 2D stereographic projection inside the hero placeholder
+- [x] **Phase 2b** — 2D Sky Chart: Canvas 2D stereographic projection inside the hero placeholder
 - [ ] **Phase 3** — Constellations + Enrichment: IAU overlays, SIMBAD + NASA Exoplanet Archive
 - [ ] **Phase 4** — Explore Mode: Three.js 3D flyable celestial sphere (behind the "Explore in 3D" button)
 - [ ] **Phase 5** — Polish + Deploy: landing, about, docker-compose, live URL
@@ -226,16 +226,11 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 ## Resume Here — Next Session
 
-**Paused:** 2026-04-10, Phase 2a complete (Parts A–H shipped).
+**Paused:** 2026-04-15, Phase 2b complete.
 
-**Current state:** Phase 1 + Phase 2a are complete. The full frontend foundation is live on `feat/phase-2a-backend`:
-- Backend: `/api/v1/sky` (Gaia DR3), `/api/v1/planets` (JPL DE421 + Moon phase), `/api/v1/geocode` (Photon proxy) — 52 backend tests passing
-- Frontend: Vite + React 18 + Tailwind dark shell, Zustand stores, React Query hooks, controls strip with geocoder, info panels (Lunar/Planets/Stars), intro + idle FSMs — 32 frontend tests passing
-- Milky Way background asset: **not yet downloaded** — Task H1 requires manually downloading the ESO image (see `docs/superpowers/plans/2026-04-09-phase-2a-frontend-foundation.md` Task H1 for instructions)
+**Current state:** Phase 1 + 2a + 2b are complete. The sky chart renders live inside the hero region — real Gaia DR3 stars (projected + drawn with magnitude/color-calibrated glow), real JPL DE421 planets (distinct amber markers, Moon with illumination shadow), cardinal labels, hover + click-to-tooltip, viewport-capped sizing.
 
-**Next up:** Phase 2b — 2D Sky Chart. Canvas 2D stereographic projection inside the hero placeholder. Needs a new spec + plan before execution.
-
-**Rendering pivot:** Three.js is **not** the Phase 2 rendering engine. Canvas 2D ships first in Phase 2b. Three.js is deferred to Phase 4 ("Explore Mode"). See `SKYVAULT_ROADMAP.md` for the full rationale.
+**Next up:** Phase 3 — Constellations + Enrichment. IAU stick figures on the chart, SIMBAD + NASA Exoplanet Archive lookups triggered from the existing click-tooltip.
 
 ---
 
