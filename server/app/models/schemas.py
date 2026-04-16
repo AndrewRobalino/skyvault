@@ -26,7 +26,10 @@ class Star(BaseModel):
     positions live implicitly in alt/az.
     """
 
-    source_id: int
+    # Gaia DR3 source_ids are 64-bit integers up to ~10^18, which exceed
+    # JavaScript's Number.MAX_SAFE_INTEGER (2^53 - 1). Serialize as string
+    # so frontend JSON.parse doesn't silently corrupt the last few digits.
+    source_id: str
     ra: float
     dec: float
     alt: float

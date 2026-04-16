@@ -80,7 +80,7 @@ async def get_sky(
 
     stars: list[Star] = [
         Star(
-            source_id=int(row["source_id"]),
+            source_id=str(int(row["source_id"])),
             ra=float(row["ra"]),
             dec=float(row["dec"]),
             alt=float(row["alt"]),
