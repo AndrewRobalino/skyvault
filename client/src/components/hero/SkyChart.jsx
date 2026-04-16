@@ -38,11 +38,6 @@ export default function SkyChart() {
   const [hoveredId, setHoveredId] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
 
-  useEffect(() => {
-    setHoveredId(null);
-    setSelectedId(null);
-  }, [skyQuery.data, planetsQuery.data]);
-
   const hoveredObj = useMemo(
     () => projected.all.find((o) => o.id === hoveredId) ?? null,
     [hoveredId, projected.all]
