@@ -2,13 +2,16 @@
 
 > Explore the night sky from any place, any moment in time.
 
-**SkyVault** is an interactive web app that renders an accurate 3D night sky for any date, time, and location on Earth. Star positions come from **ESA Gaia DR3**, planet positions from **NASA JPL DE421**, constellations from the **IAU**, enrichment data from **NASA Exoplanet Archive** and **CDS SIMBAD**. Every data point is attributed — no faked values, no approximations.
+**SkyVault** is an interactive web app that renders an accurate night sky for any date, time, and location on Earth. Star positions come from **ESA Gaia DR3**, planet positions from **NASA JPL DE421**, constellations from the **IAU**, enrichment data from **NASA Exoplanet Archive** and **CDS SIMBAD**, and the photo-realistic Milky Way backdrop is **Axel Mellinger's All-Sky Milky Way Panorama 2.0**. Every data point is attributed — no faked values, no approximations.
 
-Built with React, Three.js, FastAPI, and Astropy.
+Built with React, Vite, Canvas 2D + WebGL, FastAPI, and Astropy.
 
 ## Status
 
-🚧 Phase 1 — Foundation (in progress)
+✅ Phase 1 — Foundation
+✅ Phase 2a — Frontend Foundation
+✅ Phase 2b — 2D Sky Chart (Canvas 2D)
+🚧 Phase 2c — Visual Polish + Milky Way Backdrop (in progress)
 
 See [`SKYVAULT_ROADMAP.md`](./SKYVAULT_ROADMAP.md) for the full phase breakdown.
 
@@ -19,12 +22,13 @@ See [`SKYVAULT_ROADMAP.md`](./SKYVAULT_ROADMAP.md) for the full phase breakdown.
 - **IAU** — official 88 constellations + stick figures
 - **NASA Exoplanet Archive** — confirmed exoplanets and host stars
 - **CDS SIMBAD** — canonical object metadata
+- **Mellinger 2.0 All-Sky Milky Way Panorama** — © Axel Mellinger ([source](https://galaxy.phys.cmich.edu/~axel/mwpan2/)). Non-commercial license; SkyVault is a free public portfolio site with no ads or monetization. See [`CLAUDE.md`](./CLAUDE.md) guardrail #11 for full license terms.
 
 ## Structure
 
 ```
 skyvault/
-├── client/    # React + Vite + Three.js frontend
+├── client/    # React + Vite + Canvas 2D + WebGL frontend
 ├── server/    # FastAPI + Astropy backend
 └── ...
 ```

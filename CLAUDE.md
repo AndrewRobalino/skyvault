@@ -19,7 +19,7 @@
 ### Frontend (`client/`)
 - **React 18** + **Vite** (JavaScript, not TypeScript for v1 — keep velocity high)
 - **Tailwind CSS** — dark-first design system
-- **Canvas 2D** for sky chart rendering (Phase 2b); **Three.js** deferred to Phase 4 Explore Mode
+- **Canvas 2D** for sky chart rendering (Phase 2b); **WebGL** for the Milky Way backdrop layer (Phase 2c); **Three.js** deferred to Phase 4 Explore Mode
 - **Zustand** for global state (two stores: `observerStore` semantic + `uiStateStore` visual)
 - **@tanstack/react-query** for API data fetching and caching
 
@@ -45,6 +45,7 @@ All sources are real institutional datasets. **No faked, mocked, or approximated
 | **Gaia DR3** (G < 8 subset, ~230k stars) | Star positions (ICRS), magnitudes, parallax, proper motion, BP-RP color | **ESA** | One-time ingest via Gaia TAP (astroquery.gaia), stored as parquet in `server/data/` |
 | **JPL DE421 ephemeris** | Sun, Moon, Mercury–Neptune positions | **NASA JPL** | Astropy's `solar_system_ephemeris.set('de421')` |
 | **IAU constellation data** | Official 88 constellations, stick figures, boundaries | **IAU** | Static data, committed to repo |
+| **Mellinger 2.0 All-Sky Milky Way Panorama** | Photo-realistic Milky Way backdrop (galactic equirectangular) | **© Axel Mellinger** | Static asset at `client/public/assets/mellinger_2_galactic.webp`, sampled by WebGL shader (Phase 2c). **Non-commercial license — see Guardrails.** |
 
 ### Tier 2 — Enrichment APIs (cold path, lazy, cached)
 
@@ -60,7 +61,7 @@ Activated progressively across phases. Each lives in its own module under `serve
 - The `/about` page lists every source with institution name, dataset version, and link to the original.
 - Every API response object includes a `source` field (e.g., `"Gaia DR3"`, `"JPL DE421 via Astropy"`, `"SIMBAD/CDS"`).
 - Every UI info card displays a source badge.
-- Persistent footer: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD · NASA Exoplanet Archive"*
+- Persistent footer: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD · NASA Exoplanet Archive · Milky Way panorama © Axel Mellinger"*
 
 ---
 
@@ -214,6 +215,7 @@ This project lives or dies on accuracy. Non-negotiable:
 - [x] **Phase 1** — Foundation: Gaia ingest script, backend API serves accurate star + planet positions (Gaia DR3 + JPL DE421, real data, tests green)
 - [x] **Phase 2a** — Frontend Foundation: Vite + React shell, intro animation, controls strip, info panels, 32 frontend tests + 52 backend tests passing
 - [x] **Phase 2b** — 2D Sky Chart: Canvas 2D stereographic projection inside the hero placeholder
+- [ ] **Phase 2c** — Visual Polish + Milky Way Backdrop: WebGL Mellinger backdrop, horizon haze ring, per-planet color tints + glow rings + always-on labels, full-rectangle stereographic fill (REFERENCE_ALT = 0°), attribution footer
 - [ ] **Phase 3** — Constellations + Enrichment: IAU overlays, SIMBAD + NASA Exoplanet Archive
 - [ ] **Phase 4** — Explore Mode: Three.js 3D flyable celestial sphere (behind the "Explore in 3D" button)
 - [ ] **Phase 5** — Polish + Deploy: landing, about, docker-compose, live URL
@@ -226,11 +228,15 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 ## Resume Here — Next Session
 
-**Paused:** 2026-04-15, Phase 2b complete.
+**Paused:** 2026-04-27, Phase 2c plan written, execution starting.
 
-**Current state:** Phase 1 + 2a + 2b are complete. The sky chart renders live inside the hero region — real Gaia DR3 stars (projected + drawn with magnitude/color-calibrated glow), real JPL DE421 planets (distinct amber markers, Moon with illumination shadow), cardinal labels, hover + click-to-tooltip, viewport-capped sizing.
+**Current state:** Phase 1 + 2a + 2b complete. The sky chart renders live inside the hero region — real Gaia DR3 stars, real JPL DE421 planets, Moon with illumination shadow, cardinal labels, click-tooltip. Phase 2b shipped on `feat/phase-2b-sky-chart` (unmerged PR open).
 
-**Next up:** Phase 3 — Constellations + Enrichment. IAU stick figures on the chart, SIMBAD + NASA Exoplanet Archive lookups triggered from the existing click-tooltip.
+**Active branch:** `feat/phase-2c-visual-polish` (stacked on Phase 2b head).
+
+**Next up:** Execute the 18-task Phase 2c plan at `docs/superpowers/plans/2026-04-27-phase-2c-visual-polish.md`. Spec is at `docs/superpowers/specs/2026-04-27-phase-2c-visual-polish-design.md`. After Phase 2c ships → Phase 3 (Constellations + Enrichment).
+
+**Manual prerequisite for plan Task 14:** Andrew downloads Mellinger 2.0 panorama (https://galaxy.phys.cmich.edu/~axel/mwpan2/), converts to WebP at 4096×2048, places at `client/public/assets/mellinger_2_galactic.webp`. Asset is **gitignored** — keep it local only.
 
 ---
 
@@ -248,6 +254,7 @@ When working in this repo:
 8. **No TypeScript migration** in v1. We committed to JS. Revisit post-launch.
 9. **Preserve the dark immersive aesthetic.** Do not introduce light-mode styles, bright accent colors, or heavy UI chrome over the star map.
 10. **Respect rate limits on enrichment APIs.** SIMBAD, NASA Exoplanet Archive, and JPL Horizons must be cached. Never hammer these from the render path.
+11. **Mellinger 2.0 license is non-commercial — non-negotiable.** The Milky Way backdrop (`client/public/assets/mellinger_2_galactic.webp`) is © Axel Mellinger, licensed for personal/educational/scientific/non-commercial use with attribution. **Implementation requirements:** (a) attribution `Milky Way panorama © Axel Mellinger` in the persistent footer, (b) link to https://galaxy.phys.cmich.edu/~axel/mwpan2/ on the future `/about` page, (c) source-file comment in the backdrop loading module pointing to the license. **Forbidden:** ads on the deployed site, paid access, relicensing, repackaging the asset as Andrew's work. **If SkyVault ever pivots to commercial use:** the Mellinger backdrop must be removed or licensed explicitly from Mellinger before launch. See memory file `skyvault_mellinger_license.md` for full rules.
 
 ---
 

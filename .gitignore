@@ -41,6 +41,12 @@ server/data/*.bsp
 # Astropy cache
 .astropy/
 
+# Mellinger 2.0 Milky Way panorama — non-commercial license, large file, must stay local-only.
+# Andrew downloads from https://galaxy.phys.cmich.edu/~axel/mwpan2/ and converts to webp.
+client/public/assets/mellinger_*.webp
+client/public/assets/mellinger_*.png
+client/public/assets/mellinger_*.jpg
+
 # ---- OS ----
 .DS_Store
 Thumbs.db
