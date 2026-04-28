@@ -21,28 +21,38 @@ import { REFERENCE_ALT } from "../../utils/projection.js";
 const MELLINGER_ASSET = "/assets/mellinger_2_galactic.webp";
 const DEG = Math.PI / 180;
 
+// Probe at module/render time so the fallback decision is made before any
+// effect runs — keeps us out of the setState-in-effect anti-pattern.
+function detectNoWebGL() {
+  if (typeof window === "undefined" || typeof document === "undefined") return true;
+  try {
+    const probe = document.createElement("canvas");
+    return !(probe.getContext("webgl2") || probe.getContext("webgl"));
+  } catch {
+    return true;
+  }
+}
+
 export default function MilkyWayBackdrop({ width, height, dpr, lat, lon, datetime }) {
   const canvasRef = useRef(null);
   const glStateRef = useRef(null);
-  const [fallback, setFallback] = useState(false);
+  const [fallback] = useState(detectNoWebGL);
 
   useEffect(() => {
+    if (fallback) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const gl = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
-    if (!gl) {
-      console.warn("[MilkyWayBackdrop] WebGL unavailable — falling back to dark fill.");
-      setFallback(true);
-      return;
-    }
+    if (!gl) return;
 
     let program;
     try {
       program = createProgram(gl, PASSTHROUGH_VERT, INVERSE_PROJECTION_FRAG);
     } catch (err) {
+      // Shader compile failures are rare on real hardware; if it happens we
+      // leave the canvas transparent and the parent's dark background shows.
       console.warn("[MilkyWayBackdrop] Shader setup failed:", err.message);
-      setFallback(true);
       return;
     }
 
@@ -92,7 +102,7 @@ export default function MilkyWayBackdrop({ width, height, dpr, lat, lon, datetim
     return () => {
       glStateRef.current = null;
     };
-  }, []);
+  }, [fallback]);
 
   useEffect(() => {
     const state = glStateRef.current;

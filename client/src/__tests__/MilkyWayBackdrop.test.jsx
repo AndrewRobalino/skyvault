@@ -38,13 +38,16 @@ describe("MilkyWayBackdrop", () => {
     expect(container.querySelector("[data-backdrop-fallback]")).toBeNull();
   });
 
-  it("renders fallback if shader compile throws", () => {
+  it("does not draw if shader compile throws (canvas stays transparent over parent's dark fill)", () => {
     const glStub = makeGlStub({ shaderCompileFails: true });
     HTMLCanvasElement.prototype.getContext = vi.fn(() => glStub);
     const { container } = render(
       <MilkyWayBackdrop width={1000} height={600} dpr={1} lat={25} lon={-80} datetime="2026-04-15T03:30:00Z" />
     );
-    expect(container.querySelector("[data-backdrop-fallback]")).toBeTruthy();
+    // Canvas still mounts; setup just bails before any draw. Parent SkyChart
+    // owns the #05070d background that shows through the empty canvas.
+    expect(container.querySelector("canvas")).toBeTruthy();
+    expect(glStub.drawArrays).not.toHaveBeenCalled();
   });
 });
 

@@ -10,6 +10,10 @@ import CardinalLabels from "./CardinalLabels.jsx";
 import SelectionRing from "./SelectionRing.jsx";
 import SkyTooltip from "./SkyTooltip.jsx";
 import SkyStatusOverlay from "./SkyStatusOverlay.jsx";
+import MilkyWayBackdrop from "./MilkyWayBackdrop.jsx";
+import HorizonRing from "./HorizonRing.jsx";
+import PlanetLabels from "./PlanetLabels.jsx";
+import AttributionFooter from "./AttributionFooter.jsx";
 
 function statusFor({ selected, skyQuery, planetsQuery }) {
   if (!selected) return "idle";
@@ -95,17 +99,30 @@ export default function SkyChart() {
       onClick={handleClick}
       className="absolute inset-0 cursor-default data-[hover=true]:cursor-pointer"
       data-hover={hoveredId != null ? "true" : "false"}
-      style={{
-        background:
-          "radial-gradient(ellipse 60% 70% at 50% 45%, #0a1026 0%, #05070d 55%, #020308 100%)",
-      }}
+      style={{ background: "#05070d" }}
     >
+      <MilkyWayBackdrop
+        width={width}
+        height={height}
+        dpr={dpr}
+        lat={selected?.lat}
+        lon={selected?.lon}
+        datetime={datetimeUtc}
+      />
+
+      <HorizonRing width={width} height={height} dpr={dpr} />
+
       <SkyCanvas
         projectedStars={status === "ready" ? projected.stars : []}
         projectedPlanets={status === "ready" ? projected.planets : []}
         width={width}
         height={height}
         dpr={dpr}
+      />
+
+      <PlanetLabels
+        projectedPlanets={status === "ready" ? projected.planets : []}
+        width={width}
       />
 
       {status === "ready" && <CardinalLabels />}
@@ -126,6 +143,8 @@ export default function SkyChart() {
           planetsQuery.refetch();
         }}
       />
+
+      <AttributionFooter />
     </div>
   );
 }

@@ -118,6 +118,12 @@ describe("<SkyChart>", () => {
     expect(screen.getByText("W")).toBeInTheDocument();
   });
 
+  it("mounts the AttributionFooter (Phase 2c license-critical attribution)", () => {
+    renderWithProviders(<SkyChart />);
+    expect(screen.getByText(/Axel Mellinger/i)).toBeInTheDocument();
+    expect(screen.getByText(/Gaia DR3/i)).toBeInTheDocument();
+  });
+
   it("click on an object shows the tooltip; click empty area dismisses it", () => {
     useObserverStore.getState().useCurrentLocation(25.76, -80.19, "Miami, FL");
     useSky.mockReturnValue(
