@@ -8,6 +8,20 @@
  */
 
 import { bvToHex } from "./bvToColor.js";
+import { horizonHaze } from "./horizonHaze.js";
+
+/**
+ * Color amplification factor for star halos.
+ *
+ *   mag ≤ 1 → 1.0 (full BP-RP color visible: Vega blue, Betelgeuse orange)
+ *   mag ≥ 4 → 0.0 (near-white; prevents dim-star confetti)
+ *   linear interpolation between
+ */
+export function colorAmpFactor(magnitude) {
+  if (magnitude <= 1) return 1.0;
+  if (magnitude >= 4) return 0.0;
+  return 1 - (magnitude - 1) / 3;
+}
 
 // Calibration stops: [magnitude breakpoint, core px, halo px]
 const STAR_GLOW_STOPS = [
@@ -64,29 +78,55 @@ const SUN_CORE = "#fff4c8";
 const SUN_MID = "#ffd890";
 
 export function drawStar(ctx, star) {
-  const { x, y, magnitude, bp_rp } = star;
+  const { x, y, magnitude, bp_rp, alt } = star;
   const { core, halo } = magnitudeToGlow(magnitude);
-  const color = bvToHex(bp_rp);
+  const baseColor = bvToHex(bp_rp);
+
+  // Color amplification: blend toward white for dim stars.
+  const amp = colorAmpFactor(magnitude);
+  const color = blendHex(baseColor, "#ffffff", 1 - amp);
+
+  // Horizon haze: dim and warm-shift stars near the horizon.
+  const { brightnessMul, redShift } = horizonHaze(alt ?? 90);
+  const haloColor = blendHex(color, "#ffaa66", redShift);
+  const coreAlpha = brightnessMul;
 
   if (halo === 0) {
-    // Dim star: single pixel, no gradient.
-    ctx.fillStyle = color;
+    ctx.fillStyle = hexToRgba(haloColor, coreAlpha);
     ctx.fillRect(x - core / 2, y - core / 2, core, core);
     return;
   }
 
-  // Bright star: white core + tinted halo gradient.
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
   const gradient = ctx.createRadialGradient(x, y, 0, x, y, halo);
-  gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
-  gradient.addColorStop(core / halo, hexToRgba(color, 0.85));
-  gradient.addColorStop(1, hexToRgba(color, 0));
+  gradient.addColorStop(0, `rgba(255, 255, 255, ${coreAlpha})`);
+  gradient.addColorStop(core / halo, hexToRgba(haloColor, 0.85 * coreAlpha));
+  gradient.addColorStop(1, hexToRgba(haloColor, 0));
   ctx.fillStyle = gradient;
   ctx.beginPath();
   ctx.arc(x, y, halo, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
+}
+
+function blendHex(hexA, hexB, t) {
+  const a = parseHex(hexA);
+  const b = parseHex(hexB);
+  const r = Math.round(a.r + (b.r - a.r) * t);
+  const g = Math.round(a.g + (b.g - a.g) * t);
+  const bl = Math.round(a.b + (b.b - a.b) * t);
+  return `#${toHex2(r)}${toHex2(g)}${toHex2(bl)}`;
+}
+
+function parseHex(hex) {
+  const m = /^#?([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})$/.exec(hex);
+  if (!m) return { r: 255, g: 255, b: 255 };
+  return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
+}
+
+function toHex2(n) {
+  return n.toString(16).padStart(2, "0");
 }
 
 export function drawPlanet(ctx, planet) {

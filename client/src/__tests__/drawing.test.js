@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
-import { magnitudeToGlow, drawStar, drawPlanet } from "../utils/drawing.js";
+import {
+  magnitudeToGlow,
+  drawStar,
+  drawPlanet,
+  colorAmpFactor,
+} from "../utils/drawing.js";
 
 describe("magnitudeToGlow", () => {
   it("brightest tier (mag <= 0) returns bold halo", () => {
@@ -95,5 +100,71 @@ describe("drawPlanet", () => {
     });
     expect(ctx.arc).toHaveBeenCalled();
     expect(ctx.fill).toHaveBeenCalled();
+  });
+});
+
+describe("colorAmpFactor", () => {
+  it("brightest stars (mag <= 1) → full color (1.0)", () => {
+    expect(colorAmpFactor(-1.46)).toBe(1.0);
+    expect(colorAmpFactor(0)).toBe(1.0);
+    expect(colorAmpFactor(1)).toBe(1.0);
+  });
+
+  it("mag = 4 or higher → near-white (0.0)", () => {
+    expect(colorAmpFactor(4)).toBe(0.0);
+    expect(colorAmpFactor(6)).toBe(0.0);
+    expect(colorAmpFactor(10)).toBe(0.0);
+  });
+
+  it("interpolates linearly between mag=1 and mag=4", () => {
+    expect(colorAmpFactor(2.5)).toBeCloseTo(0.5, 4);
+    expect(colorAmpFactor(2)).toBeCloseTo(0.667, 2);
+  });
+});
+
+describe("drawStar with horizon haze and color amp", () => {
+  function mockCtx() {
+    const calls = [];
+    const gradientStops = [];
+    return {
+      calls,
+      gradientStops,
+      save: () => calls.push(["save"]),
+      restore: () => calls.push(["restore"]),
+      fillRect: (...args) => calls.push(["fillRect", ...args]),
+      arc: (...args) => calls.push(["arc", ...args]),
+      beginPath: () => calls.push(["beginPath"]),
+      fill: () => calls.push(["fill"]),
+      createRadialGradient: () => ({
+        addColorStop: (offset, color) => gradientStops.push({ offset, color }),
+      }),
+      set fillStyle(v) { calls.push(["fillStyle", v]); },
+      set globalCompositeOperation(v) { calls.push(["gco", v]); },
+    };
+  }
+
+  it("bright star at zenith uses near-full alpha (no haze)", () => {
+    const ctx = mockCtx();
+    drawStar(ctx, { x: 100, y: 100, magnitude: 0, bp_rp: 0, alt: 90 });
+    expect(ctx.gradientStops[0].color).toMatch(/rgba\(255, 255, 255, 1\)/);
+  });
+
+  it("bright star near horizon dims (alt=0 → brightnessMul=0.3)", () => {
+    const ctx = mockCtx();
+    drawStar(ctx, { x: 100, y: 100, magnitude: 0, bp_rp: 0, alt: 0 });
+    expect(ctx.gradientStops[0].color).toMatch(/rgba\(255, 255, 255, 0\.3\)/);
+  });
+
+  it("dim star (mag=7) blends toward white regardless of bp_rp", () => {
+    const ctx = mockCtx();
+    drawStar(ctx, { x: 100, y: 100, magnitude: 7, bp_rp: 2.0, alt: 90 });
+    const fillStyleCall = ctx.calls.find((c) => c[0] === "fillStyle");
+    expect(fillStyleCall[1]).toMatch(/^rgba\(255, 255, 255/);
+  });
+
+  it("missing alt defaults to 90 (zenith, no haze)", () => {
+    const ctx = mockCtx();
+    drawStar(ctx, { x: 100, y: 100, magnitude: 0, bp_rp: 0 });
+    expect(ctx.gradientStops[0].color).toMatch(/rgba\(255, 255, 255, 1\)/);
   });
 });
