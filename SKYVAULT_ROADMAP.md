@@ -133,9 +133,11 @@ Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD �
 
 ---
 
-## Phase 2c — Visual Polish + Milky Way Backdrop
+## Phase 2c — Visual Polish + Milky Way Backdrop ✅ CODE COMPLETE
 
 > **Spec:** `docs/superpowers/specs/2026-04-27-phase-2c-visual-polish-design.md` · **Plan:** `docs/superpowers/plans/2026-04-27-phase-2c-visual-polish.md` · **Branch:** `feat/phase-2c-visual-polish`
+
+**Status:** All 17 implementation tasks shipped (134 frontend tests green, lint clean). Awaiting (a) Mellinger asset placement at `client/public/assets/mellinger_2_galactic.webp` and (b) manual visual QA against the three reference observers (NYC summer, Buenos Aires same-instant, Anchorage winter).
 
 **Goal:** Transform the Phase 2b chart from "data viz of dots" into an immersive astrophotography-vibe night sky.
 

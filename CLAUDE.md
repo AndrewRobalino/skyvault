@@ -215,7 +215,7 @@ This project lives or dies on accuracy. Non-negotiable:
 - [x] **Phase 1** — Foundation: Gaia ingest script, backend API serves accurate star + planet positions (Gaia DR3 + JPL DE421, real data, tests green)
 - [x] **Phase 2a** — Frontend Foundation: Vite + React shell, intro animation, controls strip, info panels, 32 frontend tests + 52 backend tests passing
 - [x] **Phase 2b** — 2D Sky Chart: Canvas 2D stereographic projection inside the hero placeholder
-- [ ] **Phase 2c** — Visual Polish + Milky Way Backdrop: WebGL Mellinger backdrop, horizon haze ring, per-planet color tints + glow rings + always-on labels, full-rectangle stereographic fill (REFERENCE_ALT = 0°), attribution footer
+- [x] **Phase 2c** — Visual Polish + Milky Way Backdrop: WebGL Mellinger backdrop, horizon haze ring, per-planet color tints + glow rings + always-on labels, full-rectangle stereographic fill (REFERENCE_ALT = 0°), attribution footer (code complete; awaiting asset placement + manual visual QA)
 - [ ] **Phase 3** — Constellations + Enrichment: IAU overlays, SIMBAD + NASA Exoplanet Archive
 - [ ] **Phase 4** — Explore Mode: Three.js 3D flyable celestial sphere (behind the "Explore in 3D" button)
 - [ ] **Phase 5** — Polish + Deploy: landing, about, docker-compose, live URL
@@ -228,15 +228,17 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 ## Resume Here — Next Session
 
-**Paused:** 2026-04-27, Phase 2c plan written, execution starting.
+**Paused:** 2026-04-27, Phase 2c implementation complete.
 
-**Current state:** Phase 1 + 2a + 2b complete. The sky chart renders live inside the hero region — real Gaia DR3 stars, real JPL DE421 planets, Moon with illumination shadow, cardinal labels, click-tooltip. Phase 2b shipped on `feat/phase-2b-sky-chart` (unmerged PR open).
+**Current state:** Phase 1 + 2a + 2b shipped. Phase 2c **code complete** on `feat/phase-2c-visual-polish` — 134 frontend tests pass, lint clean. Mellinger backdrop layer, horizon ring, per-planet tints + always-on labels, attribution footer, REFERENCE_ALT=0 full-rectangle stereographic. Phase 2b PR still unmerged.
 
 **Active branch:** `feat/phase-2c-visual-polish` (stacked on Phase 2b head).
 
-**Next up:** Execute the 18-task Phase 2c plan at `docs/superpowers/plans/2026-04-27-phase-2c-visual-polish.md`. Spec is at `docs/superpowers/specs/2026-04-27-phase-2c-visual-polish-design.md`. After Phase 2c ships → Phase 3 (Constellations + Enrichment).
+**Next up — two manual gates before Phase 3:**
+1. **Place the Mellinger asset.** Download from https://galaxy.phys.cmich.edu/~axel/mwpan2/, convert to WebP at 4096×2048 (q=80, target 3–6 MB), save to `client/public/assets/mellinger_2_galactic.webp`. Asset is **gitignored** — keep it local. Commit with `assets: add Mellinger 2.0 galactic panorama (© Axel Mellinger, non-commercial use)`.
+2. **Run visual QA.** Plan Task 18 — verify three reference observers (NYC summer, Buenos Aires same instant, Anchorage winter) plus WebGL fallback in DevTools.
 
-**Manual prerequisite for plan Task 14:** Andrew downloads Mellinger 2.0 panorama (https://galaxy.phys.cmich.edu/~axel/mwpan2/), converts to WebP at 4096×2048, places at `client/public/assets/mellinger_2_galactic.webp`. Asset is **gitignored** — keep it local only.
+After both gates: merge Phase 2c → Phase 3 (Constellations + Enrichment) — needs spec + plan.
 
 ---
 
