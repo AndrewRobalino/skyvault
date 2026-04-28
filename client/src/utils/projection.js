@@ -14,7 +14,7 @@
  * projection pipeline stays the same for any point object.
  */
 
-export const REFERENCE_ALT = 20; // degrees — tune in one place
+export const REFERENCE_ALT = 0; // degrees — Phase 2c: horizon at short-edge inscribed circle
 
 const DEG = Math.PI / 180;
 
