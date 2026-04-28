@@ -4,6 +4,8 @@ import {
   drawStar,
   drawPlanet,
   colorAmpFactor,
+  PLANET_SIZES,
+  PLANET_TINTS,
 } from "../utils/drawing.js";
 
 describe("magnitudeToGlow", () => {
@@ -166,5 +168,51 @@ describe("drawStar with horizon haze and color amp", () => {
     const ctx = mockCtx();
     drawStar(ctx, { x: 100, y: 100, magnitude: 0, bp_rp: 0 });
     expect(ctx.gradientStops[0].color).toMatch(/rgba\(255, 255, 255, 1\)/);
+  });
+});
+
+describe("planet sizes (Phase 2c bumps)", () => {
+  it("Venus is 16px diameter", () => {
+    expect(PLANET_SIZES.Venus).toBe(16);
+  });
+  it("Jupiter is 16px diameter", () => {
+    expect(PLANET_SIZES.Jupiter).toBe(16);
+  });
+  it("Mars is 14px diameter", () => {
+    expect(PLANET_SIZES.Mars).toBe(14);
+  });
+  it("Mercury, Saturn, Uranus, Neptune are 13px diameter", () => {
+    expect(PLANET_SIZES.Mercury).toBe(13);
+    expect(PLANET_SIZES.Saturn).toBe(13);
+    expect(PLANET_SIZES.Uranus).toBe(13);
+    expect(PLANET_SIZES.Neptune).toBe(13);
+  });
+  it("Sun and Moon stay at 16px", () => {
+    expect(PLANET_SIZES.Sun).toBe(16);
+    expect(PLANET_SIZES.Moon).toBe(16);
+  });
+});
+
+describe("planet tints (Phase 2c per-planet colors)", () => {
+  it("Mars is reddish", () => {
+    expect(PLANET_TINTS.Mars).toBe("#d97a4a");
+  });
+  it("Venus is bright cream-white", () => {
+    expect(PLANET_TINTS.Venus).toBe("#f5e8c0");
+  });
+  it("Jupiter is pale cream-amber", () => {
+    expect(PLANET_TINTS.Jupiter).toBe("#e8c98a");
+  });
+  it("Saturn is yellow-tan", () => {
+    expect(PLANET_TINTS.Saturn).toBe("#c9a86a");
+  });
+  it("Mercury is neutral grey-tan", () => {
+    expect(PLANET_TINTS.Mercury).toBe("#b8a890");
+  });
+  it("Uranus is cool cyan-blue", () => {
+    expect(PLANET_TINTS.Uranus).toBe("#8eb5c4");
+  });
+  it("Neptune is darker cool blue", () => {
+    expect(PLANET_TINTS.Neptune).toBe("#6a8cb4");
   });
 });

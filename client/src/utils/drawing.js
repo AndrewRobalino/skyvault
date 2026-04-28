@@ -53,25 +53,34 @@ export function magnitudeToGlow(mag) {
   return { ...DIM_TIER };
 }
 
-// Planet marker sizes (diameter, px)
-const PLANET_SIZES = {
+// Planet marker sizes (diameter, px) — Phase 2c bumped for differentiation.
+export const PLANET_SIZES = {
   Sun: 16,
   Moon: 16,
-  Venus: 12,
-  Jupiter: 12,
-  Mars: 11,
-  Mercury: 10,
-  Saturn: 10,
-  Uranus: 10,
-  Neptune: 10,
+  Venus: 16,
+  Jupiter: 16,
+  Mars: 14,
+  Mercury: 13,
+  Saturn: 13,
+  Uranus: 13,
+  Neptune: 13,
 };
 
-const PLANET_SIZE_DEFAULT = 10;
+const PLANET_SIZE_DEFAULT = 13;
 
-// Amber planet tint (matches Phase 2a accent theme).
-const PLANET_CORE = "#ffd890";
-const PLANET_MID = "#e8a968";
-const PLANET_BORDER = "rgba(255, 216, 144, 0.4)";
+// Per-planet color tints — drawn from observed planetary colors
+// (real telescope/photo references). NOT amber-everywhere.
+export const PLANET_TINTS = {
+  Mars: "#d97a4a",
+  Venus: "#f5e8c0",
+  Jupiter: "#e8c98a",
+  Saturn: "#c9a86a",
+  Mercury: "#b8a890",
+  Uranus: "#8eb5c4",
+  Neptune: "#6a8cb4",
+};
+
+const PLANET_TINT_DEFAULT = "#e8c98a";
 
 // Sun gets a warmer disc distinct from nighttime planets.
 const SUN_CORE = "#fff4c8";
@@ -140,28 +149,35 @@ export function drawPlanet(ctx, planet) {
   }
 
   const size = PLANET_SIZES[planet.name] ?? PLANET_SIZE_DEFAULT;
+  const tint = PLANET_TINTS[planet.name] ?? PLANET_TINT_DEFAULT;
   const { x, y } = planet;
-  const halo = size * 2;
+  const r = size / 2;
 
   ctx.save();
-  ctx.globalCompositeOperation = "lighter";
-  const gradient = ctx.createRadialGradient(x, y, 0, x, y, halo);
-  gradient.addColorStop(0, PLANET_CORE);
-  gradient.addColorStop(size / halo, PLANET_MID);
-  gradient.addColorStop(1, "rgba(232, 169, 104, 0)");
-  ctx.fillStyle = gradient;
+
+  // Outer glow ring (subtle, planet's own tint, low opacity).
+  const glowRadius = r * 1.5;
+  const glowGradient = ctx.createRadialGradient(x, y, r * 0.9, x, y, glowRadius);
+  glowGradient.addColorStop(0, hexToRgba(tint, 0.35));
+  glowGradient.addColorStop(1, hexToRgba(tint, 0));
+  ctx.fillStyle = glowGradient;
   ctx.beginPath();
-  ctx.arc(x, y, halo, 0, Math.PI * 2);
+  ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
   ctx.fill();
-  ctx.restore();
 
-  // Bordered ring on the disc itself.
-  ctx.save();
-  ctx.strokeStyle = PLANET_BORDER;
+  // Crisp filled disc — the planet itself.
+  ctx.fillStyle = tint;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Thin bright edge for crisp definition.
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+  ctx.arc(x, y, r, 0, Math.PI * 2);
   ctx.stroke();
+
   ctx.restore();
 }
 
