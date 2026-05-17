@@ -11,7 +11,6 @@ import SelectionRing from "./SelectionRing.jsx";
 import SkyTooltip from "./SkyTooltip.jsx";
 import SkyStatusOverlay from "./SkyStatusOverlay.jsx";
 import MilkyWayBackdrop from "./MilkyWayBackdrop.jsx";
-import HorizonRing from "./HorizonRing.jsx";
 import PlanetLabels from "./PlanetLabels.jsx";
 import AttributionFooter from "./AttributionFooter.jsx";
 
@@ -99,7 +98,6 @@ export default function SkyChart() {
       onClick={handleClick}
       className="absolute inset-0 cursor-default data-[hover=true]:cursor-pointer"
       data-hover={hoveredId != null ? "true" : "false"}
-      style={{ background: "#05070d" }}
     >
       <MilkyWayBackdrop
         width={width}
@@ -109,8 +107,6 @@ export default function SkyChart() {
         lon={selected?.lon}
         datetime={datetimeUtc}
       />
-
-      <HorizonRing width={width} height={height} dpr={dpr} />
 
       <SkyCanvas
         projectedStars={status === "ready" ? projected.stars : []}

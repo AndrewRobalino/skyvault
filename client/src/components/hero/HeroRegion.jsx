@@ -5,7 +5,7 @@ export default function HeroRegion() {
   return (
     <section
       className="
-        relative w-full overflow-hidden border border-rule bg-bg/80
+        relative w-full overflow-hidden border border-rule
         h-[min(56.25vw,calc(100vh-14rem))]
         min-h-[260px]
       "

@@ -30,7 +30,7 @@ export default function Header() {
         <span className="h-px w-16 bg-accent-dim" />
       </div>
       <h1 className="mt-5 font-serif italic text-ink text-[clamp(32px,6vw,58px)] leading-tight">
-        {titlePlace ? `The Sky over ${titlePlace}` : "The Sky · SkyVault"}
+        {titlePlace ? `The Sky over ${titlePlace}` : "The Sky"}
       </h1>
       <p className="mt-3 font-mono text-xs uppercase tracking-widest text-ink-dim">
         {subhead}
