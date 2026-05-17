@@ -57,6 +57,10 @@ Activated progressively across phases. Each lives in its own module under `serve
 | **NASA Exoplanet Archive** | Confirmed exoplanets + host stars (~5,600 planets) | **NASA/IPAC** | Phase 3 — overlay "has exoplanets" badge on host stars |
 | **JPL Horizons** | Live ephemerides for small bodies (asteroids, comets, spacecraft) | **NASA JPL** | Phase 4 — presets like "Tonight's visible asteroids" |
 
+### Geocoder — Place lookup (separate from sky data)
+
+User-facing place search for the location input. **Photon primary** (autocomplete-grade, fuzzy, fast), **Nominatim fallback** when Photon is unreachable or 5xx. Shared in-memory TTL cache. Both OSM-backed. Source field on the response reflects which provider answered. See `server/app/services/geocoder.py`.
+
 ### Attribution rules
 - The `/about` page lists every source with institution name, dataset version, and link to the original.
 - Every API response object includes a `source` field (e.g., `"Gaia DR3"`, `"JPL DE421 via Astropy"`, `"SIMBAD/CDS"`).
@@ -215,7 +219,7 @@ This project lives or dies on accuracy. Non-negotiable:
 - [x] **Phase 1** — Foundation: Gaia ingest script, backend API serves accurate star + planet positions (Gaia DR3 + JPL DE421, real data, tests green)
 - [x] **Phase 2a** — Frontend Foundation: Vite + React shell, intro animation, controls strip, info panels, 32 frontend tests + 52 backend tests passing
 - [x] **Phase 2b** — 2D Sky Chart: Canvas 2D stereographic projection inside the hero placeholder
-- [x] **Phase 2c** — Visual Polish + Milky Way Backdrop: WebGL panorama backdrop (ESO/S. Brunier, galactic equirectangular), horizon haze ring, per-planet color tints + glow rings + always-on labels, full-rectangle stereographic fill (REFERENCE_ALT = 0°), attribution footer (code complete; awaiting manual visual QA)
+- [x] **Phase 2c** — Visual Polish + Milky Way Backdrop: WebGL panorama backdrop (ESO/S. Brunier, galactic equirectangular) + ambient CSS galaxy layer; point-based star rendering (halos only on mag ≤ 2); per-planet color tints + always-on labels; full-rectangle stereographic fill (REFERENCE_ALT = 0°); attribution footer. Code complete; awaiting visual QA across three reference observers.
 - [ ] **Phase 3** — Constellations + Enrichment: IAU overlays, SIMBAD + NASA Exoplanet Archive
 - [ ] **Phase 4** — Explore Mode: Three.js 3D flyable celestial sphere (behind the "Explore in 3D" button)
 - [ ] **Phase 5** — Polish + Deploy: landing, about, docker-compose, live URL
@@ -228,16 +232,17 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 ## Resume Here — Next Session
 
-**Paused:** 2026-05-17, Phase 2c backdrop layer wired to ESO/S. Brunier panorama.
+**Paused:** 2026-05-17, end of visual polish session.
 
-**Current state:** Phase 1 + 2a + 2b shipped. Phase 2c **code complete** on `feat/phase-2c-visual-polish`. Backdrop migrated from Mellinger 2.0 (non-commercial, asset never acquired) to ESO/S. Brunier GigaGalaxy Zoom panorama (eso0932a, CC BY 4.0). Asset at `client/public/milky-way.jpg` is now wired through both the ambient CSS `app-background` AND the WebGL `MilkyWayBackdrop` shader. Same galactic equirectangular projection → shader unchanged structurally, only the texture binding renamed (`uMellingerTex` → `uMilkyWayTex`). Phase 2b PR still unmerged.
+**Current state:** Phase 1 + 2a + 2b shipped. Phase 2c code complete on `feat/phase-2c-visual-polish` — **PR #1 open** against `main` (bundles Phase 2b + 2c, ~28 commits). Local + remote in sync.
 
-**Active branch:** `feat/phase-2c-visual-polish` (stacked on Phase 2b head).
+**What landed today (4 commits):** ESO/S. Brunier swap (CC BY 4.0 replaces Mellinger NC), Nominatim geocoder fallback, galaxy backdrop now visible across whole page (html-only bg-color), intro replays every load + no longer blocks on reduced-motion (fades aren't vestibular), HorizonRing removed, title trimmed to "The Sky", point-based star rendering with halo<core gradient crash fix. Frontend 133/133, backend 55/55.
 
-**Next up — one manual gate before Phase 3:**
-1. **Run visual QA.** Plan Task 18 — three reference observers: NYC summer (lat 40.71, lon -74.01, 2026-08-15T02:00:00Z, Milky Way in southern sky), Buenos Aires same instant (lat -34.61, lon -58.40, galactic core ~overhead), Anchorage winter (lat 61.22, lon -149.90, 2026-12-15T06:00:00Z). Verify WebGL fallback by disabling WebGL in DevTools. **Most likely surprise:** UV orientation on the ESO image — if galactic center lands in the wrong place, add 0.5 offset in the shader's `uv.x` (note in `inverseProjection.frag.js` already flags this).
+**Next up — two gates before Phase 3:**
+1. **Andrew's tweak ideas** (mentioned end of session, not specified) — ask first.
+2. **Three-observer visual QA.** Delray FL 2001-08-14 was eyeballed and looks great post-recalibration. Still need NYC summer (lat 40.71, lon -74.01, 2026-08-15T02:00:00Z, MW in southern sky), Buenos Aires same instant (lat -34.61, lon -58.40, galactic core ~overhead), Anchorage winter (lat 61.22, lon -149.90, 2026-12-15T06:00:00Z). **Most likely surprise:** UV orientation on the ESO image — if galactic center lands in the wrong place, add `+ 0.5` to `uv.x` in `inverseProjection.frag.js` (the shader header flags this).
 
-After visual QA passes: merge Phase 2c → Phase 3 (Constellations + Enrichment) — needs spec + plan.
+After both gates pass: merge PR #1 → main → Phase 3 (Constellations + Enrichment) needs spec + plan.
 
 ---
 
@@ -256,6 +261,10 @@ When working in this repo:
 9. **Preserve the dark immersive aesthetic.** Do not introduce light-mode styles, bright accent colors, or heavy UI chrome over the star map.
 10. **Respect rate limits on enrichment APIs.** SIMBAD, NASA Exoplanet Archive, and JPL Horizons must be cached. Never hammer these from the render path.
 11. **Milky Way panorama is ESO/S. Brunier (eso0932a, CC BY 4.0) — attribution required.** The backdrop (`client/public/milky-way.jpg`, 4000×2000 galactic equirectangular) is © ESO/S. Brunier, licensed under Creative Commons Attribution 4.0. Commercial use is allowed; attribution is not optional. **Implementation requirements:** (a) credit `Milky Way: ESO/S. Brunier · CC BY 4.0` in the persistent footer/AttributionFooter, (b) full credit + license link on the future `/about` page, (c) link to https://www.eso.org/public/images/eso0932a/ and https://creativecommons.org/licenses/by/4.0/ on `/about`, (d) source-file comment in `MilkyWayBackdrop.jsx` pointing to the license. **If the image is modified** (cropped, color-graded, etc.) the change must be indicated under CC BY 4.0 — projecting it through the shader is rendering, not modification of the source asset. See memory file `skyvault_eso_license.md`.
+12. **Star rendering is point-based (Stellarium-style).** Halos ONLY on mag ≤ 2 (~30 brightest); all others are anti-aliased dot circles via `arc + fill`. Do NOT add halo gradients to dim stars — they additively blob with `globalCompositeOperation: "lighter"` and produce the globular-cluster look we fixed 2026-05-17. Also: Canvas `gradient.addColorStop(offset, ...)` requires offsets in [0, 1] — when using `core/halo` as a stop position, ensure `halo > core` first or fall through to the dim path.
+13. **Two-layer Milky Way is deliberate.** `AppBackground` (CSS, ambient, page-wide) + `MilkyWayBackdrop` (WebGL, projected, inside chart). Both load `/milky-way.jpg`. Don't consolidate without asking — they serve different purposes (mood vs scientific projection). Galaxy backdrop visibility depends on `html` holding the bg-color while `body` and `#root` stay transparent; opaque bg on either hides the `z-index: -1` AppBackground.
+14. **Intro animation plays on every page load and does NOT gate on `prefers-reduced-motion`.** The intro is a soft opacity fade — fades aren't vestibular hazards per WCAG. The preference is still detected and stored on `useUiStateStore` (`prefersReducedMotion`) so Phase 4 Three.js (which DOES have motion) can read and respect it. Do not re-add a blanket `@media (prefers-reduced-motion: reduce)` rule that kills all keyframes.
+15. **Geocoder is dual-provider: Photon primary + Nominatim fallback.** Don't drop Nominatim — Photon outages happen (e.g., the 502 storm on 2026-05-17 that drove this design). Photon stays primary because Nominatim's public instance is rate-limited to ~1 req/sec and would die under autocomplete load.
 
 ---
 
