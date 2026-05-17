@@ -1,19 +1,23 @@
-"""Photon (OSM) geocoder client with in-memory TTL cache.
+"""OSM-backed geocoder client with Photon (primary) + Nominatim (fallback).
 
-Why Photon:
-    - Free and public (no API key required for reasonable use).
-    - Designed for autocomplete — fast responses, no rate-limit traps for
-      interactive use.
-    - Backed by OpenStreetMap data: global coverage, decent accuracy for
-      cities/towns/villages anywhere on Earth.
-    - Returns GeoJSON FeatureCollection which is straightforward to parse.
+Why two providers:
+    Photon is designed for autocomplete — fast, generous rate limits, fuzzy
+    matching, GeoJSON output. It's our primary. When Photon is unreachable
+    or returns 5xx (e.g. their service is down), we transparently fall back
+    to Nominatim — the older OSM geocoder. Both are backed by the same
+    OpenStreetMap data, so result quality is comparable; the response
+    shapes differ and each has its own parser.
+
+Why Nominatim only as fallback (not primary):
+    Nominatim's public instance enforces ~1 req/sec and bans abuse. It
+    works for occasional fallback usage but would die under autocomplete
+    load. Photon was built for the interactive case.
 
 Caching strategy:
     In-memory dict keyed on (query.lower().strip(), limit, lang). Entries
-    have a 1-hour TTL. When the cache grows past CACHE_MAX_ENTRIES, we sort
-    by insertion time and drop the oldest CACHE_EVICT_BATCH entries. This
-    is deliberately simple — async-lru and cachetools would both work but
-    add a dep for what's ~30 lines of code.
+    have a 1-hour TTL. Cached results don't track which provider answered
+    — both are OSM-backed. When the cache grows past CACHE_MAX_ENTRIES we
+    sort by insertion time and drop the oldest CACHE_EVICT_BATCH entries.
 """
 
 from __future__ import annotations
@@ -26,6 +30,9 @@ from app.schemas.geocode import GeocodeCandidate, GeocodeResponse
 
 
 PHOTON_BASE_URL = "https://photon.komoot.io/api"
+NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/search"
+PHOTON_SOURCE = "Photon (photon.komoot.io) / OpenStreetMap"
+NOMINATIM_SOURCE = "Nominatim (nominatim.openstreetmap.org) / OpenStreetMap"
 USER_AGENT = "SkyVault/0.1 (https://github.com/AndrewRobalino/skyvault)"
 REQUEST_TIMEOUT_SECONDS = 10.0
 CACHE_TTL_SECONDS = 3600
@@ -125,18 +132,53 @@ def _parse_feature(feature: dict) -> GeocodeCandidate | None:
     )
 
 
-async def geocode(query: str, *, limit: int = 5, lang: str = "en") -> GeocodeResponse:
-    """Fetch place candidates from Photon, with caching and error mapping.
+def _parse_nominatim_result(result: dict) -> GeocodeCandidate | None:
+    """Map one Nominatim search-result row into a GeocodeCandidate.
 
-    Raises:
-        GeocoderUnavailableError: network failure, timeout, or connection error.
-        GeocoderUpstreamError: non-2xx HTTP status from Photon.
+    Nominatim returns a flat object per result with `lat`/`lon` as strings
+    and structured address fields under `address` (when addressdetails=1).
     """
-    cache_key = _make_cache_key(query, limit, lang)
-    cached = _cache_get(cache_key)
-    if cached is not None:
-        return cached
+    try:
+        lat = float(result["lat"])
+        lon = float(result["lon"])
+    except (KeyError, TypeError, ValueError):
+        return None
 
+    if not (-90.0 <= lat <= 90.0 and -180.0 <= lon <= 180.0):
+        return None
+
+    name = result.get("name") or ""
+    if not name:
+        # Fall back to first segment of display_name if `name` is missing.
+        display = result.get("display_name") or ""
+        name = display.split(",", 1)[0].strip()
+        if not name:
+            return None
+
+    address = result.get("address") or {}
+    state = address.get("state")
+    country = address.get("country")
+
+    osm_type = result.get("osm_type")
+    osm_id_raw = result.get("osm_id")
+    osm_id = str(osm_id_raw) if osm_id_raw is not None else None
+    place_type = result.get("type")
+
+    return GeocodeCandidate(
+        display_name=_build_display_name(name, state, country),
+        name=name,
+        country=country,
+        state=state,
+        lat=lat,
+        lon=lon,
+        osm_type=osm_type,
+        osm_id=osm_id,
+        place_type=place_type,
+    )
+
+
+async def _call_photon(query: str, limit: int, lang: str) -> GeocodeResponse:
+    """Query Photon and return a parsed response. Raises on failure."""
     params = {"q": query, "limit": limit, "lang": lang}
     headers = {"User-Agent": USER_AGENT}
 
@@ -149,28 +191,71 @@ async def geocode(query: str, *, limit: int = 5, lang: str = "en") -> GeocodeRes
         raise GeocoderUnavailableError(f"Photon request failed: {exc}") from exc
 
     if resp.status_code >= 500:
-        raise GeocoderUpstreamError(
-            f"Photon returned HTTP {resp.status_code}"
-        )
+        raise GeocoderUpstreamError(f"Photon returned HTTP {resp.status_code}")
     if resp.status_code >= 400:
         # 4xx from Photon usually means a malformed query — treat as empty.
-        response = GeocodeResponse(query=query, candidates=[], count=0)
-        _cache_put(cache_key, response)
-        return response
+        return GeocodeResponse(query=query, candidates=[], count=0, source=PHOTON_SOURCE)
 
-    payload = resp.json()
-    features = payload.get("features") or []
-
-    candidates: list[GeocodeCandidate] = []
-    for feature in features:
-        parsed = _parse_feature(feature)
-        if parsed is not None:
-            candidates.append(parsed)
-
-    response = GeocodeResponse(
+    features = (resp.json() or {}).get("features") or []
+    candidates = [c for c in (_parse_feature(f) for f in features) if c is not None]
+    return GeocodeResponse(
         query=query,
         candidates=candidates,
         count=len(candidates),
+        source=PHOTON_SOURCE,
     )
+
+
+async def _call_nominatim(query: str, limit: int, lang: str) -> GeocodeResponse:
+    """Query Nominatim and return a parsed response. Raises on failure."""
+    params = {
+        "q": query,
+        "limit": limit,
+        "format": "json",
+        "addressdetails": 1,
+        "accept-language": lang,
+    }
+    headers = {"User-Agent": USER_AGENT}
+
+    try:
+        async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT_SECONDS) as client:
+            resp = await client.get(NOMINATIM_BASE_URL, params=params, headers=headers)
+    except httpx.TimeoutException as exc:
+        raise GeocoderUnavailableError(f"Nominatim request timed out: {exc}") from exc
+    except httpx.RequestError as exc:
+        raise GeocoderUnavailableError(f"Nominatim request failed: {exc}") from exc
+
+    if resp.status_code >= 500:
+        raise GeocoderUpstreamError(f"Nominatim returned HTTP {resp.status_code}")
+    if resp.status_code >= 400:
+        return GeocodeResponse(query=query, candidates=[], count=0, source=NOMINATIM_SOURCE)
+
+    rows = resp.json() or []
+    candidates = [c for c in (_parse_nominatim_result(r) for r in rows) if c is not None]
+    return GeocodeResponse(
+        query=query,
+        candidates=candidates,
+        count=len(candidates),
+        source=NOMINATIM_SOURCE,
+    )
+
+
+async def geocode(query: str, *, limit: int = 5, lang: str = "en") -> GeocodeResponse:
+    """Fetch place candidates with Photon primary + Nominatim fallback.
+
+    Raises:
+        GeocoderUnavailableError: both providers had network/timeout failures.
+        GeocoderUpstreamError: both providers returned 5xx (or one had each).
+    """
+    cache_key = _make_cache_key(query, limit, lang)
+    cached = _cache_get(cache_key)
+    if cached is not None:
+        return cached
+
+    try:
+        response = await _call_photon(query, limit, lang)
+    except (GeocoderUnavailableError, GeocoderUpstreamError):
+        response = await _call_nominatim(query, limit, lang)
+
     _cache_put(cache_key, response)
     return response
