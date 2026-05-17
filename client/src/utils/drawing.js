@@ -13,30 +13,42 @@ import { horizonHaze } from "./horizonHaze.js";
 /**
  * Color amplification factor for star halos.
  *
- *   mag ≤ 1 → 1.0 (full BP-RP color visible: Vega blue, Betelgeuse orange)
- *   mag ≥ 4 → 0.0 (near-white; prevents dim-star confetti)
+ *   mag ≤ 1.5 → 1.0 (full BP-RP color: Vega blue, Betelgeuse orange)
+ *   mag ≥ 6   → 0.0 (near-white; eye can't resolve color at very dim mags)
  *   linear interpolation between
  */
 export function colorAmpFactor(magnitude) {
-  if (magnitude <= 1) return 1.0;
-  if (magnitude >= 4) return 0.0;
-  return 1 - (magnitude - 1) / 3;
+  if (magnitude <= 1.5) return 1.0;
+  if (magnitude >= 6) return 0.0;
+  return 1 - (magnitude - 1.5) / 4.5;
 }
 
-// Calibration stops: [magnitude breakpoint, core px, halo px]
+/**
+ * Calibration stops: [magnitude breakpoint, core radius px, halo radius px].
+ *
+ * Stellarium-style point rendering: only the ~30 brightest stars (mag ≤ 2)
+ * get a visible glow halo. Everything dimmer is a tiny anti-aliased dot,
+ * so dense star fields don't blob together under additive blending.
+ */
 const STAR_GLOW_STOPS = [
-  [0, 3.0, 18],
-  [2, 2.5, 12],
-  [4, 2.0, 6],
-  [6, 1.5, 3],
+  [-1.5, 1.8, 10],  // Sirius-tier: notable bloom
+  [0, 1.5, 6],      // Vega-class
+  [1, 1.2, 3],      // Polaris/Arcturus-class — small halo
+  [2, 1.0, 0],      // halo cutoff — just a bright dot from here
+  [3, 0.85, 0],
+  [4, 0.7, 0],
+  [5, 0.6, 0],
+  [6, 0.5, 0],
 ];
 
-const DIM_TIER = { core: 1.0, halo: 0 }; // mag > 6 or invalid
+const DIM_TIER = { core: 0.5, halo: 0 }; // mag > 6 or invalid
 
 export function magnitudeToGlow(mag) {
   if (mag == null || !Number.isFinite(mag)) return { ...DIM_TIER };
   if (mag > 6) return { ...DIM_TIER };
-  if (mag <= 0) return { core: STAR_GLOW_STOPS[0][1], halo: STAR_GLOW_STOPS[0][2] };
+  if (mag <= STAR_GLOW_STOPS[0][0]) {
+    return { core: STAR_GLOW_STOPS[0][1], halo: STAR_GLOW_STOPS[0][2] };
+  }
 
   for (let i = 0; i < STAR_GLOW_STOPS.length - 1; i++) {
     const [m0, c0, h0] = STAR_GLOW_STOPS[i];
@@ -100,9 +112,14 @@ export function drawStar(ctx, star) {
   const haloColor = blendHex(color, "#ffaa66", redShift);
   const coreAlpha = brightnessMul;
 
-  if (halo === 0) {
+  // Anti-aliased point path: when there's no halo, or when interpolation has
+  // shrunk the halo below the core (Canvas gradient stops must be in [0, 1],
+  // so core/halo > 1 is invalid). Tiny filled circle, no gradient.
+  if (halo === 0 || halo <= core) {
     ctx.fillStyle = hexToRgba(haloColor, coreAlpha);
-    ctx.fillRect(x - core / 2, y - core / 2, core, core);
+    ctx.beginPath();
+    ctx.arc(x, y, core, 0, Math.PI * 2);
+    ctx.fill();
     return;
   }
 

@@ -9,43 +9,69 @@ import {
 } from "../utils/drawing.js";
 
 describe("magnitudeToGlow", () => {
-  it("brightest tier (mag <= 0) returns bold halo", () => {
-    expect(magnitudeToGlow(-1.46)).toEqual({ core: 3.0, halo: 18 });
-    expect(magnitudeToGlow(0)).toEqual({ core: 3.0, halo: 18 });
+  it("brightest stars clamp/approach the top-tier halo (Sirius-class)", () => {
+    // Anything at or below the top breakpoint (-1.5) clamps exactly.
+    expect(magnitudeToGlow(-2)).toEqual({ core: 1.8, halo: 10 });
+    expect(magnitudeToGlow(-1.5)).toEqual({ core: 1.8, halo: 10 });
+    // Sirius (-1.46) sits just inside the first interval — nearly identical.
+    const sirius = magnitudeToGlow(-1.46);
+    expect(sirius.core).toBeCloseTo(1.79, 2);
+    expect(sirius.halo).toBeCloseTo(9.89, 2);
   });
 
-  it("mag 0–2 tier returns medium halo", () => {
-    expect(magnitudeToGlow(2)).toEqual({ core: 2.5, halo: 12 });
+  it("mag 0 (Vega-class) returns notable halo", () => {
+    expect(magnitudeToGlow(0)).toEqual({ core: 1.5, halo: 6 });
   });
 
-  it("mag 2–4 tier returns smaller halo", () => {
-    expect(magnitudeToGlow(4)).toEqual({ core: 2.0, halo: 6 });
+  it("mag 1 (Polaris-class) returns small halo", () => {
+    expect(magnitudeToGlow(1)).toEqual({ core: 1.2, halo: 3 });
   });
 
-  it("mag 4–6 tier returns dim halo", () => {
-    expect(magnitudeToGlow(6)).toEqual({ core: 1.5, halo: 3 });
+  it("mag 2 sits exactly at the halo cutoff (no glow from here on)", () => {
+    expect(magnitudeToGlow(2)).toEqual({ core: 1.0, halo: 0 });
   });
 
-  it("mag > 6 clamps to pixel-dot tier (no halo)", () => {
-    expect(magnitudeToGlow(6.5)).toEqual({ core: 1.0, halo: 0 });
-    expect(magnitudeToGlow(10)).toEqual({ core: 1.0, halo: 0 });
+  it("mid-mag stars (3, 4) are tiny dots with no halo", () => {
+    expect(magnitudeToGlow(3)).toEqual({ core: 0.85, halo: 0 });
+    expect(magnitudeToGlow(4)).toEqual({ core: 0.7, halo: 0 });
+  });
+
+  it("dimmest visible (mag 5, 6) are sub-pixel dots", () => {
+    expect(magnitudeToGlow(5)).toEqual({ core: 0.6, halo: 0 });
+    expect(magnitudeToGlow(6)).toEqual({ core: 0.5, halo: 0 });
+  });
+
+  it("mag > 6 clamps to dim tier", () => {
+    expect(magnitudeToGlow(6.5)).toEqual({ core: 0.5, halo: 0 });
+    expect(magnitudeToGlow(10)).toEqual({ core: 0.5, halo: 0 });
   });
 
   it("interpolates linearly between breakpoints", () => {
-    // Midway between mag 0 (core 3.0, halo 18) and mag 2 (core 2.5, halo 12)
-    const { core, halo } = magnitudeToGlow(1);
-    expect(core).toBeCloseTo(2.75, 5);
-    expect(halo).toBeCloseTo(15, 5);
+    // Midway between mag 0 (core 1.5, halo 6) and mag 1 (core 1.2, halo 3)
+    const { core, halo } = magnitudeToGlow(0.5);
+    expect(core).toBeCloseTo(1.35, 5);
+    expect(halo).toBeCloseTo(4.5, 5);
   });
 
   it("returns sane default for null/NaN magnitude", () => {
-    expect(magnitudeToGlow(null)).toEqual({ core: 1.0, halo: 0 });
-    expect(magnitudeToGlow(undefined)).toEqual({ core: 1.0, halo: 0 });
-    expect(magnitudeToGlow(NaN)).toEqual({ core: 1.0, halo: 0 });
+    expect(magnitudeToGlow(null)).toEqual({ core: 0.5, halo: 0 });
+    expect(magnitudeToGlow(undefined)).toEqual({ core: 0.5, halo: 0 });
+    expect(magnitudeToGlow(NaN)).toEqual({ core: 0.5, halo: 0 });
   });
 });
 
 function makeMockCtx() {
+  // Mirror the real CanvasGradient.addColorStop contract — throw IndexSizeError
+  // when the offset is outside [0, 1], so tests catch the same bug a browser would.
+  const makeGradient = () => ({
+    addColorStop: vi.fn((offset, _color) => {
+      if (offset < 0 || offset > 1 || !Number.isFinite(offset)) {
+        throw new RangeError(
+          `addColorStop: offset ${offset} is outside [0, 1]`
+        );
+      }
+    }),
+  });
   return {
     save: vi.fn(),
     restore: vi.fn(),
@@ -54,9 +80,7 @@ function makeMockCtx() {
     ellipse: vi.fn(),
     fill: vi.fn(),
     stroke: vi.fn(),
-    createRadialGradient: vi.fn(() => ({
-      addColorStop: vi.fn(),
-    })),
+    createRadialGradient: vi.fn(makeGradient),
     fillRect: vi.fn(),
     set fillStyle(_) {},
     set strokeStyle(_) {},
@@ -66,20 +90,33 @@ function makeMockCtx() {
 }
 
 describe("drawStar", () => {
-  it("draws a filled rect (1px) for dim stars with halo=0", () => {
+  it("draws an anti-aliased arc (not a rect) for dim stars with halo=0", () => {
     const ctx = makeMockCtx();
     drawStar(ctx, { x: 100, y: 100, magnitude: 7, bp_rp: null });
-    expect(ctx.fillRect).toHaveBeenCalled();
-    // No gradient for dim stars
+    expect(ctx.arc).toHaveBeenCalled();
+    expect(ctx.fill).toHaveBeenCalled();
+    expect(ctx.fillRect).not.toHaveBeenCalled();
+    // No gradient halo for dim stars
     expect(ctx.createRadialGradient).not.toHaveBeenCalled();
   });
 
-  it("draws a radial gradient halo for bright stars", () => {
+  it("draws a radial gradient halo for bright stars (mag <= 2)", () => {
     const ctx = makeMockCtx();
     drawStar(ctx, { x: 400, y: 200, magnitude: -1.46, bp_rp: 0.02 });
     expect(ctx.createRadialGradient).toHaveBeenCalled();
     expect(ctx.arc).toHaveBeenCalled();
     expect(ctx.fill).toHaveBeenCalled();
+  });
+
+  it("does NOT throw when magnitude interpolates into a halo < core regime", () => {
+    // Regression: at mag ~1.9 the linear interp between [1, core 1.2, halo 3]
+    // and [2, core 1.0, halo 0] gives halo ≈ 0.3 and core ≈ 1.02 — passing
+    // core/halo (~3.4) into gradient.addColorStop blows up with IndexSizeError
+    // because stop positions must be in [0,1]. Fall through to the dim path.
+    const ctx = makeMockCtx();
+    expect(() =>
+      drawStar(ctx, { x: 100, y: 100, magnitude: 1.9, bp_rp: 0.5, alt: 60 })
+    ).not.toThrow();
   });
 });
 
@@ -106,21 +143,23 @@ describe("drawPlanet", () => {
 });
 
 describe("colorAmpFactor", () => {
-  it("brightest stars (mag <= 1) → full color (1.0)", () => {
+  it("brightest stars (mag <= 1.5) → full color (1.0)", () => {
     expect(colorAmpFactor(-1.46)).toBe(1.0);
     expect(colorAmpFactor(0)).toBe(1.0);
-    expect(colorAmpFactor(1)).toBe(1.0);
+    expect(colorAmpFactor(1.5)).toBe(1.0);
   });
 
-  it("mag = 4 or higher → near-white (0.0)", () => {
-    expect(colorAmpFactor(4)).toBe(0.0);
+  it("mag = 6 or higher → near-white (0.0)", () => {
     expect(colorAmpFactor(6)).toBe(0.0);
+    expect(colorAmpFactor(7)).toBe(0.0);
     expect(colorAmpFactor(10)).toBe(0.0);
   });
 
-  it("interpolates linearly between mag=1 and mag=4", () => {
-    expect(colorAmpFactor(2.5)).toBeCloseTo(0.5, 4);
-    expect(colorAmpFactor(2)).toBeCloseTo(0.667, 2);
+  it("interpolates linearly between mag=1.5 and mag=6", () => {
+    // Midpoint at mag = 3.75 → 0.5
+    expect(colorAmpFactor(3.75)).toBeCloseTo(0.5, 4);
+    // Mag 4 still retains ~44% color
+    expect(colorAmpFactor(4)).toBeCloseTo(0.444, 2);
   });
 });
 
