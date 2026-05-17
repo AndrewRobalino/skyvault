@@ -120,7 +120,7 @@ describe("<SkyChart>", () => {
 
   it("mounts the AttributionFooter (Phase 2c license-critical attribution)", () => {
     renderWithProviders(<SkyChart />);
-    expect(screen.getByText(/Axel Mellinger/i)).toBeInTheDocument();
+    expect(screen.getByText(/Brunier/i)).toBeInTheDocument();
     expect(screen.getByText(/Gaia DR3/i)).toBeInTheDocument();
   });
 

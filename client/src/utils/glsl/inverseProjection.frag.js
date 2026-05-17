@@ -1,6 +1,7 @@
 /**
- * Fragment shader: warps the Mellinger panorama (galactic equirectangular)
- * onto the sky canvas via inverse stereographic AltAz projection.
+ * Fragment shader: warps an all-sky Milky Way panorama (galactic
+ * equirectangular) onto the sky canvas via inverse stereographic AltAz
+ * projection.
  *
  * Per pixel:
  *   1. screen pixel → polar (r, θ) from canvas center
@@ -8,7 +9,7 @@
  *   3. (alt, az) + (lat, LST) → equatorial (RA, Dec)
  *   4. equatorial (RA, Dec) → galactic (l, b) via fixed J2000 rotation
  *   5. (l, b) → texture coords (u, v)
- *   6. sample Mellinger; apply dim factor based on alt
+ *   6. sample panorama; apply dim factor based on alt
  *
  * The math in steps 1-2 mirrors client/src/utils/inverseStereographic.js
  * exactly. The galactic transform constants are J2000 (Liu et al. 2011).
@@ -22,7 +23,7 @@ uniform vec2 uResolution;       // canvas width, height (CSS px)
 uniform float uReferenceAlt;    // projection reference altitude (radians)
 uniform float uLST;             // local sidereal time (radians)
 uniform float uObserverLat;     // observer latitude (radians)
-uniform sampler2D uMellingerTex;
+uniform sampler2D uMilkyWayTex;
 uniform float uBelowHorizonDim; // dim factor for alt < 0 (e.g. 0.25)
 uniform float uHorizonHazeStart;// alt threshold where haze begins (radians, e.g. 30°)
 
@@ -88,12 +89,13 @@ void main() {
   equatorialToGalactic(ra, dec, l, b);
 
   // Galactic equirectangular texture mapping:
-  //   u = l / 2π   (note: many Mellinger distributions wrap l so that
-  //                 l = 0 sits at the LEFT edge of the texture)
+  //   u = l / 2π   (l = 0 / galactic center sits at the LEFT edge for most
+  //                 galactic equirectangular panoramas, including ESO/S. Brunier
+  //                 eso0932a. If a future panorama centers l = 0, add 0.5 here.)
   //   v = (b + π/2) / π
   vec2 uv = vec2(l / TAU, (b + PI * 0.5) / PI);
 
-  vec3 rgb = texture2D(uMellingerTex, uv).rgb;
+  vec3 rgb = texture2D(uMilkyWayTex, uv).rgb;
 
   // Dim factor based on altitude.
   float dim = 1.0;

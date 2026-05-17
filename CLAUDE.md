@@ -45,7 +45,7 @@ All sources are real institutional datasets. **No faked, mocked, or approximated
 | **Gaia DR3** (G < 8 subset, ~230k stars) | Star positions (ICRS), magnitudes, parallax, proper motion, BP-RP color | **ESA** | One-time ingest via Gaia TAP (astroquery.gaia), stored as parquet in `server/data/` |
 | **JPL DE421 ephemeris** | Sun, Moon, Mercury–Neptune positions | **NASA JPL** | Astropy's `solar_system_ephemeris.set('de421')` |
 | **IAU constellation data** | Official 88 constellations, stick figures, boundaries | **IAU** | Static data, committed to repo |
-| **Mellinger 2.0 All-Sky Milky Way Panorama** | Photo-realistic Milky Way backdrop (galactic equirectangular) | **© Axel Mellinger** | Static asset at `client/public/assets/mellinger_2_galactic.webp`, sampled by WebGL shader (Phase 2c). **Non-commercial license — see Guardrails.** |
+| **ESO/S. Brunier GigaGalaxy Zoom panorama** (eso0932a) | Photo-realistic Milky Way backdrop (galactic equirectangular, 4000×2000) | **ESO/S. Brunier** | Static asset at `client/public/milky-way.jpg`, sampled by WebGL shader (Phase 2c). Also used as ambient page backdrop via CSS. **CC BY 4.0 — attribution required.** |
 
 ### Tier 2 — Enrichment APIs (cold path, lazy, cached)
 
@@ -61,7 +61,7 @@ Activated progressively across phases. Each lives in its own module under `serve
 - The `/about` page lists every source with institution name, dataset version, and link to the original.
 - Every API response object includes a `source` field (e.g., `"Gaia DR3"`, `"JPL DE421 via Astropy"`, `"SIMBAD/CDS"`).
 - Every UI info card displays a source badge.
-- Persistent footer: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD · NASA Exoplanet Archive · Milky Way panorama © Axel Mellinger"*
+- Persistent footer: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD · NASA Exoplanet Archive · Milky Way panorama: ESO/S. Brunier (CC BY 4.0)"*
 
 ---
 
@@ -215,7 +215,7 @@ This project lives or dies on accuracy. Non-negotiable:
 - [x] **Phase 1** — Foundation: Gaia ingest script, backend API serves accurate star + planet positions (Gaia DR3 + JPL DE421, real data, tests green)
 - [x] **Phase 2a** — Frontend Foundation: Vite + React shell, intro animation, controls strip, info panels, 32 frontend tests + 52 backend tests passing
 - [x] **Phase 2b** — 2D Sky Chart: Canvas 2D stereographic projection inside the hero placeholder
-- [x] **Phase 2c** — Visual Polish + Milky Way Backdrop: WebGL Mellinger backdrop, horizon haze ring, per-planet color tints + glow rings + always-on labels, full-rectangle stereographic fill (REFERENCE_ALT = 0°), attribution footer (code complete; awaiting asset placement + manual visual QA)
+- [x] **Phase 2c** — Visual Polish + Milky Way Backdrop: WebGL panorama backdrop (ESO/S. Brunier, galactic equirectangular), horizon haze ring, per-planet color tints + glow rings + always-on labels, full-rectangle stereographic fill (REFERENCE_ALT = 0°), attribution footer (code complete; awaiting manual visual QA)
 - [ ] **Phase 3** — Constellations + Enrichment: IAU overlays, SIMBAD + NASA Exoplanet Archive
 - [ ] **Phase 4** — Explore Mode: Three.js 3D flyable celestial sphere (behind the "Explore in 3D" button)
 - [ ] **Phase 5** — Polish + Deploy: landing, about, docker-compose, live URL
@@ -228,17 +228,16 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 ## Resume Here — Next Session
 
-**Paused:** 2026-04-27, Phase 2c implementation complete.
+**Paused:** 2026-05-17, Phase 2c backdrop layer wired to ESO/S. Brunier panorama.
 
-**Current state:** Phase 1 + 2a + 2b shipped. Phase 2c **code complete** on `feat/phase-2c-visual-polish` — 134 frontend tests pass, lint clean. Mellinger backdrop layer, horizon ring, per-planet tints + always-on labels, attribution footer, REFERENCE_ALT=0 full-rectangle stereographic. Phase 2b PR still unmerged.
+**Current state:** Phase 1 + 2a + 2b shipped. Phase 2c **code complete** on `feat/phase-2c-visual-polish`. Backdrop migrated from Mellinger 2.0 (non-commercial, asset never acquired) to ESO/S. Brunier GigaGalaxy Zoom panorama (eso0932a, CC BY 4.0). Asset at `client/public/milky-way.jpg` is now wired through both the ambient CSS `app-background` AND the WebGL `MilkyWayBackdrop` shader. Same galactic equirectangular projection → shader unchanged structurally, only the texture binding renamed (`uMellingerTex` → `uMilkyWayTex`). Phase 2b PR still unmerged.
 
 **Active branch:** `feat/phase-2c-visual-polish` (stacked on Phase 2b head).
 
-**Next up — two manual gates before Phase 3:**
-1. **Place the Mellinger asset.** Download from https://galaxy.phys.cmich.edu/~axel/mwpan2/, convert to WebP at 4096×2048 (q=80, target 3–6 MB), save to `client/public/assets/mellinger_2_galactic.webp`. Asset is **gitignored** — keep it local. Commit with `assets: add Mellinger 2.0 galactic panorama (© Axel Mellinger, non-commercial use)`.
-2. **Run visual QA.** Plan Task 18 — verify three reference observers (NYC summer, Buenos Aires same instant, Anchorage winter) plus WebGL fallback in DevTools.
+**Next up — one manual gate before Phase 3:**
+1. **Run visual QA.** Plan Task 18 — three reference observers: NYC summer (lat 40.71, lon -74.01, 2026-08-15T02:00:00Z, Milky Way in southern sky), Buenos Aires same instant (lat -34.61, lon -58.40, galactic core ~overhead), Anchorage winter (lat 61.22, lon -149.90, 2026-12-15T06:00:00Z). Verify WebGL fallback by disabling WebGL in DevTools. **Most likely surprise:** UV orientation on the ESO image — if galactic center lands in the wrong place, add 0.5 offset in the shader's `uv.x` (note in `inverseProjection.frag.js` already flags this).
 
-After both gates: merge Phase 2c → Phase 3 (Constellations + Enrichment) — needs spec + plan.
+After visual QA passes: merge Phase 2c → Phase 3 (Constellations + Enrichment) — needs spec + plan.
 
 ---
 
@@ -256,7 +255,7 @@ When working in this repo:
 8. **No TypeScript migration** in v1. We committed to JS. Revisit post-launch.
 9. **Preserve the dark immersive aesthetic.** Do not introduce light-mode styles, bright accent colors, or heavy UI chrome over the star map.
 10. **Respect rate limits on enrichment APIs.** SIMBAD, NASA Exoplanet Archive, and JPL Horizons must be cached. Never hammer these from the render path.
-11. **Mellinger 2.0 license is non-commercial — non-negotiable.** The Milky Way backdrop (`client/public/assets/mellinger_2_galactic.webp`) is © Axel Mellinger, licensed for personal/educational/scientific/non-commercial use with attribution. **Implementation requirements:** (a) attribution `Milky Way panorama © Axel Mellinger` in the persistent footer, (b) link to https://galaxy.phys.cmich.edu/~axel/mwpan2/ on the future `/about` page, (c) source-file comment in the backdrop loading module pointing to the license. **Forbidden:** ads on the deployed site, paid access, relicensing, repackaging the asset as Andrew's work. **If SkyVault ever pivots to commercial use:** the Mellinger backdrop must be removed or licensed explicitly from Mellinger before launch. See memory file `skyvault_mellinger_license.md` for full rules.
+11. **Milky Way panorama is ESO/S. Brunier (eso0932a, CC BY 4.0) — attribution required.** The backdrop (`client/public/milky-way.jpg`, 4000×2000 galactic equirectangular) is © ESO/S. Brunier, licensed under Creative Commons Attribution 4.0. Commercial use is allowed; attribution is not optional. **Implementation requirements:** (a) credit `Milky Way: ESO/S. Brunier · CC BY 4.0` in the persistent footer/AttributionFooter, (b) full credit + license link on the future `/about` page, (c) link to https://www.eso.org/public/images/eso0932a/ and https://creativecommons.org/licenses/by/4.0/ on `/about`, (d) source-file comment in `MilkyWayBackdrop.jsx` pointing to the license. **If the image is modified** (cropped, color-graded, etc.) the change must be indicated under CC BY 4.0 — projecting it through the shader is rendering, not modification of the source asset. See memory file `skyvault_eso_license.md`.
 
 ---
 

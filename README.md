@@ -2,7 +2,7 @@
 
 > Explore the night sky from any place, any moment in time.
 
-**SkyVault** is an interactive web app that renders an accurate night sky for any date, time, and location on Earth. Star positions come from **ESA Gaia DR3**, planet positions from **NASA JPL DE421**, constellations from the **IAU**, enrichment data from **NASA Exoplanet Archive** and **CDS SIMBAD**, and the photo-realistic Milky Way backdrop is **Axel Mellinger's All-Sky Milky Way Panorama 2.0**. Every data point is attributed — no faked values, no approximations.
+**SkyVault** is an interactive web app that renders an accurate night sky for any date, time, and location on Earth. Star positions come from **ESA Gaia DR3**, planet positions from **NASA JPL DE421**, constellations from the **IAU**, enrichment data from **NASA Exoplanet Archive** and **CDS SIMBAD**, and the photo-realistic Milky Way backdrop is the **ESO/S. Brunier GigaGalaxy Zoom panorama** (eso0932a). Every data point is attributed — no faked values, no approximations.
 
 Built with React, Vite, Canvas 2D + WebGL, FastAPI, and Astropy.
 
@@ -26,12 +26,12 @@ SkyVault uses real, attributed institutional data sources. No values are faked o
 | **IAU constellations** | Official 88 constellations + stick figures (Phase 3) | IAU | Public domain |
 | **NASA Exoplanet Archive** | Confirmed exoplanets and host stars (Phase 3) | NASA / IPAC | Public domain |
 | **CDS SIMBAD** | Canonical object metadata (Phase 3) | CDS Strasbourg | Free for academic / non-commercial use |
-| **Mellinger 2.0 panorama** | All-sky Milky Way backdrop image | Axel Mellinger (Central Michigan University) | Free for non-commercial use with attribution |
+| **ESO/S. Brunier panorama** (eso0932a) | All-sky Milky Way backdrop image (galactic equirectangular, 4000×2000) | ESO / Serge Brunier (GigaGalaxy Zoom Project) | CC BY 4.0 |
 
-The Mellinger 2.0 panorama is © Axel Mellinger and is used here under his
-non-commercial license terms. SkyVault is and will remain a free public
-project (no ads, no paid access). For the original panorama, see:
-<https://galaxy.phys.cmich.edu/~axel/mwpan2/>. Full license rules in
+The Milky Way panorama is © ESO/S. Brunier from the GigaGalaxy Zoom Project,
+licensed under [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/).
+For the original image and project notes, see:
+<https://www.eso.org/public/images/eso0932a/>. Attribution rules in
 [`CLAUDE.md`](./CLAUDE.md) guardrail #11.
 
 ## Structure

@@ -5,9 +5,10 @@ import AttributionFooter from "../components/hero/AttributionFooter.jsx";
 describe("AttributionFooter", () => {
   beforeEach(() => cleanup());
 
-  it("includes Mellinger attribution (license-critical)", () => {
+  it("includes Milky Way panorama attribution (CC BY 4.0 — license-critical)", () => {
     render(<AttributionFooter />);
-    expect(screen.getByText(/Axel Mellinger/i)).toBeTruthy();
+    expect(screen.getByText(/Brunier/i)).toBeTruthy();
+    expect(screen.getByText(/CC BY 4\.0/i)).toBeTruthy();
   });
 
   it("includes ESA Gaia DR3 attribution", () => {

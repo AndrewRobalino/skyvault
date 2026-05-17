@@ -6,19 +6,20 @@ import { INVERSE_PROJECTION_FRAG } from "../../utils/glsl/inverseProjection.frag
 import { REFERENCE_ALT } from "../../utils/projection.js";
 
 /**
- * MilkyWayBackdrop — WebGL layer rendering the Mellinger 2.0 all-sky panorama
+ * MilkyWayBackdrop — WebGL layer rendering an all-sky Milky Way panorama
  * projected through inverse stereographic AltAz onto the sky chart.
  *
- * LICENSE NOTICE: The Mellinger 2.0 panorama (© Axel Mellinger) is used here
- * under its non-commercial license. SkyVault must remain free of ads, paid
- * access, and commercial monetization while shipping this asset.
- * If those terms ever change, this asset MUST be replaced or licensed
- * explicitly. See: skyvault_mellinger_license.md memory.
+ * Asset: ESO/S. Brunier GigaGalaxy Zoom panorama (eso0932a), galactic
+ * equirectangular, CC BY 4.0. The fragment shader expects galactic coords
+ * and applies the J2000 galactic→equatorial rotation internally — so any
+ * open-licensed all-sky galactic equirectangular image is a drop-in.
  *
- * Source: https://galaxy.phys.cmich.edu/~axel/mwpan2/
+ * Attribution is rendered by the AttributionFooter sibling layer.
+ * Source: https://www.eso.org/public/images/eso0932a/
+ * License: https://creativecommons.org/licenses/by/4.0/
  */
 
-const MELLINGER_ASSET = "/assets/mellinger_2_galactic.webp";
+const MILKY_WAY_ASSET = "/milky-way.jpg";
 const DEG = Math.PI / 180;
 
 // Probe at module/render time so the fallback decision is made before any
@@ -71,7 +72,7 @@ export default function MilkyWayBackdrop({ width, height, dpr, lat, lon, datetim
       uReferenceAlt: gl.getUniformLocation(program, "uReferenceAlt"),
       uLST: gl.getUniformLocation(program, "uLST"),
       uObserverLat: gl.getUniformLocation(program, "uObserverLat"),
-      uMellingerTex: gl.getUniformLocation(program, "uMellingerTex"),
+      uMilkyWayTex: gl.getUniformLocation(program, "uMilkyWayTex"),
       uBelowHorizonDim: gl.getUniformLocation(program, "uBelowHorizonDim"),
       uHorizonHazeStart: gl.getUniformLocation(program, "uHorizonHazeStart"),
     };
@@ -95,9 +96,9 @@ export default function MilkyWayBackdrop({ width, height, dpr, lat, lon, datetim
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
     };
     img.onerror = () => {
-      console.warn("[MilkyWayBackdrop] Mellinger image failed to load — keeping placeholder.");
+      console.warn("[MilkyWayBackdrop] Milky Way panorama failed to load — keeping placeholder.");
     };
-    img.src = MELLINGER_ASSET;
+    img.src = MILKY_WAY_ASSET;
 
     return () => {
       glStateRef.current = null;
@@ -124,7 +125,7 @@ export default function MilkyWayBackdrop({ width, height, dpr, lat, lon, datetim
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.uniform1i(uniforms.uMellingerTex, 0);
+    gl.uniform1i(uniforms.uMilkyWayTex, 0);
 
     gl.uniform2f(uniforms.uResolution, canvas.width, canvas.height);
     gl.uniform1f(uniforms.uReferenceAlt, REFERENCE_ALT * DEG);
