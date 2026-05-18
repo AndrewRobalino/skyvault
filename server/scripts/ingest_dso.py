@@ -25,17 +25,27 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Curated list
 #
-# ``simbad``           — identifier passed to SIMBAD TAP
-# ``id``               — canonical short id used in the API
-# ``magnitude_fallback`` — published V magnitude used when SIMBAD lacks one
+# ``simbad``                    — identifier passed to SIMBAD TAP
+# ``id``                        — canonical short id used in the API
+# ``magnitude_fallback``        — published V magnitude used when SIMBAD lacks one
+# ``angular_size_fallback_arcmin`` (optional) — major axis from published refs;
+#                                  used when SIMBAD lacks galdim_majaxis. Extended
+#                                  nebulae often lack catalogued dimensions in SIMBAD.
+# ``minor_axis_fallback_arcmin`` (optional) — minor axis fallback, same idea
+# ``prefer_reference_magnitude`` (optional bool) — force use of magnitude_fallback
+#                                  even when SIMBAD has a V. Needed for planetary
+#                                  nebulae where SIMBAD reports the central star
+#                                  magnitude, not the integrated nebula brightness.
 #
-# magnitude_fallback sources (V magnitude, integrated for extended objects):
+# Reference sources (V magnitude integrated for extended objects; angular sizes
+# in arcminutes):
 #   RC3       — de Vaucouleurs et al. 1991 (Third Reference Catalog of Bright Galaxies)
 #   Harris96  — Harris 1996 GC catalog (globular clusters)
 #   SkyCat    — Sky Catalog 2000.0 (Hirshfeld & Sinnott)
 #   NED-L5    — NED-LEVEL5 integrated values
 #   H&W67     — Hodge & Wright 1967 (LMC/SMC)
 #   Acker92   — Acker et al. 1992 PN catalog (planetary nebulae)
+#   Burnham   — Burnham's Celestial Handbook
 # ---------------------------------------------------------------------------
 CURATED: list[dict[str, Any]] = [
     # --- Northern + general (14) ---
@@ -80,6 +90,8 @@ CURATED: list[dict[str, Any]] = [
         "common_name": "Cigar Galaxy", "messier_id": "M82",
         "type": "galaxy",
         "magnitude_fallback": 8.41,  # RC3
+        "angular_size_fallback_arcmin": 11.2,  # RC3
+        "minor_axis_fallback_arcmin": 4.3,     # RC3
     },
     {
         "id": "M51", "simbad": "M 51",
@@ -92,6 +104,7 @@ CURATED: list[dict[str, Any]] = [
         "common_name": "Dumbbell Nebula", "messier_id": "M27",
         "type": "nebula",
         "magnitude_fallback": 7.5,   # Acker92
+        "prefer_reference_magnitude": True,  # SIMBAD reports central star V (~14)
     },
     {
         "id": "M13", "simbad": "M 13",
@@ -104,12 +117,15 @@ CURATED: list[dict[str, Any]] = [
         "common_name": "Lagoon Nebula", "messier_id": "M8",
         "type": "nebula",
         "magnitude_fallback": 6.0,   # NED-L5
+        "angular_size_fallback_arcmin": 90.0,  # SkyCat
+        "minor_axis_fallback_arcmin": 40.0,    # SkyCat
     },
     {
         "id": "M57", "simbad": "M 57",
         "common_name": "Ring Nebula", "messier_id": "M57",
         "type": "nebula",
         "magnitude_fallback": 8.8,   # Acker92
+        "prefer_reference_magnitude": True,  # SIMBAD reports central star V (~15)
     },
     {
         "id": "M67", "simbad": "M 67",
@@ -168,6 +184,7 @@ CURATED: list[dict[str, Any]] = [
         "common_name": "Eta Carinae Nebula", "messier_id": None,
         "type": "nebula",
         "magnitude_fallback": 1.0,   # integrated; Smith 2002
+        "angular_size_fallback_arcmin": 120.0,  # SkyCat
     },
     {
         "id": "Tarantula",    "simbad": "NGC 2070",
@@ -257,12 +274,24 @@ def parse_simbad_row(spec: dict[str, Any], row: dict[str, Any]) -> dict[str, Any
     minor = row.get("galdim_minaxis")
     angle = row.get("galdim_angle")
 
-    if _is_missing(v_raw):
+    if spec.get("prefer_reference_magnitude") or _is_missing(v_raw):
         magnitude = spec["magnitude_fallback"]
         magnitude_source = "reference"
     else:
         magnitude = float(v_raw)
         magnitude_source = "SIMBAD"
+
+    if _is_missing(major):
+        major_val = spec.get("angular_size_fallback_arcmin")
+        major_source = "reference" if major_val is not None else None
+    else:
+        major_val = float(major)
+        major_source = "SIMBAD"
+
+    if _is_missing(minor):
+        minor_val = spec.get("minor_axis_fallback_arcmin")
+    else:
+        minor_val = float(minor)
 
     return {
         "id":                  spec["id"],
@@ -273,8 +302,9 @@ def parse_simbad_row(spec: dict[str, Any], row: dict[str, Any]) -> dict[str, Any
         "dec":                 dec,
         "magnitude":           magnitude,
         "magnitude_source":    magnitude_source,
-        "angular_size_arcmin": None if _is_missing(major) else float(major),
-        "minor_axis_arcmin":   None if _is_missing(minor) else float(minor),
+        "angular_size_arcmin": major_val,
+        "angular_size_source": major_source,
+        "minor_axis_arcmin":   minor_val,
         "position_angle_deg":  None if _is_missing(angle) else float(angle),
     }
 
