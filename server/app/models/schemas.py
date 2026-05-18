@@ -88,12 +88,12 @@ class DeepSkyObject(BaseModel):
     common_name: str
     messier_id: str | None = None
     type: Literal["galaxy", "nebula", "open_cluster", "globular_cluster"]
-    ra: float
-    dec: float
+    ra: float = Field(..., ge=0.0, lt=360.0, description="ICRS right ascension in degrees")
+    dec: float = Field(..., ge=-90.0, le=90.0, description="ICRS declination in degrees")
     alt: float
     az: float
-    magnitude: float
-    angular_size_arcmin: float
+    magnitude: float = Field(..., description="Apparent visual magnitude (Johnson V)")
+    angular_size_arcmin: float = Field(..., gt=0.0, description="Major-axis angular size in arcminutes")
     minor_axis_arcmin: float | None = None
     position_angle_deg: float | None = None
     source: str = "SIMBAD/CDS"
