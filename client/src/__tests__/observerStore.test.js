@@ -77,6 +77,7 @@ describe("observerStore", () => {
     expect(s.submitted).toBe(true);
     expect(s.geocodeRequested).toBe(false);
     expect(s.datetimeUtc).toBe("2026-04-08T22:00:00.000Z");
+    expect(s.candidates).toEqual([]);
   });
 
   it("selectCandidate with invalid index is a no-op", () => {

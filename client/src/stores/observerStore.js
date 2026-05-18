@@ -47,6 +47,7 @@ export const useObserverStore = create((set, get) => ({
         displayName: picked.display_name,
         country: picked.country ?? null,
       },
+      candidates: [],
       datetimeUtc,
       submitted: true,
       geocodeRequested: false,
