@@ -10,9 +10,13 @@ vi.mock("../hooks/useSky.js", () => ({
 vi.mock("../hooks/usePlanets.js", () => ({
   usePlanets: vi.fn(),
 }));
+vi.mock("../hooks/useDso.js", () => ({
+  useDso: vi.fn(),
+}));
 
 import { useSky } from "../hooks/useSky.js";
 import { usePlanets } from "../hooks/usePlanets.js";
+import { useDso } from "../hooks/useDso.js";
 
 HTMLCanvasElement.prototype.getContext = () => ({
   setTransform: vi.fn(),
@@ -65,6 +69,7 @@ beforeEach(() => {
   global.ResizeObserver = MockRO;
   useSky.mockReturnValue(mockQuery({}));
   usePlanets.mockReturnValue(mockQuery({}));
+  useDso.mockReturnValue(mockQuery({}));
   vi.useFakeTimers();
 });
 
@@ -82,6 +87,7 @@ describe("<SkyChart>", () => {
     useObserverStore.getState().useCurrentLocation(25.76, -80.19, "Miami, FL");
     useSky.mockReturnValue(mockQuery({ isLoading: true }));
     usePlanets.mockReturnValue(mockQuery({ isLoading: true }));
+    useDso.mockReturnValue(mockQuery({ isLoading: true }));
     renderWithProviders(<SkyChart />);
     expect(screen.getByText(/Computing sky/i)).toBeInTheDocument();
     expect(screen.getByText(/Miami, FL/)).toBeInTheDocument();
@@ -91,15 +97,18 @@ describe("<SkyChart>", () => {
     useObserverStore.getState().useCurrentLocation(25.76, -80.19, "Miami, FL");
     const skyRefetch = vi.fn();
     const planetsRefetch = vi.fn();
+    const dsoRefetch = vi.fn();
     useSky.mockReturnValue(
       mockQuery({ isError: true, error: { status: 500 }, refetch: skyRefetch })
     );
     usePlanets.mockReturnValue(mockQuery({ refetch: planetsRefetch }));
+    useDso.mockReturnValue(mockQuery({ refetch: dsoRefetch }));
     renderWithProviders(<SkyChart />);
     const retryBtn = screen.getByRole("button", { name: /retry/i });
     fireEvent.click(retryBtn);
     expect(skyRefetch).toHaveBeenCalled();
     expect(planetsRefetch).toHaveBeenCalled();
+    expect(dsoRefetch).toHaveBeenCalled();
   });
 
   it("ready state renders cardinal labels N/S/E/W", () => {
@@ -109,6 +118,9 @@ describe("<SkyChart>", () => {
     );
     usePlanets.mockReturnValue(
       mockQuery({ data: { observer: {}, planets: [], count: 0 } })
+    );
+    useDso.mockReturnValue(
+      mockQuery({ data: { observer: {}, dsos: [], count: 0 } })
     );
     renderWithProviders(<SkyChart />);
     act(() => { vi.advanceTimersByTime(200); });
@@ -151,6 +163,9 @@ describe("<SkyChart>", () => {
     usePlanets.mockReturnValue(
       mockQuery({ data: { observer: {}, planets: [], count: 0 } })
     );
+    useDso.mockReturnValue(
+      mockQuery({ data: { observer: {}, dsos: [], count: 0 } })
+    );
     const { container } = renderWithProviders(<SkyChart />);
     act(() => { vi.advanceTimersByTime(200); });
 
@@ -182,6 +197,9 @@ describe("<SkyChart>", () => {
     );
     usePlanets.mockReturnValue(
       mockQuery({ data: { observer: {}, planets: [], count: 0 } })
+    );
+    useDso.mockReturnValue(
+      mockQuery({ data: { observer: {}, dsos: [], count: 0 } })
     );
     const { container } = renderWithProviders(<SkyChart />);
     act(() => { vi.advanceTimersByTime(200); });

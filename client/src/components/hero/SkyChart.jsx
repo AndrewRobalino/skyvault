@@ -2,8 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useObserverStore } from "../../stores/observerStore.js";
 import { useSky } from "../../hooks/useSky.js";
 import { usePlanets } from "../../hooks/usePlanets.js";
+import { useDso } from "../../hooks/useDso.js";
 import { useCanvasSize } from "../../hooks/useCanvasSize.js";
-import { projectStars, projectPlanets } from "../../utils/projection.js";
+import { projectStars, projectPlanets, projectDsos } from "../../utils/projection.js";
 import { findNearestWithinRadius } from "../../utils/hitTest.js";
 import SkyCanvas from "./SkyCanvas.jsx";
 import CardinalLabels from "./CardinalLabels.jsx";
@@ -14,11 +15,11 @@ import MilkyWayBackdrop from "./MilkyWayBackdrop.jsx";
 import PlanetLabels from "./PlanetLabels.jsx";
 import AttributionFooter from "./AttributionFooter.jsx";
 
-function statusFor({ selected, skyQuery, planetsQuery }) {
+function statusFor({ selected, skyQuery, planetsQuery, dsoQuery }) {
   if (!selected) return "idle";
-  if (skyQuery.isError || planetsQuery.isError) return "error";
-  if (skyQuery.isLoading || planetsQuery.isLoading) return "loading";
-  if (skyQuery.data && planetsQuery.data) return "ready";
+  if (skyQuery.isError || planetsQuery.isError || dsoQuery.isError) return "error";
+  if (skyQuery.isLoading || planetsQuery.isLoading || dsoQuery.isLoading) return "loading";
+  if (skyQuery.data && planetsQuery.data && dsoQuery.data) return "ready";
   return "loading";
 }
 
@@ -28,6 +29,7 @@ export default function SkyChart() {
 
   const skyQuery = useSky(selected, datetimeUtc);
   const planetsQuery = usePlanets(selected, datetimeUtc);
+  const dsoQuery = useDso(selected, datetimeUtc);
 
   const containerRef = useRef(null);
   const { width, height, dpr } = useCanvasSize(containerRef);
@@ -35,8 +37,9 @@ export default function SkyChart() {
   const projected = useMemo(() => {
     const stars = projectStars(skyQuery.data?.stars ?? [], width, height);
     const planets = projectPlanets(planetsQuery.data?.planets ?? [], width, height);
-    return { stars, planets, all: [...stars, ...planets] };
-  }, [skyQuery.data, planetsQuery.data, width, height]);
+    const dsos = projectDsos(dsoQuery.data?.dsos ?? [], width, height);
+    return { stars, planets, dsos, all: [...stars, ...planets, ...dsos] };
+  }, [skyQuery.data, planetsQuery.data, dsoQuery.data, width, height]);
 
   const [hoveredId, setHoveredId] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
@@ -50,7 +53,7 @@ export default function SkyChart() {
     [selectedId, projected.all]
   );
 
-  const status = statusFor({ selected, skyQuery, planetsQuery });
+  const status = statusFor({ selected, skyQuery, planetsQuery, dsoQuery });
 
   const getMouseCoords = (e) => {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -111,6 +114,7 @@ export default function SkyChart() {
       <SkyCanvas
         projectedStars={status === "ready" ? projected.stars : []}
         projectedPlanets={status === "ready" ? projected.planets : []}
+        projectedDsos={status === "ready" ? projected.dsos : []}
         width={width}
         height={height}
         dpr={dpr}
@@ -137,6 +141,7 @@ export default function SkyChart() {
         onRetry={() => {
           skyQuery.refetch();
           planetsQuery.refetch();
+          dsoQuery.refetch();
         }}
       />
 
