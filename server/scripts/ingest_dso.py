@@ -17,6 +17,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 from astropy.coordinates import SkyCoord
 import astropy.units as u
 
@@ -80,6 +81,25 @@ SIMBAD_TYPE_MAP = {
 }
 
 
+def _is_missing(val: Any) -> bool:
+    """True if val is None, NaN, or a numpy masked element."""
+    if val is None:
+        return True
+    if isinstance(val, np.ma.core.MaskedConstant):
+        return True
+    try:
+        if np.ma.is_masked(val):
+            return True
+    except (TypeError, ValueError):
+        pass
+    try:
+        if isinstance(val, float) and np.isnan(val):
+            return True
+    except (TypeError, ValueError):
+        pass
+    return False
+
+
 def parse_simbad_row(spec: dict[str, Any], row: dict[str, Any]) -> dict[str, Any]:
     """Parse one SIMBAD result row into our DSO dict shape.
 
@@ -95,6 +115,7 @@ def parse_simbad_row(spec: dict[str, Any], row: dict[str, Any]) -> dict[str, Any
     otype = otype.strip()
     inferred_type = SIMBAD_TYPE_MAP.get(otype, spec["type"])
 
+    flux_v = row.get("FLUX_V")
     major = row.get("GALDIM_MAJAXIS")
     minor = row.get("GALDIM_MINAXIS")
     angle = row.get("GALDIM_ANGLE")
@@ -106,10 +127,10 @@ def parse_simbad_row(spec: dict[str, Any], row: dict[str, Any]) -> dict[str, Any
         "type":                inferred_type,
         "ra":                  float(sc.ra.deg),
         "dec":                 float(sc.dec.deg),
-        "magnitude":           float(row["FLUX_V"]) if row.get("FLUX_V") is not None else None,
-        "angular_size_arcmin": float(major) if major is not None else None,
-        "minor_axis_arcmin":   float(minor) if minor is not None else None,
-        "position_angle_deg":  float(angle) if angle is not None else None,
+        "magnitude":           None if _is_missing(flux_v) else float(flux_v),
+        "angular_size_arcmin": None if _is_missing(major) else float(major),
+        "minor_axis_arcmin":   None if _is_missing(minor) else float(minor),
+        "position_angle_deg":  None if _is_missing(angle) else float(angle),
     }
 
 
