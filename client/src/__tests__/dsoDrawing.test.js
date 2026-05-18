@@ -9,12 +9,16 @@ function makeCtx() {
     restore: vi.fn(),
     beginPath: vi.fn(),
     ellipse: vi.fn((...a) => ops.push(["ellipse", ...a])),
-    arc: vi.fn(),
-    fill: vi.fn(),
+    arc: vi.fn((...a) => ops.push(["arc", ...a])),
+    fill: vi.fn(() => ops.push(["fill"])),
+    stroke: vi.fn(() => ops.push(["stroke"])),
     translate: vi.fn(),
     rotate: vi.fn(),
     createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
     set fillStyle(_v) {},
+    set strokeStyle(_v) {},
+    set lineWidth(_v) {},
+    set lineCap(_v) {},
     set globalCompositeOperation(v) { ops.push(["composite", v]); },
   };
 }
@@ -59,5 +63,42 @@ describe("drawDso", () => {
     expect(DSO_TYPE_COLORS.nebula).toBeTruthy();
     expect(DSO_TYPE_COLORS.open_cluster).toBeTruthy();
     expect(DSO_TYPE_COLORS.globular_cluster).toBeTruthy();
+  });
+});
+
+describe("drawDso nucleus", () => {
+  it("draws a bright nucleus gradient on top of the glow", () => {
+    const ctx = makeCtx();
+    drawDso(ctx, {
+      x: 100, y: 100, type: "galaxy",
+      angular_size_arcmin: 50, minor_axis_arcmin: 25,
+      position_angle_deg: 0, pxPerArcmin: 1,
+    });
+    // Two radial gradients should be created per draw: one for the glow,
+    // one for the nucleus.
+    expect(ctx.createRadialGradient).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not stroke anything (no UI-chip outlines)", () => {
+    const ctx = makeCtx();
+    drawDso(ctx, {
+      x: 100, y: 100, type: "globular_cluster",
+      angular_size_arcmin: 30, minor_axis_arcmin: 30,
+      position_angle_deg: null, pxPerArcmin: 1,
+    });
+    expect(ctx.stroke).not.toHaveBeenCalled();
+  });
+
+  it("renders for every known DSO type without crashing", () => {
+    for (const type of ["galaxy", "nebula", "open_cluster", "globular_cluster"]) {
+      const ctx = makeCtx();
+      expect(() =>
+        drawDso(ctx, {
+          x: 100, y: 100, type,
+          angular_size_arcmin: 50, minor_axis_arcmin: 50,
+          position_angle_deg: 0, pxPerArcmin: 1,
+        }),
+      ).not.toThrow();
+    }
   });
 });
