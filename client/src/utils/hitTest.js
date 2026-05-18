@@ -21,7 +21,7 @@ export function findNearestWithinRadius(projected, mouseX, mouseY) {
   let bestDistSq = Infinity;
 
   for (const obj of projected) {
-    const r = radiusFor(obj.kind);
+    const r = obj.hitRadius ?? radiusFor(obj.kind);
     const dx = obj.x - mouseX;
     const dy = obj.y - mouseY;
     const distSq = dx * dx + dy * dy;

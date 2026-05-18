@@ -56,3 +56,22 @@ describe("findNearestWithinRadius", () => {
     expect(PLANET_RADIUS).toBe(22);
   });
 });
+
+describe("hitTest honors per-object hitRadius", () => {
+  it("treats DSO hitRadius as the click target size", () => {
+    const objects = [
+      { id: "dso:M31", x: 100, y: 100, hitRadius: 80 },
+      { id: "star:abc", x: 200, y: 100 },
+    ];
+    // Click 50px from M31 — inside its hitRadius, well outside the default star radius.
+    const hit = findNearestWithinRadius(objects, 150, 100);
+    expect(hit?.id).toBe("dso:M31");
+  });
+
+  it("falls back to the default radius when hitRadius is absent", () => {
+    const objects = [{ id: "star:abc", x: 100, y: 100 }];
+    // 200px away is outside any reasonable default radius.
+    const hit = findNearestWithinRadius(objects, 300, 100);
+    expect(hit).toBeNull();
+  });
+});
