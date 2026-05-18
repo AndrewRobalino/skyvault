@@ -9,6 +9,13 @@ from app.services import dso_catalog
 FIXTURE = Path(__file__).parent / "fixtures" / "naked_eye_dso_minimal.json"
 
 
+@pytest.fixture(autouse=True)
+def clear_dso_catalog_cache():
+    dso_catalog.load_catalog.cache_clear()
+    yield
+    dso_catalog.load_catalog.cache_clear()
+
+
 def test_load_returns_all_objects():
     objects = dso_catalog.load_catalog(FIXTURE)
     assert len(objects) == 3
@@ -68,3 +75,28 @@ def test_dsos_for_observer_include_below_horizon_flag():
     by_id = {d.id: d for d in result}
     assert "LMC" in by_id
     assert by_id["LMC"].alt < 0
+    # M45 (Pleiades) is below NYC horizon in late summer — present only with the flag.
+    assert "M45" in by_id
+    assert by_id["M45"].alt < 0
+
+
+def test_load_returns_empty_for_empty_catalog(tmp_path):
+    empty = tmp_path / "empty.json"
+    empty.write_text("[]", encoding="utf-8")
+    assert dso_catalog.load_catalog(empty) == []
+    assert dso_catalog.dsos_for_observer(
+        lat=40.7128, lon=-74.0060,
+        time_utc="2026-08-15T02:00:00Z",
+        catalog_path=empty,
+    ) == []
+
+
+def test_horizon_only_filters_all_below_horizon():
+    """Stronger guarantee than 'LMC missing' — every returned object has alt >= 0."""
+    result = dso_catalog.dsos_for_observer(
+        lat=40.7128, lon=-74.0060,
+        time_utc="2026-08-15T02:00:00Z",
+        catalog_path=FIXTURE,
+    )
+    assert all(d.alt >= 0 for d in result), \
+        f"Found object below horizon: {[d for d in result if d.alt < 0]}"

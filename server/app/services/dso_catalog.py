@@ -18,14 +18,23 @@ from astropy import units as u
 from astropy.coordinates import AltAz, EarthLocation, SkyCoord
 from astropy.time import Time
 
-from app.config import DSO_CATALOG_PATH
+from app.config import settings
 from app.models.schemas import DeepSkyObject
+
+
+class DsoCatalogNotFoundError(FileNotFoundError):
+    """Raised when the DSO catalog JSON is missing at load time."""
 
 
 @lru_cache(maxsize=4)
 def load_catalog(path: Path | None = None) -> list[dict]:
     """Load the static DSO catalog JSON. Cached per path."""
-    p = Path(path) if path is not None else DSO_CATALOG_PATH
+    p = Path(path) if path is not None else settings.dso_catalog_path
+    if not p.exists():
+        raise DsoCatalogNotFoundError(
+            f"DSO catalog not found at {p}. "
+            f"Run: cd server && python scripts/ingest_dso.py"
+        )
     with p.open(encoding="utf-8") as fh:
         return json.load(fh)
 
@@ -54,7 +63,7 @@ def dsos_for_observer(
         return []
 
     location = EarthLocation(lat=lat * u.deg, lon=lon * u.deg)
-    time = Time(time_utc)
+    time = Time(time_utc.replace("Z", ""), scale="utc")
     frame = AltAz(obstime=time, location=location)
 
     ras = [obj["ra"] for obj in raw]

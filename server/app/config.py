@@ -11,7 +11,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 SERVER_ROOT: Path = Path(__file__).resolve().parent.parent
 DATA_DIR: Path = SERVER_ROOT / "data"
-DSO_CATALOG_PATH: Path = DATA_DIR / "naked_eye_dso.json"
 
 
 class Settings(BaseSettings):
@@ -31,6 +30,9 @@ class Settings(BaseSettings):
 
     # JPL DE421 planetary ephemeris (downloaded once via download_ephemeris.py)
     ephemeris_kernel_path: Path = DATA_DIR / "de421.bsp"
+
+    # Naked-eye DSO catalog (produced once via scripts/ingest_dso.py)
+    dso_catalog_path: Path = DATA_DIR / "naked_eye_dso.json"
 
     # Sky query defaults
     default_mag_limit: float = 6.5
