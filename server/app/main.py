@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import constellations, geocode, objects, planets, sky
+from app.routers import constellations, dso, geocode, objects, planets, sky
 
 
 app = FastAPI(
@@ -30,5 +30,6 @@ async def health() -> dict[str, str]:
 app.include_router(sky.router, prefix=settings.api_v1_prefix)
 app.include_router(planets.router, prefix=settings.api_v1_prefix)
 app.include_router(constellations.router, prefix=settings.api_v1_prefix)
+app.include_router(dso.router, prefix=settings.api_v1_prefix)
 app.include_router(objects.router, prefix=settings.api_v1_prefix)
 app.include_router(geocode.router, prefix=settings.api_v1_prefix)
