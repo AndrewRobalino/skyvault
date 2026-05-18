@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   magnitudeToGlow,
   drawStar,
@@ -253,5 +253,63 @@ describe("planet tints (Phase 2c per-planet colors)", () => {
   });
   it("Neptune is darker cool blue", () => {
     expect(PLANET_TINTS.Neptune).toBe("#6a8cb4");
+  });
+});
+
+import { _resetCacheForTests, getTexture } from "../utils/textureCache.js";
+import { PLANET_TEXTURE_URLS } from "../utils/drawing.js";
+
+function makeCtx() {
+  return {
+    save: vi.fn(),
+    restore: vi.fn(),
+    drawImage: vi.fn(),
+    beginPath: vi.fn(),
+    arc: vi.fn(),
+    fill: vi.fn(),
+    stroke: vi.fn(),
+    ellipse: vi.fn(),
+    clip: vi.fn(),
+    createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
+    set fillStyle(_v) {},
+    set strokeStyle(_v) {},
+    set lineWidth(_v) {},
+    set globalCompositeOperation(_v) {},
+  };
+}
+
+describe("drawPlanet sprite", () => {
+  beforeEach(() => {
+    _resetCacheForTests();
+  });
+
+  it("uses drawImage when the texture is loaded", () => {
+    const ctx = makeCtx();
+    const img = getTexture(PLANET_TEXTURE_URLS.Mars);
+    Object.defineProperty(img, "complete", { value: true });
+    Object.defineProperty(img, "naturalWidth", { value: 512 });
+
+    drawPlanet(ctx, { name: "Mars", x: 100, y: 100, alt: 45, az: 180 });
+    expect(ctx.drawImage).toHaveBeenCalled();
+    const args = ctx.drawImage.mock.calls[0];
+    expect(args[0]).toBe(img);
+  });
+
+  it("falls back to a colored dot when the texture is not yet loaded", () => {
+    const ctx = makeCtx();
+    const img = getTexture(PLANET_TEXTURE_URLS.Jupiter);
+    Object.defineProperty(img, "complete", { value: false });
+    Object.defineProperty(img, "naturalWidth", { value: 0 });
+
+    drawPlanet(ctx, { name: "Jupiter", x: 100, y: 100, alt: 45, az: 180 });
+    expect(ctx.drawImage).not.toHaveBeenCalled();
+    expect(ctx.arc).toHaveBeenCalled();
+  });
+
+  it("Sun stays procedural (no drawImage)", () => {
+    const ctx = makeCtx();
+    drawPlanet(ctx, { name: "Sun", x: 100, y: 100, alt: 30, az: 90 });
+    expect(ctx.drawImage).not.toHaveBeenCalled();
+    expect(ctx.createRadialGradient).toHaveBeenCalled();
   });
 });

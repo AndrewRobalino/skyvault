@@ -9,6 +9,7 @@
 
 import { bvToHex } from "./bvToColor.js";
 import { horizonHaze } from "./horizonHaze.js";
+import { getTexture } from "./textureCache.js";
 
 /**
  * Color amplification factor for star halos.
@@ -94,6 +95,17 @@ export const PLANET_TINTS = {
 
 const PLANET_TINT_DEFAULT = "#e8c98a";
 
+export const PLANET_TEXTURE_URLS = {
+  Mercury: "/textures/planets/mercury.jpg",
+  Venus:   "/textures/planets/venus.jpg",
+  Mars:    "/textures/planets/mars.jpg",
+  Jupiter: "/textures/planets/jupiter.jpg",
+  Saturn:  "/textures/planets/saturn.jpg",
+  Uranus:  "/textures/planets/uranus.jpg",
+  Neptune: "/textures/planets/neptune.jpg",
+  Moon:    "/textures/planets/moon.jpg",
+};
+
 // Sun gets a warmer disc distinct from nighttime planets.
 const SUN_CORE = "#fff4c8";
 const SUN_MID = "#ffd890";
@@ -169,10 +181,11 @@ export function drawPlanet(ctx, planet) {
   const tint = PLANET_TINTS[planet.name] ?? PLANET_TINT_DEFAULT;
   const { x, y } = planet;
   const r = size / 2;
+  const textureUrl = PLANET_TEXTURE_URLS[planet.name];
 
   ctx.save();
 
-  // Outer glow ring (subtle, planet's own tint, low opacity).
+  // Outer glow ring — unchanged, keeps the planet visually distinct from stars.
   const glowRadius = r * 1.5;
   const glowGradient = ctx.createRadialGradient(x, y, r * 0.9, x, y, glowRadius);
   glowGradient.addColorStop(0, hexToRgba(tint, 0.35));
@@ -182,11 +195,22 @@ export function drawPlanet(ctx, planet) {
   ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
   ctx.fill();
 
-  // Crisp filled disc — the planet itself.
-  ctx.fillStyle = tint;
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.fill();
+  const img = textureUrl ? getTexture(textureUrl) : null;
+  if (img && img.complete && img.naturalWidth > 0) {
+    // Clip to a circle so the rectangular texture renders as a disk.
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.drawImage(img, x - r, y - r, size, size);
+    ctx.restore();
+  } else {
+    // Fallback while the texture loads.
+    ctx.fillStyle = tint;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   // Thin bright edge for crisp definition.
   ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
