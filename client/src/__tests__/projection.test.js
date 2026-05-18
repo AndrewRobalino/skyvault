@@ -3,6 +3,7 @@ import {
   projectAltAz,
   projectStars,
   projectPlanets,
+  projectDsos,
   REFERENCE_ALT,
 } from "../utils/projection.js";
 
@@ -93,5 +94,39 @@ describe("projectPlanets", () => {
     expect(projected[0].kind).toBe("planet");
     expect(projected[0].id).toBe("planet:Jupiter");
     expect(projected[0].name).toBe("Jupiter");
+  });
+});
+
+describe("projectDsos", () => {
+  it("projects an above-horizon DSO with kind=dso and pxPerArcmin", () => {
+    const dsos = [{
+      id: "M31", common_name: "Andromeda Galaxy",
+      type: "galaxy",
+      ra: 10.6847, dec: 41.2687,
+      alt: 45, az: 90,
+      magnitude: 3.44,
+      angular_size_arcmin: 178,
+      minor_axis_arcmin: 63,
+      position_angle_deg: 35,
+      source: "SIMBAD/CDS",
+    }];
+    const projected = projectDsos(dsos, 1000, 1000);
+    expect(projected).toHaveLength(1);
+    const p = projected[0];
+    expect(p.kind).toBe("dso");
+    expect(p.id).toBe("dso:M31");
+    expect(typeof p.x).toBe("number");
+    expect(typeof p.y).toBe("number");
+    expect(p.pxPerArcmin).toBeGreaterThan(0);
+    // hitRadius should be derived from angular size in pixels, min 12px
+    expect(p.hitRadius).toBeGreaterThanOrEqual(12);
+    // Original DSO fields preserved
+    expect(p.type).toBe("galaxy");
+    expect(p.common_name).toBe("Andromeda Galaxy");
+  });
+
+  it("returns [] for empty input or zero-size canvas", () => {
+    expect(projectDsos([], 1000, 1000)).toEqual([]);
+    expect(projectDsos([{ alt: 0, az: 0 }], 0, 0)).toEqual([]);
   });
 });

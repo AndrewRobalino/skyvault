@@ -76,3 +76,38 @@ export function projectPlanets(planets, width, height) {
     };
   });
 }
+
+export function projectDsos(dsos, width, height) {
+  if (!dsos || !dsos.length || !width || !height) return [];
+
+  // Sizing scale: REFERENCE_ALT=0 means alt=0 maps to halfShort.
+  // Near-zenith linearization: 90° of sky spans halfShort px, so
+  // pxPerArcmin ≈ halfShort / 90 / 60. Slight stereographic distortion
+  // toward the horizon is acceptable for DSO sizing.
+  const halfShort = Math.min(width, height) / 2;
+  const pxPerArcmin = halfShort / 90 / 60;
+
+  return dsos.map((d) => {
+    const { x, y } = projectAltAz(d, width, height);
+    const majorPx = (d.angular_size_arcmin ?? 0) * pxPerArcmin;
+    return {
+      kind: "dso",
+      id: `dso:${d.id}`,
+      dso_id: d.id,
+      common_name: d.common_name,
+      messier_id: d.messier_id ?? null,
+      type: d.type,
+      x,
+      y,
+      alt: d.alt,
+      az: d.az,
+      magnitude: d.magnitude,
+      angular_size_arcmin: d.angular_size_arcmin,
+      minor_axis_arcmin: d.minor_axis_arcmin ?? null,
+      position_angle_deg: d.position_angle_deg ?? null,
+      pxPerArcmin,
+      hitRadius: Math.max(12, majorPx / 2),
+      source: d.source ?? "SIMBAD/CDS",
+    };
+  });
+}
