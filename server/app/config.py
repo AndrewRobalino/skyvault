@@ -11,6 +11,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 SERVER_ROOT: Path = Path(__file__).resolve().parent.parent
 DATA_DIR: Path = SERVER_ROOT / "data"
+DSO_CATALOG_PATH: Path = DATA_DIR / "naked_eye_dso.json"
 
 
 class Settings(BaseSettings):
