@@ -22,6 +22,8 @@ export default function AttributionFooter() {
     >
       <div>Milky Way: ESO/S. Brunier · CC BY 4.0</div>
       <div>Stars: ESA Gaia DR3 · Planets: NASA JPL DE421</div>
+      <div>Planet &amp; Moon textures: Solar System Scope · CC BY 4.0</div>
+      <div>DSO data: SIMBAD/CDS</div>
     </div>
   );
 }
