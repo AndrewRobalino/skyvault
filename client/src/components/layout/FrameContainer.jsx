@@ -5,7 +5,7 @@
  */
 export default function FrameContainer({ children }) {
   return (
-    <div className="frame relative mx-auto w-full max-w-[1280px] border border-accent-dim/40 bg-bg-frame px-6 py-10 md:px-10 md:py-14">
+    <div className="frame relative mx-auto w-full max-w-[1280px] border border-accent-dim/40 px-6 py-10 md:px-10 md:py-14">
       {children}
     </div>
   );

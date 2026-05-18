@@ -38,6 +38,7 @@ All real institutional datasets. Two-tier architecture: bulk render data loaded 
 | **Gaia DR3** (G<8 subset, ~230k stars) | **ESA** | ICRS positions, magnitude, parallax, proper motion, BP-RP color | One-time TAP query via astroquery → parquet |
 | **JPL DE421** | **NASA/JPL** | Sun, Moon, Mercury–Neptune positions (arcsecond precision) | Astropy `solar_system_ephemeris.set('de421')` |
 | **IAU Constellation Data** | **IAU** | Official 88 constellation boundaries + stick figures | Static JSON committed to repo |
+| **Mellinger 2.0 All-Sky Milky Way Panorama** | **© Axel Mellinger** | Photo-realistic Milky Way backdrop (galactic equirectangular) | Static asset (gitignored), sampled by WebGL shader. Non-commercial license — see CLAUDE.md guardrail #11. |
 
 ### Tier 2 — Enrichment (cold path, cached)
 
@@ -47,7 +48,7 @@ All real institutional datasets. Two-tier architecture: bulk render data loaded 
 | **NASA Exoplanet Archive** | **NASA/IPAC** | ~5,600 confirmed exoplanets + host stars | Phase 3 |
 | **JPL Horizons** | **NASA/JPL** | Live ephemerides for asteroids, comets, spacecraft | Phase 4 |
 
-Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD · NASA Exoplanet Archive"*
+Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD · NASA Exoplanet Archive · Milky Way panorama © Axel Mellinger"*
 
 ---
 
@@ -110,7 +111,9 @@ Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD �
 
 ---
 
-## Phase 2b — 2D Sky Chart (Canvas 2D)
+## Phase 2b — 2D Sky Chart (Canvas 2D) ✅ COMPLETE
+
+> **Shipped:** rectangular full-bleed stereographic projection, star rendering with magnitude/color-calibrated glow, planet rendering with distinct amber markers, Moon with illumination shadow, cardinal labels, hover + click-to-tooltip progressive disclosure, viewport-capped sizing. See `docs/superpowers/specs/2026-04-13-phase-2b-sky-chart-design.md` and `docs/superpowers/plans/2026-04-13-phase-2b-sky-chart.md`.
 
 **Goal:** Render the actual night sky inside the hero placeholder from Phase 2a using an HTML Canvas 2D stereographic projection.
 
@@ -127,6 +130,33 @@ Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD �
 - Zooming / panning (deferred)
 - Constellation stick figures (Phase 3)
 - 3D flying camera (Phase 4)
+
+---
+
+## Phase 2c — Visual Polish + Milky Way Backdrop ✅ CODE COMPLETE
+
+> **Spec:** `docs/superpowers/specs/2026-04-27-phase-2c-visual-polish-design.md` · **Plan:** `docs/superpowers/plans/2026-04-27-phase-2c-visual-polish.md` · **Branch:** `feat/phase-2c-visual-polish`
+
+**Status:** All 17 implementation tasks shipped (134 frontend tests green, lint clean). Awaiting (a) Mellinger asset placement at `client/public/assets/mellinger_2_galactic.webp` and (b) manual visual QA against the three reference observers (NYC summer, Buenos Aires same-instant, Anchorage winter).
+
+**Goal:** Transform the Phase 2b chart from "data viz of dots" into an immersive astrophotography-vibe night sky.
+
+**In scope:**
+- **Mellinger 2.0 Milky Way backdrop** — WebGL fragment shader samples the galactic equirectangular panorama, transforms galactic → equatorial → AltAz per fragment, renders behind the Canvas 2D star/planet layer
+- **Horizon haze ring** — atmospheric extinction tint near the horizon, both visually and as alpha falloff for low-altitude stars
+- **Star realism** — magnitude-driven color amplification on the bright tail (Sirius/Vega/Betelgeuse glow with their real BP-RP color), no diffraction spikes (real astrophotos don't have them — telescope artifact), no twinkle
+- **Planet differentiation** — per-planet color tints (Mars red-orange, Jupiter cream, Saturn pale gold, Venus white-blue, etc.), subtle glow rings to separate planets from stars at a glance, **always-on planet labels** (no need to hover)
+- **Full-rectangle projection** — `REFERENCE_ALT` drops from 20° to 0°, stereographic projection fills the entire canvas rect (no empty corners)
+- **Attribution footer** — persistent strip with Gaia/JPL/IAU/CDS/Exoplanet Archive/Mellinger credits
+- **License compliance** — Mellinger asset gitignored, attribution baked into source comments + footer + (future) `/about` page
+
+**Out of scope:**
+- Constellation stick figures (Phase 3)
+- IAU constellation labels (Phase 3)
+- `/about` page (Phase 5)
+- 3D flying camera (Phase 4)
+
+**Key technical decision:** WebGL chosen over CPU-in-Web-Worker or server-side rendering for the backdrop. WebGL gets us 60fps continuous sampling per pixel, frees the main thread for Canvas 2D star/planet rendering, and showcases shader work as a resume signal. Mellinger asset stays in galactic coords as distributed (no offline reprojection); shader does the galactic→equatorial rotation matrix internally.
 
 ---
 

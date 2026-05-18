@@ -36,7 +36,7 @@ describe("<App> smoke test", () => {
     expect(screen.getByText(/OBSERVATORIUM · SKYVAULT/i)).toBeInTheDocument();
   });
 
-  it("renders the hero coming-soon message", () => {
+  it("renders the sky chart idle state", () => {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } },
     });
@@ -45,7 +45,7 @@ describe("<App> smoke test", () => {
         <App />
       </QueryClientProvider>
     );
-    expect(screen.getByText(/arrives next session/i)).toBeInTheDocument();
+    expect(screen.getByText(/pick a date and location/i)).toBeInTheDocument();
   });
 
   it("renders the EXPLORE IN 3D stub button", () => {

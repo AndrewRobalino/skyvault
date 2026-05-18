@@ -6,7 +6,6 @@ import { useUiStateStore } from "../stores/uiStateStore.js";
 describe("useIntroSequence", () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    sessionStorage.clear();
     useUiStateStore.setState({
       introState: "pending",
       activityState: "normal",
@@ -31,18 +30,12 @@ describe("useIntroSequence", () => {
     vi.useRealTimers();
   });
 
-  it("plays intro on first mount when sessionStorage flag is unset", () => {
+  it("plays intro on every mount", () => {
     renderHook(() => useIntroSequence());
     expect(useUiStateStore.getState().introState).toBe("playing");
   });
 
-  it("skips intro when sessionStorage flag is set", () => {
-    sessionStorage.setItem("skyvault.introPlayed", "true");
-    renderHook(() => useIntroSequence());
-    expect(useUiStateStore.getState().introState).toBe("done");
-  });
-
-  it("skips intro when prefers-reduced-motion is reduce", () => {
+  it("plays intro even when prefers-reduced-motion is reduce (intro is opacity fade, not motion)", () => {
     window.matchMedia = vi.fn().mockImplementation((query) => ({
       matches: true,
       media: query,
@@ -50,7 +43,8 @@ describe("useIntroSequence", () => {
       removeEventListener: vi.fn(),
     }));
     renderHook(() => useIntroSequence());
-    expect(useUiStateStore.getState().introState).toBe("done");
+    expect(useUiStateStore.getState().introState).toBe("playing");
+    // Detection is still recorded so motion-heavy code (Phase 4) can read it.
     expect(useUiStateStore.getState().prefersReducedMotion).toBe(true);
   });
 
@@ -61,6 +55,5 @@ describe("useIntroSequence", () => {
       vi.advanceTimersByTime(5_000);
     });
     expect(useUiStateStore.getState().introState).toBe("done");
-    expect(sessionStorage.getItem("skyvault.introPlayed")).toBe("true");
   });
 });

@@ -47,6 +47,28 @@ SAMPLE_PHOTON_RESPONSE = {
 }
 
 
+# A minimal Nominatim-shaped response (Nominatim returns a JSON array, not GeoJSON)
+SAMPLE_NOMINATIM_RESPONSE = [
+    {
+        "place_id": 282540249,
+        "osm_type": "relation",
+        "osm_id": 178923,
+        "lat": "35.2272086",
+        "lon": "-80.8430827",
+        "class": "boundary",
+        "type": "administrative",
+        "name": "Charlotte",
+        "display_name": "Charlotte, Mecklenburg County, North Carolina, United States",
+        "address": {
+            "city": "Charlotte",
+            "state": "North Carolina",
+            "country": "United States",
+            "country_code": "us",
+        },
+    }
+]
+
+
 @pytest.fixture(autouse=True)
 def clear_cache():
     """Each test starts with an empty cache."""
@@ -146,6 +168,37 @@ async def test_geocode_upstream_5xx_raises_upstream_error():
     with patch.object(httpx.AsyncClient, "get", AsyncMock(return_value=mock_response)):
         with pytest.raises(geocoder.GeocoderUpstreamError):
             await geocoder.geocode("Portoviejo", limit=5, lang="en")
+
+
+@pytest.mark.asyncio
+async def test_falls_back_to_nominatim_when_photon_returns_5xx():
+    photon_failure = httpx.Response(503, json={"error": "down"})
+    nominatim_ok = httpx.Response(200, json=SAMPLE_NOMINATIM_RESPONSE)
+    mock_get = AsyncMock(side_effect=[photon_failure, nominatim_ok])
+
+    with patch.object(httpx.AsyncClient, "get", mock_get):
+        result = await geocoder.geocode("Charlotte", limit=5, lang="en")
+
+    assert mock_get.call_count == 2
+    assert "Nominatim" in result.source
+    assert result.count == 1
+    assert result.candidates[0].name == "Charlotte"
+    assert result.candidates[0].state == "North Carolina"
+    assert result.candidates[0].country == "United States"
+    assert abs(result.candidates[0].lat - 35.2272086) < 1e-6
+
+
+@pytest.mark.asyncio
+async def test_falls_back_to_nominatim_when_photon_times_out():
+    nominatim_ok = httpx.Response(200, json=SAMPLE_NOMINATIM_RESPONSE)
+    mock_get = AsyncMock(side_effect=[httpx.TimeoutException("slow"), nominatim_ok])
+
+    with patch.object(httpx.AsyncClient, "get", mock_get):
+        result = await geocoder.geocode("Charlotte", limit=5, lang="en")
+
+    assert mock_get.call_count == 2
+    assert "Nominatim" in result.source
+    assert result.count == 1
 
 
 @pytest.mark.asyncio

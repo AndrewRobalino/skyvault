@@ -82,3 +82,15 @@ def test_sky_every_star_has_required_fields_with_source():
     for star in body["stars"]:
         missing = required - set(star.keys())
         assert not missing, f"star missing fields: {missing}"
+
+
+def test_sky_source_id_serialized_as_string():
+    # Gaia DR3 source_ids are 64-bit ints (~10^18) that exceed JS
+    # Number.MAX_SAFE_INTEGER. They must cross the API as strings so the
+    # frontend doesn't silently lose precision.
+    response = client.get("/api/v1/sky", params={**MIAMI, "mag_limit": 4.0})
+    body = response.json()
+    assert body["count"] > 0
+    for star in body["stars"]:
+        assert isinstance(star["source_id"], str)
+        assert star["source_id"].isdigit()

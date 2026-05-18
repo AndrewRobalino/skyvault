@@ -5,15 +5,17 @@
 /* Custom CSS variables for things Tailwind's color scale doesn't handle cleanly. */
 :root {
   --bg-panel: rgba(10, 14, 28, 0.55);
-  --intro-galaxy-opacity: 0.28;
+  --intro-galaxy-opacity: 0.65;
   --intro-content-opacity: 1;
 }
 
+html {
+  background-color: #05060d;
+}
 html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #05060d;
   color: #dce1f0;
   font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
   -webkit-font-smoothing: antialiased;
@@ -45,16 +47,6 @@ body.ui-hidden .footer,
 body.ui-hidden .hero {
   opacity: 0;
   transition: opacity 800ms ease;
-}
-
-/* Reduced motion — kill transitions */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
 }
 
 /* Intro animation keyframes */
@@ -114,7 +106,6 @@ body.ui-hidden .hero {
   background-size: cover;
   background-position: center;
   opacity: var(--intro-galaxy-opacity);
-  mix-blend-mode: screen;
 }
 .app-background::after {
   content: "";
