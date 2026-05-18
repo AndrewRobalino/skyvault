@@ -213,27 +213,6 @@ CURATED: list[dict[str, Any]] = [
 ]
 
 
-# Map SIMBAD's OTYPE codes -> our type literal.
-SIMBAD_TYPE_MAP = {
-    "G":     "galaxy",
-    "GiG":   "galaxy",   # giant galaxy
-    "AGN":   "galaxy",
-    "Sy1":   "galaxy",
-    "Sy2":   "galaxy",
-    "PaG":   "galaxy",   # pair of galaxies
-    "rG":    "galaxy",   # radio galaxy
-    "HII":   "nebula",
-    "ISM":   "nebula",
-    "RNe":   "nebula",
-    "PN":    "nebula",
-    "EmO":   "nebula",
-    "MoC":   "nebula",
-    "OpC":   "open_cluster",
-    "Cl*":   "open_cluster",
-    "GlC":   "globular_cluster",
-}
-
-
 def _is_missing(val: Any) -> bool:
     """True if val is None, NaN, or a numpy masked element."""
     if val is None:
@@ -264,10 +243,12 @@ def parse_simbad_row(spec: dict[str, Any], row: dict[str, Any]) -> dict[str, Any
     ra = float(row["ra"])
     dec = float(row["dec"])
 
-    otype_raw = row.get("otype", "")
-    otype = otype_raw.decode() if isinstance(otype_raw, (bytes, bytearray)) else str(otype_raw)
-    otype = otype.strip()
-    inferred_type = SIMBAD_TYPE_MAP.get(otype, spec["type"])
+    # SIMBAD's OTYPE reports the dominant astrophysical classification, which
+    # for objects like the Lagoon Nebula (M8) or Tarantula Nebula will return
+    # "open_cluster" because of an embedded star cluster. That contradicts the
+    # popular identity we curated. Trust the curated type; SIMBAD's OTYPE is
+    # discarded for naming.
+    inferred_type = spec["type"]
 
     v_raw = row.get("V")
     major = row.get("galdim_majaxis")

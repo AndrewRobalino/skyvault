@@ -67,20 +67,23 @@ def test_parse_simbad_row_open_cluster_no_minor_axis():
     assert out["position_angle_deg"] is None
 
 
-def test_parse_simbad_row_unknown_otype_falls_back_to_spec_type():
+def test_parse_simbad_row_always_uses_curated_type():
+    """SIMBAD classifies some nebulae (M8, Tarantula) by an embedded cluster,
+    which contradicts the user-facing identity. Curated `type` always wins."""
     row = {
-        "main_id": "?",
-        "ra": 0.0,
-        "dec": 0.0,
-        "V": 5.0,
-        "galdim_majaxis": 50.0,
-        "galdim_minaxis": None,
+        "main_id": "M  8",
+        "ra": 270.9,
+        "dec": -24.4,
+        "V": ma.masked,
+        "galdim_majaxis": 90.0,
+        "galdim_minaxis": 40.0,
         "galdim_angle": None,
-        "otype": "XYZ",
+        "otype": "OpC",  # SIMBAD says open cluster (embedded NGC 6530)
     }
-    spec = next(s for s in CURATED if s["id"] == "M67")
+    spec = next(s for s in CURATED if s["id"] == "M8")
     out = parse_simbad_row(spec, row)
-    assert out["type"] == "open_cluster"
+    assert spec["type"] == "nebula"
+    assert out["type"] == "nebula", "Curated type must override SIMBAD OTYPE"
 
 
 def test_curated_list_is_25_objects():
