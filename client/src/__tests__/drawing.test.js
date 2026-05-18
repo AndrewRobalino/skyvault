@@ -313,3 +313,43 @@ describe("drawPlanet sprite", () => {
     expect(ctx.createRadialGradient).toHaveBeenCalled();
   });
 });
+
+describe("drawPlanet Moon with texture", () => {
+  beforeEach(() => {
+    _resetCacheForTests();
+  });
+
+  it("uses drawImage when texture is loaded (full moon, no shadow)", () => {
+    const ctx = makeCtx();
+    const img = getTexture(PLANET_TEXTURE_URLS.Moon);
+    Object.defineProperty(img, "complete", { value: true });
+    Object.defineProperty(img, "naturalWidth", { value: 512 });
+
+    drawPlanet(ctx, { name: "Moon", x: 50, y: 50, illumination: 1.0 });
+    expect(ctx.drawImage).toHaveBeenCalled();
+    // Full moon: no shadow ellipse drawn -> ellipse() not called.
+    expect(ctx.ellipse).not.toHaveBeenCalled();
+  });
+
+  it("draws a shadow ellipse when illumination < 0.98", () => {
+    const ctx = makeCtx();
+    const img = getTexture(PLANET_TEXTURE_URLS.Moon);
+    Object.defineProperty(img, "complete", { value: true });
+    Object.defineProperty(img, "naturalWidth", { value: 512 });
+
+    drawPlanet(ctx, { name: "Moon", x: 50, y: 50, illumination: 0.5 });
+    expect(ctx.drawImage).toHaveBeenCalled();
+    expect(ctx.ellipse).toHaveBeenCalled();
+  });
+
+  it("falls back to procedural disk when texture not loaded", () => {
+    const ctx = makeCtx();
+    const img = getTexture(PLANET_TEXTURE_URLS.Moon);
+    Object.defineProperty(img, "complete", { value: false });
+    Object.defineProperty(img, "naturalWidth", { value: 0 });
+
+    drawPlanet(ctx, { name: "Moon", x: 50, y: 50, illumination: 0.5 });
+    expect(ctx.drawImage).not.toHaveBeenCalled();
+    expect(ctx.arc).toHaveBeenCalled();
+  });
+});

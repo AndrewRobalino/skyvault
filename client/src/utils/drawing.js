@@ -246,31 +246,43 @@ function drawMoon(ctx, planet) {
   const size = PLANET_SIZES.Moon;
   const r = size / 2;
   const frac = illumination ?? 1.0;
+  const img = getTexture(PLANET_TEXTURE_URLS.Moon);
 
-  // Filled disc.
   ctx.save();
-  ctx.fillStyle = "#e8e3d6";
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.fill();
 
-  // Shadow arc representing the unlit fraction.
-  if (frac < 0.98) {
-    ctx.fillStyle = "rgba(5, 6, 13, 0.8)";
+  if (img.complete && img.naturalWidth > 0) {
+    // Clip to a circle, draw the texture, then composite a shadow ellipse.
+    ctx.save();
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
-    const shadowWidth = r * 2 * (1 - frac);
-    ctx.ellipse(
-      x + r - shadowWidth / 2,
-      y,
-      shadowWidth / 2,
-      r,
-      0,
-      0,
-      Math.PI * 2,
-      true
-    );
-    ctx.fill("evenodd");
+    ctx.clip();
+    ctx.drawImage(img, x - r, y - r, size, size);
+
+    if (frac < 0.98) {
+      // Shadow: dark ellipse covering the unlit fraction.
+      ctx.fillStyle = "rgba(5, 6, 13, 0.85)";
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      const shadowWidth = r * 2 * (1 - frac);
+      ctx.ellipse(
+        x + r - shadowWidth / 2,
+        y,
+        shadowWidth / 2,
+        r,
+        0,
+        0,
+        Math.PI * 2,
+        true
+      );
+      ctx.fill("evenodd");
+    }
+    ctx.restore();
+  } else {
+    // Fallback: procedural moon (the pre-2d behavior).
+    ctx.fillStyle = "#e8e3d6";
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   // Subtle border.
