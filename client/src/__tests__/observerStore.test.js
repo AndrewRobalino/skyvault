@@ -80,6 +80,30 @@ describe("observerStore", () => {
     expect(s.candidates).toEqual([]);
   });
 
+  it("submit after a location is already selected updates datetimeUtc without re-geocoding", () => {
+    // Repro for the GO button bug: user changes the date and hits GO.
+    // submit() must NOT clear `selected` (would force them to retype the
+    // location) and must NOT set `geocodeRequested` (the location text
+    // hasn't changed). It should just refresh `datetimeUtc` so the
+    // sky/planets/dso queries refetch.
+    const store = useObserverStore.getState();
+    store.setRawQuery("Portoviejo");
+    store.setDate("2026-04-08");
+    store.setTime("22:00");
+    store.setTimezone("UTC");
+    store.setCandidates(SAMPLE_CANDIDATES);
+    store.selectCandidate(0);
+    const beforeUtc = useObserverStore.getState().datetimeUtc;
+
+    store.setDate("2026-04-09");
+    store.submit();
+    const after = useObserverStore.getState();
+    expect(after.selected).not.toBeNull();
+    expect(after.geocodeRequested).toBe(false);
+    expect(after.datetimeUtc).not.toBe(beforeUtc);
+    expect(after.datetimeUtc).toBe("2026-04-09T22:00:00.000Z");
+  });
+
   it("selectCandidate with invalid index is a no-op", () => {
     const store = useObserverStore.getState();
     store.setDate("2026-04-08");
