@@ -95,6 +95,62 @@ describe("projectPlanets", () => {
     expect(projected[0].id).toBe("planet:Jupiter");
     expect(projected[0].name).toBe("Jupiter");
   });
+
+  it("attaches displaySize from apparent angular diameter (log-scaled)", () => {
+    // Sun at 1 AU → ~1920" → maps to top of the scale (15 px).
+    // Moon at 0.00257 AU → ~1862" → also at the top (eclipse-class tie).
+    // Jupiter at 5 AU → ~38" → middle (~9 px).
+    // Neptune at 30 AU → ~2.3" → bottom (4 px).
+    const planets = [
+      { name: "Sun", alt: 30, az: 0, distance_au: 1.0 },
+      { name: "Moon", alt: 30, az: 0, distance_au: 0.00257 },
+      { name: "Jupiter", alt: 30, az: 0, distance_au: 5.0 },
+      { name: "Neptune", alt: 30, az: 0, distance_au: 30.0 },
+    ];
+    const [sun, moon, jupiter, neptune] = projectPlanets(planets, 800, 450);
+    expect(sun.displaySize).toBe(15);
+    expect(moon.displaySize).toBeGreaterThanOrEqual(14); // ties Sun within rounding
+    expect(jupiter.displaySize).toBeGreaterThan(5);
+    expect(jupiter.displaySize).toBeLessThan(sun.displaySize);
+    expect(neptune.displaySize).toBe(4); // clamped at floor
+  });
+
+  it("Mars grows at opposition vs conjunction (real dynamic behavior)", () => {
+    const opp = projectPlanets(
+      [{ name: "Mars", alt: 30, az: 0, distance_au: 0.37 }],
+      800, 450,
+    )[0];
+    const conj = projectPlanets(
+      [{ name: "Mars", alt: 30, az: 0, distance_au: 2.67 }],
+      800, 450,
+    )[0];
+    expect(opp.displaySize).toBeGreaterThan(conj.displaySize);
+  });
+
+  it("returns null displaySize when distance_au is missing", () => {
+    const [p] = projectPlanets(
+      [{ name: "Jupiter", alt: 30, az: 0 }],
+      800, 450,
+    );
+    expect(p.displaySize).toBeNull();
+  });
+
+  it("normalizes lowercase backend names to Title Case", () => {
+    // Backend (FastAPI) returns "saturn", "moon", "sun" — frontend keys
+    // for textures/sizes/tints are "Saturn", "Moon", "Sun". Without
+    // normalization every planet lookup falls through to the default
+    // tint and the Sun/Moon special-case dispatch never fires.
+    const planets = [
+      { name: "saturn", alt: 22, az: 282, distance_au: 9.4 },
+      { name: "moon", alt: 30, az: 90, distance_au: 0.0026 },
+      { name: "sun", alt: 60, az: 180, distance_au: 1.0 },
+    ];
+    const [saturn, moon, sun] = projectPlanets(planets, 800, 450);
+    expect(saturn.name).toBe("Saturn");
+    expect(saturn.id).toBe("planet:Saturn");
+    expect(moon.name).toBe("Moon");
+    expect(sun.name).toBe("Sun");
+  });
 });
 
 describe("projectDsos", () => {

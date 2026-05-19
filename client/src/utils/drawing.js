@@ -10,6 +10,7 @@
 import { bvToHex } from "./bvToColor.js";
 import { horizonHaze } from "./horizonHaze.js";
 import { getTexture } from "./textureCache.js";
+import { PLANET_ICONS, drawMoonIcon } from "./planetIcons.js";
 
 /**
  * Color amplification factor for star halos.
@@ -66,20 +67,25 @@ export function magnitudeToGlow(mag) {
   return { ...DIM_TIER };
 }
 
-// Planet marker sizes (diameter, px) — Phase 2c bumped for differentiation.
+// Logarithmically-scaled marker diameters (px). The Sun caps at 15px and
+// every other body sizes down by log(d / d_moon) / log(d_sun / d_moon),
+// then maps onto [4, 15]. Linear scaling breaks at this dynamic range —
+// the Sun is 285× wider than Mercury, so a 15px Sun would put Mercury at
+// 0.05px. Log compression preserves "bigger is bigger" while keeping
+// every body clickable. Real diameters from IAU/NASA fact sheets.
 export const PLANET_SIZES = {
-  Sun: 16,
-  Moon: 16,
-  Venus: 16,
-  Jupiter: 16,
-  Mars: 14,
-  Mercury: 13,
-  Saturn: 13,
-  Uranus: 13,
-  Neptune: 13,
+  Sun: 15,
+  Jupiter: 11,
+  Saturn: 10,
+  Uranus: 9,
+  Neptune: 9,
+  Venus: 6,
+  Mars: 5,
+  Mercury: 5,
+  Moon: 4,
 };
 
-const PLANET_SIZE_DEFAULT = 13;
+const PLANET_SIZE_DEFAULT = 5;
 
 // Per-planet color tints — drawn from observed planetary colors
 // (real telescope/photo references). NOT amber-everywhere.
@@ -177,15 +183,14 @@ export function drawPlanet(ctx, planet) {
     return;
   }
 
-  const size = PLANET_SIZES[planet.name] ?? PLANET_SIZE_DEFAULT;
+  const size = planet.displaySize ?? PLANET_SIZES[planet.name] ?? PLANET_SIZE_DEFAULT;
   const tint = PLANET_TINTS[planet.name] ?? PLANET_TINT_DEFAULT;
   const { x, y } = planet;
   const r = size / 2;
-  const textureUrl = PLANET_TEXTURE_URLS[planet.name];
 
   ctx.save();
 
-  // Outer glow ring — unchanged, keeps the planet visually distinct from stars.
+  // Outer glow ring — keeps the planet visually distinct from stars.
   const glowRadius = r * 1.5;
   const glowGradient = ctx.createRadialGradient(x, y, r * 0.9, x, y, glowRadius);
   glowGradient.addColorStop(0, hexToRgba(tint, 0.35));
@@ -195,17 +200,13 @@ export function drawPlanet(ctx, planet) {
   ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
   ctx.fill();
 
-  const img = textureUrl ? getTexture(textureUrl) : null;
-  if (img && img.complete && img.naturalWidth > 0) {
-    // Clip to a circle so the rectangular texture renders as a disk.
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.drawImage(img, x - r, y - r, size, size);
-    ctx.restore();
+  // Procedural body — stylized icon per planet (Jupiter banded, Saturn ringed,
+  // Mars with polar caps, etc). Photo textures don't read at this scale and
+  // live in the tooltip thumbnail instead.
+  const drawIcon = PLANET_ICONS[planet.name];
+  if (drawIcon) {
+    drawIcon(ctx, x, y, r);
   } else {
-    // Fallback while the texture loads.
     ctx.fillStyle = tint;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -224,69 +225,125 @@ export function drawPlanet(ctx, planet) {
 
 function drawSun(ctx, planet) {
   const { x, y } = planet;
-  const size = PLANET_SIZES.Sun;
-  const halo = size * 2.5;
+  const size = planet.displaySize ?? PLANET_SIZES.Sun;
+  const r = size / 2;
+  const glowRadius = r * 1.6;
 
   ctx.save();
-  ctx.globalCompositeOperation = "lighter";
-  const gradient = ctx.createRadialGradient(x, y, 0, x, y, halo);
-  gradient.addColorStop(0, "#ffffff");
-  gradient.addColorStop(size / halo, SUN_CORE);
-  gradient.addColorStop(0.7, SUN_MID);
-  gradient.addColorStop(1, "rgba(255, 216, 144, 0)");
-  ctx.fillStyle = gradient;
+
+  // Warmer outer corona — leans more orange than the planet glows.
+  const glowGradient = ctx.createRadialGradient(x, y, r * 0.9, x, y, glowRadius);
+  glowGradient.addColorStop(0, "rgba(255, 188, 96, 0.65)");
+  glowGradient.addColorStop(1, "rgba(255, 188, 96, 0)");
+  ctx.fillStyle = glowGradient;
   ctx.beginPath();
-  ctx.arc(x, y, halo, 0, Math.PI * 2);
+  ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
   ctx.fill();
+
+  // Disk with real limb darkening: bright white core, deepens to amber
+  // then a hot orange-red rim. Reads as a fiery sphere, not a flat dot.
+  const diskGradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+  diskGradient.addColorStop(0, "#ffffff");
+  diskGradient.addColorStop(0.45, "#fff0b8");
+  diskGradient.addColorStop(0.85, "#ffae54");
+  diskGradient.addColorStop(1, "#d6661c");
+  ctx.fillStyle = diskGradient;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Two small sunspots clipped to the disk — adds texture, breaks the
+  // "solid yellow ball" read. Real sunspots are dark cooler regions.
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.fillStyle = "rgba(72, 28, 8, 0.55)";
+  ctx.beginPath();
+  ctx.ellipse(x - r * 0.32, y - r * 0.12, r * 0.14, r * 0.10, 0.3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(x + r * 0.22, y + r * 0.28, r * 0.11, r * 0.08, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Warm rim stroke seals the limb.
+  ctx.strokeStyle = "rgba(255, 160, 80, 0.7)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.stroke();
+
   ctx.restore();
 }
 
 function drawMoon(ctx, planet) {
-  const { x, y, illumination } = planet;
-  const size = PLANET_SIZES.Moon;
+  const { x, y, illumination, phase_name } = planet;
+  const size = planet.displaySize ?? PLANET_SIZES.Moon;
   const r = size / 2;
   const frac = illumination ?? 1.0;
-  const img = getTexture(PLANET_TEXTURE_URLS.Moon);
+  const isWaning =
+    typeof phase_name === "string" &&
+    (phase_name.startsWith("waning") || phase_name === "last quarter");
 
   ctx.save();
 
-  if (img.complete && img.naturalWidth > 0) {
-    // Clip to a circle, draw the texture, then composite a shadow ellipse.
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.drawImage(img, x - r, y - r, size, size);
+  // Soft outer halo — the gentle glow you see around the moon in dark sky.
+  const haloR = r * 1.35;
+  const haloGrad = ctx.createRadialGradient(x, y, r * 0.9, x, y, haloR);
+  haloGrad.addColorStop(0, "rgba(248, 240, 220, 0.22)");
+  haloGrad.addColorStop(1, "rgba(248, 240, 220, 0)");
+  ctx.fillStyle = haloGrad;
+  ctx.beginPath();
+  ctx.arc(x, y, haloR, 0, Math.PI * 2);
+  ctx.fill();
 
-    if (frac < 0.98) {
-      // Shadow: dark ellipse covering the unlit fraction.
-      ctx.fillStyle = "rgba(5, 6, 13, 0.85)";
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      const shadowWidth = r * 2 * (1 - frac);
-      ctx.ellipse(
-        x + r - shadowWidth / 2,
-        y,
-        shadowWidth / 2,
-        r,
-        0,
-        0,
-        Math.PI * 2,
-        true
-      );
-      ctx.fill("evenodd");
-    }
-    ctx.restore();
-  } else {
-    // Fallback: procedural moon (the pre-2d behavior).
-    ctx.fillStyle = "#e8e3d6";
+  if (frac >= 0.98) {
+    drawMoonIcon(ctx, x, y, r);
+  } else if (frac <= 0.02) {
+    // New moon — solid dark disk.
+    ctx.fillStyle = "#15171f";
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.fill();
+  } else {
+    // Dark hemisphere base — solid (no maria leak through transparency).
+    ctx.fillStyle = "#15171f";
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Lit-region path:
+    //   Outer: half of the disk on the lit side (RIGHT waxing, LEFT waning)
+    //   Inner: half of the terminator ellipse (same side for crescent,
+    //          opposite for gibbous so the lit region wraps the center)
+    // Canvas y-down sweep directions:
+    //   Outer top→bottom: CCW=false through RIGHT, CCW=true through LEFT
+    //   Inner bottom→top: CCW=true through RIGHT, CCW=false through LEFT
+    const isCrescent = frac < 0.5;
+    const rx = r * Math.abs(1 - 2 * frac);
+    const litDiskRight = !isWaning;
+    const litTermRight = isCrescent ? litDiskRight : !litDiskRight;
+    const outerCCW = !litDiskRight;
+    const innerCCW = litTermRight;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x, y - r);
+    ctx.arc(x, y, r, -Math.PI / 2, Math.PI / 2, outerCCW);
+    if (innerCCW) {
+      ctx.ellipse(x, y, rx, r, 0, Math.PI / 2, -Math.PI / 2, true);
+    } else {
+      ctx.ellipse(x, y, rx, r, 0, Math.PI / 2, 3 * Math.PI / 2, false);
+    }
+    ctx.closePath();
+    ctx.clip();
+
+    drawMoonIcon(ctx, x, y, r);
+    ctx.restore();
   }
 
-  // Subtle border.
-  ctx.strokeStyle = "rgba(232, 227, 214, 0.4)";
+  ctx.strokeStyle = "rgba(232, 227, 214, 0.45)";
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
