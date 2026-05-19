@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { getTexture, preloadTextures, _resetCacheForTests } from "../utils/textureCache.js";
 
 describe("textureCache", () => {

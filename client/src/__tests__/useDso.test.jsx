@@ -15,9 +15,11 @@ vi.mock("../api/client.js", () => ({
 
 function wrap() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return ({ children }) => (
+  const Wrapper = ({ children }) => (
     <QueryClientProvider client={qc}>{children}</QueryClientProvider>
   );
+  Wrapper.displayName = "QueryWrapper";
+  return Wrapper;
 }
 
 describe("useDso", () => {
