@@ -1,0 +1,32 @@
+{
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "source_url": "https://www.solarsystemscope.com/textures/",
+  "attribution": "Planet & Moon textures \u00a9 Solar System Scope (INOVE), CC BY 4.0",
+  "files": {
+    "mercury.jpg": {
+      "original": "2k_mercury.jpg"
+    },
+    "venus.jpg": {
+      "original": "2k_venus_atmosphere.jpg"
+    },
+    "mars.jpg": {
+      "original": "2k_mars.jpg"
+    },
+    "jupiter.jpg": {
+      "original": "2k_jupiter.jpg"
+    },
+    "saturn.jpg": {
+      "original": "2k_saturn.jpg"
+    },
+    "uranus.jpg": {
+      "original": "2k_uranus.jpg"
+    },
+    "neptune.jpg": {
+      "original": "2k_neptune.jpg"
+    },
+    "moon.jpg": {
+      "original": "2k_moon.jpg"
+    }
+  }
+}
