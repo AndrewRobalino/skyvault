@@ -1,0 +1,38 @@
+[
+  {
+    "id": "M31",
+    "common_name": "Andromeda Galaxy",
+    "messier_id": "M31",
+    "type": "galaxy",
+    "ra": 10.6847,
+    "dec": 41.2687,
+    "magnitude": 3.44,
+    "angular_size_arcmin": 178.0,
+    "minor_axis_arcmin": 63.0,
+    "position_angle_deg": 35.0
+  },
+  {
+    "id": "LMC",
+    "common_name": "Large Magellanic Cloud",
+    "messier_id": null,
+    "type": "galaxy",
+    "ra": 80.8939,
+    "dec": -69.7561,
+    "magnitude": 0.9,
+    "angular_size_arcmin": 645.0,
+    "minor_axis_arcmin": 550.0,
+    "position_angle_deg": null
+  },
+  {
+    "id": "M45",
+    "common_name": "Pleiades",
+    "messier_id": "M45",
+    "type": "open_cluster",
+    "ra": 56.75,
+    "dec": 24.1167,
+    "magnitude": 1.6,
+    "angular_size_arcmin": 110.0,
+    "minor_axis_arcmin": null,
+    "position_angle_deg": null
+  }
+]

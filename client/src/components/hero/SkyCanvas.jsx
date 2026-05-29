@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import { drawStar, drawPlanet } from "../../utils/drawing.js";
+import { drawDso } from "../../utils/dsoDrawing.js";
 
-export default function SkyCanvas({ projectedStars, projectedPlanets, width, height, dpr }) {
+export default function SkyCanvas({ projectedStars, projectedPlanets, projectedDsos, width, height, dpr }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -19,6 +20,13 @@ export default function SkyCanvas({ projectedStars, projectedPlanets, width, hei
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
 
+    // Layer order: DSOs under stars (cluster stars pop through), planets on top.
+    for (const d of projectedDsos ?? []) {
+      if (d.x < -200 || d.x > width + 200) continue;
+      if (d.y < -200 || d.y > height + 200) continue;
+      drawDso(ctx, d);
+    }
+
     for (const s of projectedStars) {
       if (s.x < -32 || s.x > width + 32) continue;
       if (s.y < -32 || s.y > height + 32) continue;
@@ -30,7 +38,7 @@ export default function SkyCanvas({ projectedStars, projectedPlanets, width, hei
       if (p.y < -32 || p.y > height + 32) continue;
       drawPlanet(ctx, p);
     }
-  }, [projectedStars, projectedPlanets, width, height, dpr]);
+  }, [projectedStars, projectedPlanets, projectedDsos, width, height, dpr]);
 
   return (
     <canvas

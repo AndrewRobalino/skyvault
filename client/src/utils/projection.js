@@ -57,13 +57,63 @@ export function projectStars(stars, width, height) {
   });
 }
 
+function titleCasePlanetName(name) {
+  if (typeof name !== "string" || name.length === 0) return name;
+  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+}
+
+// Real equatorial diameters (km). NASA / IAU fact sheets.
+const PLANET_DIAMETER_KM = {
+  Sun: 1_392_700,
+  Moon: 3474.8,
+  Mercury: 4879.4,
+  Venus: 12_104,
+  Mars: 6792,
+  Jupiter: 142_984,
+  Saturn: 120_536,
+  Uranus: 51_118,
+  Neptune: 49_528,
+};
+
+const AU_KM = 149_597_870.7;
+const RAD_TO_ARCSEC = 206_264.806;
+
+// Apparent angular diameter from Earth, in arcseconds.
+// Approximation valid for d << observer distance: θ ≈ diameter / distance.
+function apparentArcsec(name, distanceAu) {
+  const d = PLANET_DIAMETER_KM[name];
+  if (!d || !Number.isFinite(distanceAu) || distanceAu <= 0) return null;
+  return (d / (distanceAu * AU_KM)) * RAD_TO_ARCSEC;
+}
+
+// Log-scale apparent arcsec → marker diameter in px.
+// Anchored to the naked-eye dynamic range: Neptune at conjunction ≈ 2",
+// Sun ≈ 1920". Outside that, clamp. Result rounded to integer px.
+const MARKER_MIN_PX = 4;
+const MARKER_MAX_PX = 15;
+const LOG_MIN = Math.log10(2);     // Neptune-class
+const LOG_MAX = Math.log10(1920);  // Sun-class
+const LOG_SPAN = LOG_MAX - LOG_MIN;
+const PX_SPAN = MARKER_MAX_PX - MARKER_MIN_PX;
+
+export function markerSizePx(name, distanceAu) {
+  const arcsec = apparentArcsec(name, distanceAu);
+  if (arcsec == null) return null;
+  const logVal = Math.log10(Math.max(arcsec, 0.01));
+  const t = Math.max(0, Math.min(1, (logVal - LOG_MIN) / LOG_SPAN));
+  return Math.round(MARKER_MIN_PX + t * PX_SPAN);
+}
+
 export function projectPlanets(planets, width, height) {
   return planets.map((p) => {
     const { x, y } = projectAltAz(p, width, height);
+    const name = titleCasePlanetName(p.name);
+    const displaySize = markerSizePx(name, p.distance_au);
     return {
       kind: "planet",
-      id: `planet:${p.name}`,
-      name: p.name,
+      id: `planet:${name}`,
+      name,
+      displaySize,
       x,
       y,
       alt: p.alt,
@@ -73,6 +123,41 @@ export function projectPlanets(planets, width, height) {
       illumination: p.illumination ?? null,
       phase_name: p.phase_name ?? null,
       source: p.source ?? "JPL DE421 via Astropy",
+    };
+  });
+}
+
+export function projectDsos(dsos, width, height) {
+  if (!dsos || !dsos.length || !width || !height) return [];
+
+  // Sizing scale: REFERENCE_ALT=0 means alt=0 maps to halfShort.
+  // Near-zenith linearization: 90° of sky spans halfShort px, so
+  // pxPerArcmin ≈ halfShort / 90 / 60. Slight stereographic distortion
+  // toward the horizon is acceptable for DSO sizing.
+  const halfShort = Math.min(width, height) / 2;
+  const pxPerArcmin = halfShort / 90 / 60;
+
+  return dsos.map((d) => {
+    const { x, y } = projectAltAz(d, width, height);
+    const majorPx = (d.angular_size_arcmin ?? 0) * pxPerArcmin;
+    return {
+      kind: "dso",
+      id: `dso:${d.id}`,
+      dso_id: d.id,
+      common_name: d.common_name,
+      messier_id: d.messier_id ?? null,
+      type: d.type,
+      x,
+      y,
+      alt: d.alt,
+      az: d.az,
+      magnitude: d.magnitude,
+      angular_size_arcmin: d.angular_size_arcmin,
+      minor_axis_arcmin: d.minor_axis_arcmin ?? null,
+      position_angle_deg: d.position_angle_deg ?? null,
+      pxPerArcmin,
+      hitRadius: Math.max(12, majorPx / 2),
+      source: d.source ?? "SIMBAD/CDS",
     };
   });
 }

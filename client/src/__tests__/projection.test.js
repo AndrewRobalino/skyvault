@@ -3,6 +3,7 @@ import {
   projectAltAz,
   projectStars,
   projectPlanets,
+  projectDsos,
   REFERENCE_ALT,
 } from "../utils/projection.js";
 
@@ -93,5 +94,95 @@ describe("projectPlanets", () => {
     expect(projected[0].kind).toBe("planet");
     expect(projected[0].id).toBe("planet:Jupiter");
     expect(projected[0].name).toBe("Jupiter");
+  });
+
+  it("attaches displaySize from apparent angular diameter (log-scaled)", () => {
+    // Sun at 1 AU → ~1920" → maps to top of the scale (15 px).
+    // Moon at 0.00257 AU → ~1862" → also at the top (eclipse-class tie).
+    // Jupiter at 5 AU → ~38" → middle (~9 px).
+    // Neptune at 30 AU → ~2.3" → bottom (4 px).
+    const planets = [
+      { name: "Sun", alt: 30, az: 0, distance_au: 1.0 },
+      { name: "Moon", alt: 30, az: 0, distance_au: 0.00257 },
+      { name: "Jupiter", alt: 30, az: 0, distance_au: 5.0 },
+      { name: "Neptune", alt: 30, az: 0, distance_au: 30.0 },
+    ];
+    const [sun, moon, jupiter, neptune] = projectPlanets(planets, 800, 450);
+    expect(sun.displaySize).toBe(15);
+    expect(moon.displaySize).toBeGreaterThanOrEqual(14); // ties Sun within rounding
+    expect(jupiter.displaySize).toBeGreaterThan(5);
+    expect(jupiter.displaySize).toBeLessThan(sun.displaySize);
+    expect(neptune.displaySize).toBe(4); // clamped at floor
+  });
+
+  it("Mars grows at opposition vs conjunction (real dynamic behavior)", () => {
+    const opp = projectPlanets(
+      [{ name: "Mars", alt: 30, az: 0, distance_au: 0.37 }],
+      800, 450,
+    )[0];
+    const conj = projectPlanets(
+      [{ name: "Mars", alt: 30, az: 0, distance_au: 2.67 }],
+      800, 450,
+    )[0];
+    expect(opp.displaySize).toBeGreaterThan(conj.displaySize);
+  });
+
+  it("returns null displaySize when distance_au is missing", () => {
+    const [p] = projectPlanets(
+      [{ name: "Jupiter", alt: 30, az: 0 }],
+      800, 450,
+    );
+    expect(p.displaySize).toBeNull();
+  });
+
+  it("normalizes lowercase backend names to Title Case", () => {
+    // Backend (FastAPI) returns "saturn", "moon", "sun" — frontend keys
+    // for textures/sizes/tints are "Saturn", "Moon", "Sun". Without
+    // normalization every planet lookup falls through to the default
+    // tint and the Sun/Moon special-case dispatch never fires.
+    const planets = [
+      { name: "saturn", alt: 22, az: 282, distance_au: 9.4 },
+      { name: "moon", alt: 30, az: 90, distance_au: 0.0026 },
+      { name: "sun", alt: 60, az: 180, distance_au: 1.0 },
+    ];
+    const [saturn, moon, sun] = projectPlanets(planets, 800, 450);
+    expect(saturn.name).toBe("Saturn");
+    expect(saturn.id).toBe("planet:Saturn");
+    expect(moon.name).toBe("Moon");
+    expect(sun.name).toBe("Sun");
+  });
+});
+
+describe("projectDsos", () => {
+  it("projects an above-horizon DSO with kind=dso and pxPerArcmin", () => {
+    const dsos = [{
+      id: "M31", common_name: "Andromeda Galaxy",
+      type: "galaxy",
+      ra: 10.6847, dec: 41.2687,
+      alt: 45, az: 90,
+      magnitude: 3.44,
+      angular_size_arcmin: 178,
+      minor_axis_arcmin: 63,
+      position_angle_deg: 35,
+      source: "SIMBAD/CDS",
+    }];
+    const projected = projectDsos(dsos, 1000, 1000);
+    expect(projected).toHaveLength(1);
+    const p = projected[0];
+    expect(p.kind).toBe("dso");
+    expect(p.id).toBe("dso:M31");
+    expect(typeof p.x).toBe("number");
+    expect(typeof p.y).toBe("number");
+    expect(p.pxPerArcmin).toBeGreaterThan(0);
+    // hitRadius should be derived from angular size in pixels, min 12px
+    expect(p.hitRadius).toBeGreaterThanOrEqual(12);
+    // Original DSO fields preserved
+    expect(p.type).toBe("galaxy");
+    expect(p.common_name).toBe("Andromeda Galaxy");
+  });
+
+  it("returns [] for empty input or zero-size canvas", () => {
+    expect(projectDsos([], 1000, 1000)).toEqual([]);
+    expect(projectDsos([{ alt: 0, az: 0 }], 0, 0)).toEqual([]);
   });
 });

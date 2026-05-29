@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     # JPL DE421 planetary ephemeris (downloaded once via download_ephemeris.py)
     ephemeris_kernel_path: Path = DATA_DIR / "de421.bsp"
 
+    # Naked-eye DSO catalog (produced once via scripts/ingest_dso.py)
+    dso_catalog_path: Path = DATA_DIR / "naked_eye_dso.json"
+
     # Sky query defaults
     default_mag_limit: float = 6.5
 

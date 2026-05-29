@@ -57,4 +57,6 @@ export const api = {
     request("/sky", { lat, lon, datetime, mag_limit }),
   planets: (lat, lon, datetime) =>
     request("/planets", { lat, lon, datetime }),
+  dso: (lat, lon, datetime, { include_below_horizon = false } = {}) =>
+    request("/dso", { lat, lon, datetime, include_below_horizon }),
 };

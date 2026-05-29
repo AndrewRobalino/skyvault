@@ -1,3 +1,5 @@
+import { PLANET_TEXTURE_URLS } from "../../utils/drawing.js";
+
 const TOOLTIP_W = 240;
 const ANCHOR_OFFSET = 12;
 
@@ -55,8 +57,19 @@ function StarBody({ object }) {
 
 function PlanetBody({ object }) {
   const isMoon = object.name === "Moon";
+  const textureUrl = PLANET_TEXTURE_URLS[object.name];
   return (
     <>
+      {textureUrl && (
+        <div className="mb-2 flex justify-center">
+          <img
+            src={textureUrl}
+            alt={object.name}
+            className="h-16 w-16 rounded-full object-cover"
+            loading="lazy"
+          />
+        </div>
+      )}
       <div className="mb-2">
         <p className="text-ink text-sm font-medium">{object.name}</p>
       </div>
@@ -73,6 +86,41 @@ function PlanetBody({ object }) {
         {isMoon && object.phase_name && (
           <Row label="Phase" value={object.phase_name} />
         )}
+      </div>
+      <div className="border-t border-rule/60 pt-2 font-mono text-[11px] text-accent-dim">
+        Source: {object.source}
+      </div>
+    </>
+  );
+}
+
+const DSO_TYPE_LABEL = {
+  galaxy: "Galaxy",
+  nebula: "Nebula",
+  open_cluster: "Open cluster",
+  globular_cluster: "Globular cluster",
+};
+
+function DsoBody({ object }) {
+  const typeLabel = DSO_TYPE_LABEL[object.type] ?? "Deep-sky object";
+  const sizeText =
+    object.minor_axis_arcmin != null
+      ? `${object.angular_size_arcmin.toFixed(1)}' × ${object.minor_axis_arcmin.toFixed(1)}'`
+      : `${object.angular_size_arcmin.toFixed(1)}'`;
+  return (
+    <>
+      <div className="mb-2">
+        <p className="text-ink text-sm font-medium">{object.common_name}</p>
+        <p className="text-ink-dim text-[11px] uppercase tracking-[0.18em] mt-0.5">
+          {typeLabel}
+          {object.messier_id && <> · {object.messier_id}</>}
+        </p>
+      </div>
+      <div className="border-t border-rule/60 pt-2 pb-2">
+        <Row label="Magnitude" value={formatNumber(object.magnitude, 2)} />
+        <Row label="Angular size" value={sizeText} />
+        <Row label="Altitude" value={formatDeg(object.alt)} />
+        <Row label="Azimuth" value={formatDeg(object.az)} />
       </div>
       <div className="border-t border-rule/60 pt-2 font-mono text-[11px] text-accent-dim">
         Source: {object.source}
@@ -106,11 +154,9 @@ export default function SkyTooltip({ object, container }) {
       "
       style={{ left, top, width: TOOLTIP_W }}
     >
-      {object.kind === "star" ? (
-        <StarBody object={object} />
-      ) : (
-        <PlanetBody object={object} />
-      )}
+      {object.kind === "star" && <StarBody object={object} />}
+      {object.kind === "planet" && <PlanetBody object={object} />}
+      {object.kind === "dso" && <DsoBody object={object} />}
     </div>
   );
 }

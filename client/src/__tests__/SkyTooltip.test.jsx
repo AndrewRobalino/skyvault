@@ -117,3 +117,56 @@ describe("<SkyTooltip>", () => {
     expect(leftPx).toBeLessThan(1180);
   });
 });
+
+describe("SkyTooltip planet body texture thumbnail", () => {
+  it("shows the photoreal texture thumbnail for a planet", () => {
+    const obj = {
+      kind: "planet",
+      name: "Jupiter",
+      x: 500, y: 500,
+      alt: 45, az: 180,
+      distance_au: 4.5,
+      source: "JPL DE421 via Astropy",
+    };
+    render(<SkyTooltip object={obj} container={container} />);
+    const img = screen.getByAltText("Jupiter");
+    expect(img.getAttribute("src")).toContain("/textures/planets/jupiter.jpg");
+  });
+
+  it("does not show a thumbnail for the Sun (procedural, no texture)", () => {
+    const obj = {
+      kind: "planet",
+      name: "Sun",
+      x: 500, y: 500,
+      alt: 30, az: 90,
+      distance_au: 1.0,
+      source: "JPL DE421 via Astropy",
+    };
+    render(<SkyTooltip object={obj} container={container} />);
+    expect(screen.queryByAltText("Sun")).toBeNull();
+  });
+});
+
+describe("SkyTooltip DSO body", () => {
+  it("renders DSO metadata", () => {
+    const obj = {
+      kind: "dso",
+      id: "dso:M31",
+      common_name: "Andromeda Galaxy",
+      messier_id: "M31",
+      type: "galaxy",
+      x: 500, y: 500,
+      alt: 45, az: 90,
+      magnitude: 3.44,
+      angular_size_arcmin: 178,
+      minor_axis_arcmin: 63,
+      position_angle_deg: 35,
+      source: "SIMBAD/CDS",
+    };
+    render(<SkyTooltip object={obj} container={container} />);
+    expect(screen.getByText("Andromeda Galaxy")).toBeInTheDocument();
+    expect(screen.getAllByText(/Galaxy/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/SIMBAD\/CDS/)).toBeInTheDocument();
+    expect(screen.getByText(/3.44/)).toBeInTheDocument();
+  });
+});

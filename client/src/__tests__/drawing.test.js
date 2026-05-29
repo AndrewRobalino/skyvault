@@ -76,10 +76,13 @@ function makeMockCtx() {
     save: vi.fn(),
     restore: vi.fn(),
     beginPath: vi.fn(),
+    closePath: vi.fn(),
+    moveTo: vi.fn(),
     arc: vi.fn(),
     ellipse: vi.fn(),
     fill: vi.fn(),
     stroke: vi.fn(),
+    clip: vi.fn(),
     createRadialGradient: vi.fn(makeGradient),
     fillRect: vi.fn(),
     set fillStyle(_) {},
@@ -210,25 +213,21 @@ describe("drawStar with horizon haze and color amp", () => {
   });
 });
 
-describe("planet sizes (Phase 2c bumps)", () => {
-  it("Venus is 16px diameter", () => {
-    expect(PLANET_SIZES.Venus).toBe(16);
+describe("PLANET_SIZES fallback map", () => {
+  // Actual rendering size comes from `planet.displaySize`, computed in
+  // projectPlanets from real apparent angular diameter (see projection.js).
+  // PLANET_SIZES is a safety net for when distance_au is missing — keep
+  // its values within [4, 15] so the fallback is never disruptive.
+  it("every entry sits inside the canonical [4, 15] px range", () => {
+    for (const px of Object.values(PLANET_SIZES)) {
+      expect(px).toBeGreaterThanOrEqual(4);
+      expect(px).toBeLessThanOrEqual(15);
+    }
   });
-  it("Jupiter is 16px diameter", () => {
-    expect(PLANET_SIZES.Jupiter).toBe(16);
-  });
-  it("Mars is 14px diameter", () => {
-    expect(PLANET_SIZES.Mars).toBe(14);
-  });
-  it("Mercury, Saturn, Uranus, Neptune are 13px diameter", () => {
-    expect(PLANET_SIZES.Mercury).toBe(13);
-    expect(PLANET_SIZES.Saturn).toBe(13);
-    expect(PLANET_SIZES.Uranus).toBe(13);
-    expect(PLANET_SIZES.Neptune).toBe(13);
-  });
-  it("Sun and Moon stay at 16px", () => {
-    expect(PLANET_SIZES.Sun).toBe(16);
-    expect(PLANET_SIZES.Moon).toBe(16);
+  it("includes every body the renderer dispatches on", () => {
+    for (const name of ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]) {
+      expect(PLANET_SIZES[name]).toBeTypeOf("number");
+    }
   });
 });
 
@@ -253,5 +252,127 @@ describe("planet tints (Phase 2c per-planet colors)", () => {
   });
   it("Neptune is darker cool blue", () => {
     expect(PLANET_TINTS.Neptune).toBe("#6a8cb4");
+  });
+});
+
+function makeCtx() {
+  return {
+    save: vi.fn(),
+    restore: vi.fn(),
+    drawImage: vi.fn(),
+    beginPath: vi.fn(),
+    closePath: vi.fn(),
+    moveTo: vi.fn(),
+    arc: vi.fn(),
+    fill: vi.fn(),
+    stroke: vi.fn(),
+    ellipse: vi.fn(),
+    clip: vi.fn(),
+    fillRect: vi.fn(),
+    createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
+    set fillStyle(_v) {},
+    set strokeStyle(_v) {},
+    set lineWidth(_v) {},
+    set globalCompositeOperation(_v) {},
+  };
+}
+
+describe("drawPlanet procedural icons (Phase 2d)", () => {
+  // Phase 2d shift: photo textures don't read at sky-chart scale (22px),
+  // so planets draw as stylized procedural icons. Photo textures still
+  // ship — they live in the tooltip thumbnail. See planetIcons.js.
+  it("never calls drawImage for a regular planet", () => {
+    const ctx = makeCtx();
+    drawPlanet(ctx, { name: "Jupiter", x: 100, y: 100, alt: 45, az: 180 });
+    expect(ctx.drawImage).not.toHaveBeenCalled();
+  });
+
+  it("draws Jupiter bands via fillRect inside a disk clip", () => {
+    const ctx = makeCtx();
+    drawPlanet(ctx, { name: "Jupiter", x: 100, y: 100, alt: 45, az: 180 });
+    expect(ctx.clip).toHaveBeenCalled();
+    expect(ctx.fillRect).toHaveBeenCalled();
+  });
+
+  it("draws Saturn's ring as an ellipse", () => {
+    const ctx = makeCtx();
+    drawPlanet(ctx, { name: "Saturn", x: 100, y: 100, alt: 45, az: 180 });
+    expect(ctx.ellipse).toHaveBeenCalled();
+  });
+
+  it("Sun stays procedural (no drawImage)", () => {
+    const ctx = makeCtx();
+    drawPlanet(ctx, { name: "Sun", x: 100, y: 100, alt: 30, az: 90 });
+    expect(ctx.drawImage).not.toHaveBeenCalled();
+    expect(ctx.createRadialGradient).toHaveBeenCalled();
+  });
+});
+
+describe("drawPlanet Moon (procedural icon)", () => {
+  // Photo texture lives in the tooltip thumbnail; the sky-chart Moon is
+  // procedural so the maria pattern reads at 4–15px. drawMoon never calls
+  // drawImage anymore — regression guard against the old texture path.
+  it("never calls drawImage for the Moon (icon is procedural)", () => {
+    const ctx = makeCtx();
+    drawPlanet(ctx, { name: "Moon", x: 50, y: 50, illumination: 1.0 });
+    expect(ctx.drawImage).not.toHaveBeenCalled();
+  });
+
+  it("draws maria via ellipse calls inside the disk clip", () => {
+    const ctx = makeCtx();
+    drawPlanet(ctx, { name: "Moon", x: 50, y: 50, illumination: 1.0 });
+    expect(ctx.clip).toHaveBeenCalled();
+    expect(ctx.ellipse).toHaveBeenCalled();
+  });
+
+  it("draws a phase-shadow ellipse when illumination < 0.98", () => {
+    const ctx = makeCtx();
+    drawPlanet(ctx, { name: "Moon", x: 50, y: 50, illumination: 0.5 });
+    // Maria + shadow both use ellipse — count must exceed maria-only count.
+    const maria = makeCtx();
+    drawPlanet(maria, { name: "Moon", x: 50, y: 50, illumination: 1.0 });
+    expect(ctx.ellipse.mock.calls.length).toBeGreaterThan(maria.ellipse.mock.calls.length);
+  });
+
+  it("waxing and waning crescents render mirrored terminator directions", () => {
+    // The lit-region clip path traces the terminator ellipse first (before
+    // drawMoonIcon's maria). For waxing crescent the terminator sweeps
+    // through the RIGHT (canvas CCW=true); waning sweeps through the LEFT
+    // (CCW=false). The 8th positional arg on ctx.ellipse is the
+    // counterclockwise flag.
+    const waxing = makeCtx();
+    drawPlanet(waxing, {
+      name: "Moon",
+      x: 50,
+      y: 50,
+      illumination: 0.25,
+      phase_name: "waxing crescent",
+    });
+    const waning = makeCtx();
+    drawPlanet(waning, {
+      name: "Moon",
+      x: 50,
+      y: 50,
+      illumination: 0.25,
+      phase_name: "waning crescent",
+    });
+    const waxingTermCcw = waxing.ellipse.mock.calls[0][7];
+    const waningTermCcw = waning.ellipse.mock.calls[0][7];
+    expect(waxingTermCcw).not.toBe(waningTermCcw);
+  });
+
+  it("terminator ellipse is centered on the disk, not anchored to a limb", () => {
+    const ctx = makeCtx();
+    drawPlanet(ctx, {
+      name: "Moon",
+      x: 50,
+      y: 50,
+      illumination: 0.25,
+      phase_name: "waning crescent",
+    });
+    // First ellipse call is the terminator path (before maria).
+    const [cx, cy] = ctx.ellipse.mock.calls[0];
+    expect(cx).toBe(50);
+    expect(cy).toBe(50);
   });
 });

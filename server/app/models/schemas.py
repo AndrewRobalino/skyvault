@@ -7,6 +7,8 @@ requirement, not a nice-to-have.
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -70,4 +72,34 @@ class Planet(BaseModel):
 class PlanetsResponse(BaseModel):
     observer: Observer
     planets: list[Planet]
+    count: int
+
+
+class DeepSkyObject(BaseModel):
+    """A naked-eye deep-sky object (galaxy, nebula, or star cluster).
+
+    Positions are computed in the observer's AltAz frame at the request time.
+    RA/Dec are the catalog ICRS coordinates from SIMBAD. Angular sizes are
+    major-axis arcminutes (and minor-axis for elongated objects like M31).
+    Position angle is degrees east of north for the major axis.
+    """
+
+    id: str
+    common_name: str
+    messier_id: str | None = None
+    type: Literal["galaxy", "nebula", "open_cluster", "globular_cluster"]
+    ra: float = Field(..., ge=0.0, lt=360.0, description="ICRS right ascension in degrees")
+    dec: float = Field(..., ge=-90.0, le=90.0, description="ICRS declination in degrees")
+    alt: float
+    az: float
+    magnitude: float = Field(..., description="Apparent visual magnitude (Johnson V)")
+    angular_size_arcmin: float = Field(..., gt=0.0, description="Major-axis angular size in arcminutes")
+    minor_axis_arcmin: float | None = None
+    position_angle_deg: float | None = None
+    source: str = "SIMBAD/CDS"
+
+
+class DsoResponse(BaseModel):
+    observer: Observer
+    dsos: list[DeepSkyObject]
     count: int

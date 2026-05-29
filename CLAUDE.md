@@ -219,8 +219,9 @@ This project lives or dies on accuracy. Non-negotiable:
 - [x] **Phase 1** — Foundation: Gaia ingest script, backend API serves accurate star + planet positions (Gaia DR3 + JPL DE421, real data, tests green)
 - [x] **Phase 2a** — Frontend Foundation: Vite + React shell, intro animation, controls strip, info panels, 32 frontend tests + 52 backend tests passing
 - [x] **Phase 2b** — 2D Sky Chart: Canvas 2D stereographic projection inside the hero placeholder
-- [x] **Phase 2c** — Visual Polish + Milky Way Backdrop: WebGL panorama backdrop (ESO/S. Brunier, galactic equirectangular) + ambient CSS galaxy layer; point-based star rendering (halos only on mag ≤ 2); per-planet color tints + always-on labels; full-rectangle stereographic fill (REFERENCE_ALT = 0°); attribution footer. Code complete; awaiting visual QA across three reference observers.
-- [ ] **Phase 3** — Constellations + Enrichment: IAU overlays, SIMBAD + NASA Exoplanet Archive
+- [x] **Phase 2c** — Visual Polish + Milky Way Backdrop: WebGL panorama backdrop (ESO/S. Brunier, galactic equirectangular) + ambient CSS galaxy layer; point-based star rendering (halos only on mag ≤ 2); per-planet color tints + always-on labels; full-rectangle stereographic fill (REFERENCE_ALT = 0°); attribution footer. **Merged to main 2026-05-17 (PR #1).**
+- [~] **Phase 2d** — Celestial Objects (in progress on `feat/phase-2d-celestial-objects`): planet sprite icons + Moon texture with phase shadow + 25 naked-eye DSOs as soft glows with bright nuclei. Backend: `GET /api/v1/dso`, dso_catalog service, ingest_dso.py (TAP query + reference fallbacks), naked_eye_dso.json seeded with 25 objects. Frontend: textureCache, sprite renderers (planet + moon), dsoDrawing, useDso hook, projectDsos, SkyChart/SkyCanvas wired, SkyTooltip extended with DsoBody + planet photo. **Awaiting:** Solar System Scope texture download (manual) + three-observer visual QA + PR.
+- [ ] **Phase 3** — Constellations + Enrichment: IAU overlays, NASA Exoplanet Archive (SIMBAD already integrated for DSOs in 2d)
 - [ ] **Phase 4** — Explore Mode: Three.js 3D flyable celestial sphere (behind the "Explore in 3D" button)
 - [ ] **Phase 5** — Polish + Deploy: landing, about, docker-compose, live URL
 
@@ -232,17 +233,26 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 ## Resume Here — Next Session
 
-**Paused:** 2026-05-17, end of visual polish session.
+**Paused:** 2026-05-18, end of Phase 2d coding session.
 
-**Current state:** Phase 1 + 2a + 2b shipped. Phase 2c code complete on `feat/phase-2c-visual-polish` — **PR #1 open** against `main` (bundles Phase 2b + 2c, ~28 commits). Local + remote in sync.
+**Current state:** Phase 1 + 2a + 2b + 2c shipped (PR #1 merged 2026-05-17). Phase 2d in progress on `feat/phase-2d-celestial-objects` — **all backend + frontend code complete and committed**. Frontend 158 tests / backend 74 tests, all green.
 
-**What landed today (4 commits):** ESO/S. Brunier swap (CC BY 4.0 replaces Mellinger NC), Nominatim geocoder fallback, galaxy backdrop now visible across whole page (html-only bg-color), intro replays every load + no longer blocks on reduced-motion (fades aren't vestibular), HorizonRing removed, title trimmed to "The Sky", point-based star rendering with halo<core gradient crash fix. Frontend 133/133, backend 55/55.
+### What landed this session (2026-05-17 → 2026-05-18)
 
-**Next up — two gates before Phase 3:**
-1. **Andrew's tweak ideas** (mentioned end of session, not specified) — ask first.
-2. **Three-observer visual QA.** Delray FL 2001-08-14 was eyeballed and looks great post-recalibration. Still need NYC summer (lat 40.71, lon -74.01, 2026-08-15T02:00:00Z, MW in southern sky), Buenos Aires same instant (lat -34.61, lon -58.40, galactic core ~overhead), Anchorage winter (lat 61.22, lon -149.90, 2026-12-15T06:00:00Z). **Most likely surprise:** UV orientation on the ESO image — if galactic center lands in the wrong place, add `+ 0.5` to `uv.x` in `inverseProjection.frag.js` (the shader header flags this).
+1. **Spec + plan** — `docs/superpowers/specs/2026-05-17-phase-2d-celestial-objects-design.md` + `docs/superpowers/plans/2026-05-17-phase-2d-celestial-objects.md`
+2. **Did-you-mean dropdown fix** — `selectCandidate` now clears `candidates` so the dropdown closes after picking.
+3. **Backend (Tasks 1–5):** `DeepSkyObject` + `DsoResponse` schemas with Field bounds; `dso_catalog.py` service with Astropy ICRS→AltAz transform, `DsoCatalogNotFoundError`, settings-based path, lru_cache; `GET /api/v1/dso` router; `scripts/ingest_dso.py` using SIMBAD TAP `query_tap` + LEFT JOIN allfluxes; `naked_eye_dso.json` seeded (25 objects: 14 SIMBAD V mags + 11 reference mags from RC3/Harris96/SkyCat/NED-L5/H&W67/Acker92; 22 SIMBAD angular sizes + 3 reference sizes from RC3/SkyCat).
+4. **Frontend (Tasks 7–10):** `textureCache.js` (module-level Image cache with preload); planet sprite rendering in `drawing.js` (`PLANET_TEXTURE_URLS` exported, texture-clipped disk + dot fallback when not loaded); Moon sprite + phase shadow in `drawMoon` (texture + shadow ellipse over illumination, falls back to procedural); `dsoDrawing.js` with soft glow + bright nucleus (no UI-chip icons — iconographic glyphs were tried and rejected as breaking sky immersion).
+5. **Frontend integration (Tasks 11–16):** `api.dso`, `useDso` hook, `projectDsos` (attaches `kind: "dso"`, `pxPerArcmin`, `hitRadius`), SkyChart wires `useDso` alongside sky/planets, SkyCanvas draws DSOs between Milky Way backdrop and stars, SkyTooltip extended with `DsoBody` + photoreal `PlanetBody` thumbnail (three-way `kind` dispatch), `hitTest.js` honors per-object `hitRadius`, AttributionFooter credits Solar System Scope + SIMBAD/CDS.
+6. **DSO visibility tuning** — final values: min radius 5px (was 2), glow 0.55/0.25 alpha (original), bright nucleus at center (white 0.50 → type-color 0.28 radial). Icons were tried and rejected mid-iteration.
 
-After both gates pass: merge PR #1 → main → Phase 3 (Constellations + Enrichment) needs spec + plan.
+### What's left for Phase 2d
+
+1. **Task 6 — Solar System Scope textures (Andrew manual).** Download 8 JPGs (`2k_mercury.jpg`, `2k_venus_atmosphere.jpg`, `2k_mars.jpg`, `2k_jupiter.jpg`, `2k_saturn.jpg`, `2k_uranus.jpg`, `2k_neptune.jpg`, `2k_moon.jpg`) from https://www.solarsystemscope.com/textures/, downscale to 512×256 JPG (Pillow snippet in plan Task 6 Step 2), drop into `client/public/textures/planets/` with the `2k_` and `_atmosphere` parts removed. Then create `_credits.json` per the plan and commit. Until textures land, planets fall back to colored dots and Moon falls back to procedural disc — app keeps working.
+2. **Task 17 — Three-observer visual QA (Andrew manual).** After textures land, run the four reference observers (Delray FL 2001-08-14, NYC summer 2026-08-15T02:00Z, Buenos Aires same instant, Anchorage winter 2026-12-15T06:00Z). Capture screenshots into `docs/screenshots/phase-2d/`. Most likely surprise: planet icon sizes may need a one-line tweak in `PLANET_SIZES` after seeing real textures at scale.
+3. **Task 18 — Bundle + lint + PR open.** `npm run build` to verify bundle < 1.5 MB, `npm run lint`, then `gh pr create` (PR template in plan Task 18 Step 5). Branch: `feat/phase-2d-celestial-objects` → `main`.
+
+After Phase 2d merges: **Phase 3 (Constellations + Enrichment).** Note: SIMBAD is already wired and used (DSO catalog); Phase 3 still owes IAU constellation overlays + click-to-lookup SIMBAD on stars + NASA Exoplanet Archive overlay.
 
 ---
 
@@ -265,6 +275,11 @@ When working in this repo:
 13. **Two-layer Milky Way is deliberate.** `AppBackground` (CSS, ambient, page-wide) + `MilkyWayBackdrop` (WebGL, projected, inside chart). Both load `/milky-way.jpg`. Don't consolidate without asking — they serve different purposes (mood vs scientific projection). Galaxy backdrop visibility depends on `html` holding the bg-color while `body` and `#root` stay transparent; opaque bg on either hides the `z-index: -1` AppBackground.
 14. **Intro animation plays on every page load and does NOT gate on `prefers-reduced-motion`.** The intro is a soft opacity fade — fades aren't vestibular hazards per WCAG. The preference is still detected and stored on `useUiStateStore` (`prefersReducedMotion`) so Phase 4 Three.js (which DOES have motion) can read and respect it. Do not re-add a blanket `@media (prefers-reduced-motion: reduce)` rule that kills all keyframes.
 15. **Geocoder is dual-provider: Photon primary + Nominatim fallback.** Don't drop Nominatim — Photon outages happen (e.g., the 502 storm on 2026-05-17 that drove this design). Photon stays primary because Nominatim's public instance is rate-limited to ~1 req/sec and would die under autocomplete load.
+16. **Planet & Moon textures are Solar System Scope (INOVE), CC BY 4.0 — attribution required.** Files live at `client/public/textures/planets/{mercury,venus,mars,jupiter,saturn,uranus,neptune,moon}.jpg`, sourced from https://www.solarsystemscope.com/textures/. **Implementation requirements:** (a) credit "Planet & Moon textures: Solar System Scope · CC BY 4.0" in AttributionFooter, (b) full credit + license link on the future `/about` page, (c) `_credits.json` next to the textures documenting source per-file. Same legal pattern as the ESO panorama in guardrail #11.
+17. **DSO ingest must use SIMBAD TAP with LEFT JOIN allfluxes — not `add_votable_fields`.** In astroquery >= 0.4.8 the old `add_votable_fields("flux(V)", "dim", "otype")` API does INNER joins and silently drops every extended object that lacks a V magnitude in SIMBAD (M42, M45, M8, etc — all the diffuse ones). The TAP query in `scripts/ingest_dso.py` exists specifically to handle this; don't "simplify" back to the old API.
+18. **DSO magnitudes/sizes have a dual-source fallback model.** SIMBAD doesn't have V magnitudes for diffuse nebulae or angular sizes for some extended objects (M82, M8, NGC 3372), and it returns the *central star* magnitude for planetary nebulae (M27=14, M57=16 — wrong for our "naked-eye visibility" framing). The ingest script's `CURATED` list carries `magnitude_fallback`, `angular_size_fallback_arcmin`, `minor_axis_fallback_arcmin`, and `prefer_reference_magnitude` flags, all sourced from published catalogs (RC3, Harris96, SkyCat, NED-L5, H&W67, Acker92, Burnham). Output JSON includes `magnitude_source` and `angular_size_source` ("SIMBAD" or "reference") for provenance. **Never** silently substitute values without a citation in the script.
+19. **Curated DSO `type` always wins over SIMBAD `OTYPE`.** SIMBAD classifies M8 (Lagoon Nebula) and NGC 2070 (Tarantula Nebula) as `open_cluster` because of embedded star clusters (NGC 6530 / cluster cores). Our user-facing identity is `nebula` for both. The ingest script discards SIMBAD's OTYPE and uses `spec["type"]` directly. Don't reintroduce a SIMBAD-OTYPE inference map.
+20. **DSOs render as soft glow + bright nucleus — NOT iconographic glyphs.** Tried glyphs (spiral/puff/dots/ring SVG-style icons) on 2026-05-18; they read as UI chips against the immersive sky and broke the "real-looking sky" feel. The current approach (colored soft glow at real angular size + 5px bright nucleus colored by type) is scientifically honest (real galaxies have bright cores, real nebulae have illuminated centers) and doesn't introduce graphic-design elements. Don't re-add type icons.
 
 ---
 
