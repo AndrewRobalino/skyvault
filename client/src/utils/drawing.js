@@ -9,7 +9,6 @@
 
 import { bvToHex } from "./bvToColor.js";
 import { horizonHaze } from "./horizonHaze.js";
-import { getTexture } from "./textureCache.js";
 import { PLANET_ICONS, drawMoonIcon } from "./planetIcons.js";
 
 /**
@@ -111,10 +110,6 @@ export const PLANET_TEXTURE_URLS = {
   Neptune: "/textures/planets/neptune.jpg",
   Moon:    "/textures/planets/moon.jpg",
 };
-
-// Sun gets a warmer disc distinct from nighttime planets.
-const SUN_CORE = "#fff4c8";
-const SUN_MID = "#ffd890";
 
 export function drawStar(ctx, star) {
   const { x, y, magnitude, bp_rp, alt } = star;

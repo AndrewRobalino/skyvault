@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   magnitudeToGlow,
   drawStar,
@@ -254,9 +254,6 @@ describe("planet tints (Phase 2c per-planet colors)", () => {
     expect(PLANET_TINTS.Neptune).toBe("#6a8cb4");
   });
 });
-
-import { _resetCacheForTests, getTexture } from "../utils/textureCache.js";
-import { PLANET_TEXTURE_URLS } from "../utils/drawing.js";
 
 function makeCtx() {
   return {
