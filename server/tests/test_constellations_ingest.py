@@ -29,6 +29,18 @@ def test_parse_index_handles_constellation_with_no_lines():
     assert unique_hips(parsed) == set()
 
 
+def test_parse_index_strips_leading_style_marker():
+    # Stellarium lines can lead with a style string like "thin" (e.g. the Big
+    # Dipper's thin lines in Ursa Major). It must be filtered, not crash/drop.
+    index = {"constellations": [
+        {"id": "CON western UMa", "lines": [["thin", 58001, 57399, 54539]],
+         "common_name": {"english": "Great Bear"}, "iau": "UMa"}
+    ]}
+    parsed = parse_index(index)
+    assert len(parsed) == 1
+    assert parsed[0]["pairs"] == [(58001, 57399), (57399, 54539)]
+
+
 def test_unique_hips_collects_all_referenced_stars():
     parsed = parse_index(_load())
     hips = unique_hips(parsed)

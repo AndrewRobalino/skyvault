@@ -40,6 +40,11 @@ def parse_index(index: dict[str, Any]) -> list[dict[str, Any]]:
     """Flatten each constellation's HIP polylines into consecutive HIP pairs.
 
     A line ``[a, b, c]`` becomes segments ``(a, b)`` and ``(b, c)``.
+
+    Stellarium lines may carry a leading style marker string (e.g.
+    ``["thin", 33856, 33152]`` for a thin-weight line). We don't render
+    per-line weights in v1, so any non-integer tokens are filtered out and the
+    remaining HIP ids form the polyline.
     """
     out: list[dict[str, Any]] = []
     for c in index.get("constellations", []):
@@ -48,8 +53,9 @@ def parse_index(index: dict[str, Any]) -> list[dict[str, Any]]:
             name = c["common_name"]["english"]
             pairs: list[tuple[int, int]] = []
             for line in c.get("lines", []):
-                for a, b in zip(line, line[1:]):
-                    pairs.append((int(a), int(b)))
+                hips = [int(t) for t in line if not isinstance(t, str)]
+                for a, b in zip(hips, hips[1:]):
+                    pairs.append((a, b))
         except (KeyError, TypeError, ValueError) as exc:
             logger.warning("Skipping malformed constellation entry: %s", exc)
             continue
