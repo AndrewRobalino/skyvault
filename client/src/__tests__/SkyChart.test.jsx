@@ -13,10 +13,15 @@ vi.mock("../hooks/usePlanets.js", () => ({
 vi.mock("../hooks/useDso.js", () => ({
   useDso: vi.fn(),
 }));
+vi.mock("../hooks/useConstellations.js", () => ({
+  useConstellations: vi.fn(),
+}));
 
 import { useSky } from "../hooks/useSky.js";
 import { usePlanets } from "../hooks/usePlanets.js";
 import { useDso } from "../hooks/useDso.js";
+import { useConstellations } from "../hooks/useConstellations.js";
+import { useUiStateStore } from "../stores/uiStateStore.js";
 
 HTMLCanvasElement.prototype.getContext = () => ({
   setTransform: vi.fn(),
@@ -30,9 +35,12 @@ HTMLCanvasElement.prototype.getContext = () => ({
   restore: vi.fn(),
   ellipse: vi.fn(),
   fillRect: vi.fn(),
+  moveTo: vi.fn(),
+  lineTo: vi.fn(),
   set fillStyle(_) {},
   set strokeStyle(_) {},
   set lineWidth(_) {},
+  set globalAlpha(_) {},
   set globalCompositeOperation(_) {},
 });
 
@@ -70,6 +78,8 @@ beforeEach(() => {
   useSky.mockReturnValue(mockQuery({}));
   usePlanets.mockReturnValue(mockQuery({}));
   useDso.mockReturnValue(mockQuery({}));
+  useConstellations.mockReturnValue(mockQuery({}));
+  useUiStateStore.setState({ showConstellations: false });
   vi.useFakeTimers();
 });
 
@@ -180,6 +190,55 @@ describe("<SkyChart>", () => {
 
     fireEvent.click(root, { clientX: 10, clientY: 10 });
     expect(screen.queryByText(/Gaia DR3 · 42/)).not.toBeInTheDocument();
+  });
+
+  it("renders constellation labels when the toggle is on and data present", () => {
+    useObserverStore.getState().useCurrentLocation(25.76, -80.19, "Miami, FL");
+    useUiStateStore.setState({ showConstellations: true });
+    useSky.mockReturnValue(mockQuery({ data: { observer: {}, stars: [], count: 0 } }));
+    usePlanets.mockReturnValue(mockQuery({ data: { observer: {}, planets: [], count: 0 } }));
+    useDso.mockReturnValue(mockQuery({ data: { observer: {}, dsos: [], count: 0 } }));
+    useConstellations.mockReturnValue(
+      mockQuery({
+        data: {
+          constellations: [
+            {
+              id: "Ori",
+              name: "Orion",
+              segments: [{ from_alt: 45, from_az: 90, to_alt: 50, to_az: 95, visible: true }],
+              label_alt: 80,
+              label_az: 90,
+              label_visible: true,
+            },
+          ],
+        },
+      })
+    );
+    renderWithProviders(<SkyChart />);
+    act(() => { vi.advanceTimersByTime(200); });
+    expect(screen.getByText("Orion")).toBeInTheDocument();
+  });
+
+  it("does NOT render constellation labels when the toggle is off", () => {
+    useObserverStore.getState().useCurrentLocation(25.76, -80.19, "Miami, FL");
+    useUiStateStore.setState({ showConstellations: false });
+    useSky.mockReturnValue(mockQuery({ data: { observer: {}, stars: [], count: 0 } }));
+    usePlanets.mockReturnValue(mockQuery({ data: { observer: {}, planets: [], count: 0 } }));
+    useDso.mockReturnValue(mockQuery({ data: { observer: {}, dsos: [], count: 0 } }));
+    useConstellations.mockReturnValue(
+      mockQuery({
+        data: {
+          constellations: [
+            { id: "Ori", name: "Orion",
+              segments: [{ from_alt: 45, from_az: 90, to_alt: 50, to_az: 95, visible: true }],
+              label_alt: 80, label_az: 90, label_visible: true },
+          ],
+        },
+      })
+    );
+    renderWithProviders(<SkyChart />);
+    act(() => { vi.advanceTimersByTime(200); });
+    expect(screen.queryByText("Orion")).not.toBeInTheDocument();
   });
 
   it("Escape keypress clears an active selection", () => {
