@@ -59,4 +59,6 @@ export const api = {
     request("/planets", { lat, lon, datetime }),
   dso: (lat, lon, datetime, { include_below_horizon = false } = {}) =>
     request("/dso", { lat, lon, datetime, include_below_horizon }),
+  constellations: (lat, lon, datetime) =>
+    request("/constellations", { lat, lon, datetime }),
 };
