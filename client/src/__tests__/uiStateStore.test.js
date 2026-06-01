@@ -48,3 +48,16 @@ describe("uiStateStore", () => {
     expect(useUiStateStore.getState().prefersReducedMotion).toBe(true);
   });
 });
+
+describe("showConstellations", () => {
+  it("defaults to false", () => {
+    expect(useUiStateStore.getState().showConstellations).toBe(false);
+  });
+
+  it("toggleConstellations flips the flag", () => {
+    useUiStateStore.getState().toggleConstellations();
+    expect(useUiStateStore.getState().showConstellations).toBe(true);
+    useUiStateStore.getState().toggleConstellations();
+    expect(useUiStateStore.getState().showConstellations).toBe(false);
+  });
+});

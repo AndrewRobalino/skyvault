@@ -8,6 +8,7 @@ import { create } from "zustand";
  *   activityState — "normal" | "glass" | "hidden"
  *   lastActivityAt — epoch ms of the last meaningful user input
  *   prefersReducedMotion — reflects @media (prefers-reduced-motion: reduce)
+ *   showConstellations — constellation overlay toggle (default off)
  */
 export const useUiStateStore = create((set) => ({
   introState: "pending",
@@ -25,4 +26,11 @@ export const useUiStateStore = create((set) => ({
   markHidden: () => set({ activityState: "hidden" }),
 
   setReducedMotion: (prefersReducedMotion) => set({ prefersReducedMotion }),
+
+  showConstellations: false,
+
+  toggleConstellations: () =>
+    set((s) => ({ showConstellations: !s.showConstellations })),
+
+  setShowConstellations: (showConstellations) => set({ showConstellations }),
 }));
