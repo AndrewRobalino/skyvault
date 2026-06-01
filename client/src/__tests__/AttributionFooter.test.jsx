@@ -36,4 +36,9 @@ describe("AttributionFooter", () => {
     const root = container.firstChild;
     expect(root.className).toMatch(/absolute/);
   });
+
+  it("credits the constellation figure source", () => {
+    render(<AttributionFooter />);
+    expect(screen.getByText(/Constellation figures: Stellarium · CC BY-SA/)).toBeInTheDocument();
+  });
 });
