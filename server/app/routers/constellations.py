@@ -1,14 +1,36 @@
-"""GET /api/v1/constellations — IAU 88 constellations, stick figures, labels.
+"""GET /api/v1/constellations — Western stick-figure constellations for an observer.
 
-Phase 3 focus, but the route is scaffolded now so the frontend can stub against it.
+Source: Stellarium Western sky culture (figures, CC BY-SA) + ESA Hipparcos
+(coordinates) + IAU (names). See scripts/ingest_constellations.py.
 """
 
-from fastapi import APIRouter
+from __future__ import annotations
+
+from fastapi import APIRouter, HTTPException, Query
+
+from app.models.schemas import ConstellationsResponse, Observer
+from app.services import constellation_catalog
 
 router = APIRouter(prefix="/constellations", tags=["constellations"])
 
 
-@router.get("")
-async def get_constellations() -> dict:
-    # TODO(phase-3): load IAU stick-figure data from data/constellations.json
-    return {"constellations": [], "source": "IAU"}
+@router.get("", response_model=ConstellationsResponse)
+async def get_constellations(
+    lat: float = Query(..., ge=-90.0, le=90.0, description="Observer latitude (deg)"),
+    lon: float = Query(..., ge=-180.0, le=180.0, description="Observer longitude (deg)"),
+    datetime: str = Query(..., description="Observation time, ISO 8601 UTC"),
+) -> ConstellationsResponse:
+    try:
+        data = constellation_catalog.load_catalog()
+    except constellation_catalog.ConstellationCatalogNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    constellations = constellation_catalog.constellations_for_observer(
+        lat=lat, lon=lon, time_utc=datetime
+    )
+    return ConstellationsResponse(
+        observer=Observer(lat=lat, lon=lon, datetime=datetime),
+        constellations=constellations,
+        count=len(constellations),
+        source=data["source"],
+    )
