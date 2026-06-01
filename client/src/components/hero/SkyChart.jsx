@@ -17,6 +17,7 @@ import MilkyWayBackdrop from "./MilkyWayBackdrop.jsx";
 import PlanetLabels from "./PlanetLabels.jsx";
 import ConstellationLabels from "./ConstellationLabels.jsx";
 import AttributionFooter from "./AttributionFooter.jsx";
+import ConstellationToggle from "./ConstellationToggle.jsx";
 
 function statusFor({ selected, skyQuery, planetsQuery, dsoQuery }) {
   if (!selected) return "idle";
@@ -165,6 +166,8 @@ export default function SkyChart() {
           dsoQuery.refetch();
         }}
       />
+
+      <ConstellationToggle />
 
       <AttributionFooter />
     </div>
