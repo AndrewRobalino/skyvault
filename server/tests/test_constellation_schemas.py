@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from app.models.schemas import (
     Constellation,
     ConstellationSegment,
@@ -12,6 +14,9 @@ def test_segment_carries_both_endpoints_altaz_and_visible():
     )
     assert seg.visible is True
     assert seg.from_alt == 10.0
+    assert seg.from_az == 20.0
+    assert seg.to_alt == 12.0
+    assert seg.to_az == 25.0
 
 
 def test_constellation_groups_segments_and_label():
@@ -29,6 +34,21 @@ def test_constellation_groups_segments_and_label():
     )
     assert c.id == "Ori"
     assert len(c.segments) == 1
+    assert c.label_alt == 11.0
+    assert c.label_az == 22.0
+    assert c.label_visible is True
+
+
+def test_constellation_allows_empty_segments():
+    c = Constellation(
+        id="X",
+        name="X",
+        segments=[],
+        label_alt=0.0,
+        label_az=0.0,
+        label_visible=False,
+    )
+    assert c.segments == []
 
 
 def test_response_includes_source_block():
