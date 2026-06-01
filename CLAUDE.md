@@ -221,7 +221,8 @@ This project lives or dies on accuracy. Non-negotiable:
 - [x] **Phase 2b** — 2D Sky Chart: Canvas 2D stereographic projection inside the hero placeholder
 - [x] **Phase 2c** — Visual Polish + Milky Way Backdrop: WebGL panorama backdrop (ESO/S. Brunier, galactic equirectangular) + ambient CSS galaxy layer; point-based star rendering (halos only on mag ≤ 2); per-planet color tints + always-on labels; full-rectangle stereographic fill (REFERENCE_ALT = 0°); attribution footer. **Merged to main 2026-05-17 (PR #1).**
 - [x] **Phase 2d** — Celestial Objects: planet sprite icons (procedural + photo-texture tooltip thumbnails) + Moon texture with phase shadow + apparent-size scaling + 25 naked-eye DSOs as soft glows with bright nuclei. Backend: `GET /api/v1/dso`, dso_catalog service, ingest_dso.py (TAP query + reference fallbacks), naked_eye_dso.json seeded with 25 objects. Frontend: textureCache, sprite renderers (planet + moon), dsoDrawing, useDso hook, projectDsos, SkyChart/SkyCanvas wired, SkyTooltip extended with DsoBody + planet photo. **Merged to main 2026-05-29 (PR #2, commit `f17dccb`).**
-- [ ] **Phase 3** — Constellations + Enrichment: IAU overlays, NASA Exoplanet Archive (SIMBAD already integrated for DSOs in 2d)
+- [x] **Phase 3a** — Constellations: toggleable Western stick-figure overlay (lines + name labels), observer-parameterized `GET /api/v1/constellations` (ICRS→AltAz, both-endpoints-visible rule). Backend: `constellation_catalog` service, `ingest_constellations.py` (Stellarium `index.json` HIP polylines → VizieR Hipparcos → baked `constellations.json`, 88 constellations / 674 segments). Frontend: `showConstellations` store toggle (default OFF), gated `useConstellations` hook, `projectConstellations`, SkyCanvas line layer (behind objects), `ConstellationLabels` DOM overlay, `ConstellationToggle` control. Triple-attributed: Stellarium Western (CC BY-SA) + ESA Hipparcos + IAU. **Branch `feat/phase-3a-constellations` — not yet merged.**
+- [ ] **Phase 3b** — Enrichment: click-to-lookup SIMBAD on stars + NASA Exoplanet Archive host-star badges (cold-path cached `/objects/{id}` infra; backend stubs today).
 - [ ] **Phase 4** — Explore Mode: Three.js 3D flyable celestial sphere (behind the "Explore in 3D" button)
 - [ ] **Phase 5** — Polish + Deploy: landing, about, docker-compose, live URL
 
@@ -233,16 +234,18 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 ## Resume Here — Next Session
 
-**Paused:** 2026-05-29, after merging Phase 2d.
+**Paused:** 2026-06-01, after implementing Phase 3a (Constellations) on branch `feat/phase-3a-constellations` — not yet merged.
 
-**Current state:** Phase 1 + 2a + 2b + 2c + **2d all shipped to main** (PR #2 merged 2026-05-29, commit `f17dccb`). Frontend 169 tests / backend 74 tests, all green; lint clean (0 warnings); production build 236 KB JS (75 KB gzip). Andrew did a live visual-QA pass across the reference observers — holds up; no fixes flagged.
+**Current state:** Phase 1 + 2a + 2b + 2c + 2d shipped to main; **Phase 3a complete on `feat/phase-3a-constellations`** (spec + plan in `docs/superpowers/`). Frontend 184 tests / backend 94 tests, all green; lint clean (0 warnings); production build 238.55 KB JS (75.75 KB gzip). Built subagent-driven, TDD per task, two-stage review. **Pending: live visual QA + merge.** During the bake, found Stellarium `lines` carry style markers (e.g. `"thin"`) — parser strips them; without that fix Canis Major + Ursa Major were silently dropped.
 
-### Next up — Phase 3 (Constellations + Enrichment)
+### Next up — Phase 3b (Enrichment)
 
 Needs a spec + plan (brainstorm first). Scope:
-1. **IAU constellation overlays** — stick figures + (optional) boundaries. `GET /api/v1/constellations` is already in the contract; `constellations.json` (IAU stick figures) needs sourcing/committing. Render as a toggleable line layer in SkyCanvas.
-2. **Click-to-lookup SIMBAD on stars** — SIMBAD is already wired (used by DSO ingest), but not yet for interactive star lookups. Add `GET /api/v1/objects/{id}` enrichment path (cached) + frontend click → info panel with alternate names, spectral class, object type.
-3. **NASA Exoplanet Archive overlay** — "has confirmed exoplanets" badge on host stars. Cold-path, cached service under `server/app/services/enrichment/exoplanet_archive.py`.
+1. **Click-to-lookup SIMBAD on stars** — SIMBAD is already wired (used by DSO ingest), but not yet for interactive star lookups. Add `GET /api/v1/objects/{id}` enrichment path (cached) + frontend click → info panel with alternate names, spectral class, object type. (`objects.py` router + `enrichment/simbad.py` are stubs today.)
+2. **NASA Exoplanet Archive overlay** — "has confirmed exoplanets" badge on host stars. Cold-path, cached service under `server/app/services/enrichment/exoplanet_archive.py`.
+
+### Tech debt noted during 3a (not a blocker)
+- `time_utc.replace("Z", "")` is duplicated across `constellation_catalog.py`, `dso_catalog.py`, `coordinates.py`, `ephemeris.py` and only handles `Z`-suffix ISO. The frontend always sends `Z`, so no live bug — but a shared UTC-parse helper would remove the latent `+00:00` failure mode.
 
 ### Known follow-ups (deferred, not blockers)
 - Planet apparent-size scaling and Saturn's ring tilt are stylized for v1; real ring-plane geometry waits for Phase 4 Three.js.
