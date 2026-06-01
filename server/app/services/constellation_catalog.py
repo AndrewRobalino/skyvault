@@ -58,6 +58,7 @@ def constellations_for_observer(
         return []
 
     location = EarthLocation(lat=lat * u.deg, lon=lon * u.deg)
+    # Strips a trailing "Z"; the frontend always sends Z-suffixed ISO UTC.
     time = Time(time_utc.replace("Z", ""), scale="utc")
     frame = AltAz(obstime=time, location=location)
 

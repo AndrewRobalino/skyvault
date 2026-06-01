@@ -36,6 +36,7 @@ def test_polaris_segment_visible_from_nyc():
     umi = next(c for c in result if c.id == "UMi")
     assert umi.segments[0].visible is True
     assert umi.label_alt > 0
+    assert umi.label_visible is True
 
 
 def test_polaris_below_horizon_from_southern_hemisphere():
@@ -47,14 +48,17 @@ def test_polaris_below_horizon_from_southern_hemisphere():
     )
     umi = next(c for c in result if c.id == "UMi")
     assert umi.segments[0].visible is False
+    assert umi.label_visible is False
 
 
 def test_response_shape_has_altaz_on_endpoints():
+    # Orion is below the horizon at this UTC time; this checks response SHAPE only.
     result = constellation_catalog.constellations_for_observer(
         lat=40.7128, lon=-74.0060, time_utc="2026-06-01T04:00:00Z",
         catalog_path=FIXTURE,
     )
     ori = next(c for c in result if c.id == "Ori")
     seg = ori.segments[0]
-    assert hasattr(seg, "from_alt") and hasattr(seg, "to_az")
+    assert seg.from_alt is not None and seg.from_az is not None
+    assert seg.to_alt is not None and seg.to_az is not None
     assert isinstance(seg.visible, bool)

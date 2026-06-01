@@ -109,7 +109,8 @@ class ConstellationSegment(BaseModel):
     """One stick-figure line segment in the observer's AltAz frame.
 
     ``visible`` is True only when BOTH endpoints are above the horizon.
-    Horizon-crossing segments are dropped at the service layer, not clipped.
+    Segments with an endpoint below the horizon are still returned with
+    ``visible=False`` — the client decides whether to draw them.
     """
 
     from_alt: float
