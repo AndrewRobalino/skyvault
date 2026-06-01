@@ -39,4 +39,22 @@ describe("projectConstellations", () => {
     expect(projectConstellations([], W, H)).toEqual({ lines: [], labels: [] });
     expect(projectConstellations(undefined, W, H)).toEqual({ lines: [], labels: [] });
   });
+
+  it("suppresses an orphan label when no segment is visible", () => {
+    // Centroid above the horizon but every segment below it -> no figure to
+    // label, so the label must be dropped (avoids a floating name).
+    const orphan = [
+      {
+        id: "Cas",
+        name: "Cassiopeia",
+        segments: [{ from_alt: -2, from_az: 10, to_alt: -5, to_az: 15, visible: false }],
+        label_alt: 3,
+        label_az: 12,
+        label_visible: true,
+      },
+    ];
+    const { lines, labels } = projectConstellations(orphan, W, H);
+    expect(lines).toHaveLength(0);
+    expect(labels).toHaveLength(0);
+  });
 });
