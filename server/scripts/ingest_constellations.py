@@ -46,13 +46,13 @@ def parse_index(index: dict[str, Any]) -> list[dict[str, Any]]:
         try:
             iau = c["iau"]
             name = c["common_name"]["english"]
-        except (KeyError, TypeError) as exc:
+            pairs: list[tuple[int, int]] = []
+            for line in c.get("lines", []):
+                for a, b in zip(line, line[1:]):
+                    pairs.append((int(a), int(b)))
+        except (KeyError, TypeError, ValueError) as exc:
             logger.warning("Skipping malformed constellation entry: %s", exc)
             continue
-        pairs: list[tuple[int, int]] = []
-        for line in c.get("lines", []):
-            for a, b in zip(line, line[1:]):
-                pairs.append((int(a), int(b)))
         out.append({"id": iau, "name": name, "pairs": pairs})
     return out
 
@@ -73,6 +73,8 @@ def centroid_radec(points: list[tuple[float, float]]) -> tuple[float, float]:
     Unit-vector mean is robust to the RA=0/360 wraparound (a naive arithmetic
     mean of RA degrees would place a centroid of 359 and 1 deg at 180).
     """
+    if not points:
+        raise ValueError("centroid_radec requires at least one point")
     ra = np.radians([p[0] for p in points])
     dec = np.radians([p[1] for p in points])
     x = np.mean(np.cos(dec) * np.cos(ra))
@@ -105,6 +107,7 @@ def build_catalog(
         if not segments:
             logger.warning("Constellation %s has no resolvable segments", c["id"])
             continue
+        # sorted() -> deterministic float summation -> reproducible baked output.
         ra_c, dec_c = centroid_radec(sorted(star_points))
         constellations.append(
             {
@@ -120,27 +123,24 @@ def build_catalog(
 def resolve_hip_coords(hips: set[int]) -> dict[int, tuple[float, float]]:
     """Resolve HIP ids to ICRS RA/Dec (deg) via VizieR Hipparcos I/239/hip_main.
 
-    Network call — used only by main(), never by tests. Positions are the
-    catalogue ICRS values (epoch J1991.25); proper-motion drift to J2000 is
-    sub-arcsecond for the bright figure stars and visually irrelevant for
-    stick-figure lines, so it is not applied.
+    Fetches the full hip_main catalogue (columns HIP, RAICRS, DEICRS) once and
+    filters to the requested HIP set locally — more robust than per-id VizieR
+    constraint strings. Network call; used only by main(), never by tests.
+
+    Positions are the catalogue ICRS values (epoch J1991.25); proper-motion
+    drift to J2000 is sub-arcsecond for the bright figure stars and visually
+    irrelevant for stick-figure lines, so it is not applied.
     """
     from astroquery.vizier import Vizier
 
-    v = Vizier(columns=["HIP", "RAICRS", "DEICRS"], catalog="I/239/hip_main")
-    v.ROW_LIMIT = -1
-    hip_list = sorted(hips)
+    v = Vizier(columns=["HIP", "RAICRS", "DEICRS"], row_limit=-1)
+    catalogs = v.get_catalogs("I/239/hip_main")
+    table = catalogs[0]
     coords: dict[int, tuple[float, float]] = {}
-    # Query in chunks to keep the constraint string manageable.
-    chunk = 500
-    for i in range(0, len(hip_list), chunk):
-        block = hip_list[i : i + chunk]
-        result = v.query_constraints(HIP="=,{}".format(",".join(map(str, block))))
-        if not result:
-            continue
-        table = result[0]
-        for row in table:
-            coords[int(row["HIP"])] = (float(row["RAICRS"]), float(row["DEICRS"]))
+    for row in table:
+        hip = int(row["HIP"])
+        if hip in hips:
+            coords[hip] = (float(row["RAICRS"]), float(row["DEICRS"]))
     return coords
 
 
@@ -159,6 +159,11 @@ def main() -> None:
     logger.info("Resolving %d unique HIP stars via VizieR...", len(hips))
     coords = resolve_hip_coords(hips)
     logger.info("Resolved %d/%d HIP stars", len(coords), len(hips))
+    if len(coords) < 0.5 * len(hips):
+        raise SystemExit(
+            f"Only resolved {len(coords)}/{len(hips)} HIP stars — VizieR query "
+            "likely failed. Aborting to avoid baking an empty catalog."
+        )
 
     catalog = build_catalog(parsed, coords)
     OUTPUT_PATH.write_text(json.dumps(catalog, indent=2), encoding="utf-8")

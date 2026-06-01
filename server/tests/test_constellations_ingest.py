@@ -70,3 +70,9 @@ def test_parse_index_skips_malformed_entry():
     parsed = parse_index(index)
     assert len(parsed) == 1
     assert parsed[0]["id"] == "Tst"
+
+
+def test_build_catalog_drops_constellation_with_all_segments_unresolved():
+    parsed = [{"id": "Tst", "name": "Test", "pairs": [(1, 99), (98, 99)]}]
+    out = build_catalog(parsed, {})  # nothing resolves
+    assert out["constellations"] == []
