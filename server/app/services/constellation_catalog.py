@@ -38,3 +38,72 @@ def load_catalog(path: Path | None = None) -> dict:
         )
     with p.open(encoding="utf-8") as fh:
         return json.load(fh)
+
+
+def constellations_for_observer(
+    lat: float,
+    lon: float,
+    time_utc: str,
+    catalog_path: Path | None = None,
+) -> list[Constellation]:
+    """Return constellations with AltAz-transformed segments + labels.
+
+    A segment is ``visible`` only when both endpoints are above the horizon.
+    A label is visible only when its centroid is above the horizon. Nothing is
+    dropped from the response — visibility is flagged so the client can choose.
+    """
+    data = load_catalog(catalog_path)
+    raw = data.get("constellations", [])
+    if not raw:
+        return []
+
+    location = EarthLocation(lat=lat * u.deg, lon=lon * u.deg)
+    time = Time(time_utc.replace("Z", ""), scale="utc")
+    frame = AltAz(obstime=time, location=location)
+
+    # Flatten every endpoint + every label into one SkyCoord for a single
+    # vectorized transform, then scatter results back by index.
+    ras: list[float] = []
+    decs: list[float] = []
+    for c in raw:
+        for seg in c["segments"]:
+            ras.extend([seg["from"][0], seg["to"][0]])
+            decs.extend([seg["from"][1], seg["to"][1]])
+        ras.append(c["label"][0])
+        decs.append(c["label"][1])
+
+    coords = SkyCoord(ra=np.array(ras) * u.deg, dec=np.array(decs) * u.deg, frame="icrs")
+    altaz = coords.transform_to(frame)
+    alts = altaz.alt.deg
+    azs = altaz.az.deg
+
+    out: list[Constellation] = []
+    idx = 0
+    for c in raw:
+        segments: list[ConstellationSegment] = []
+        for _seg in c["segments"]:
+            f_alt, f_az = float(alts[idx]), float(azs[idx])
+            t_alt, t_az = float(alts[idx + 1]), float(azs[idx + 1])
+            idx += 2
+            segments.append(
+                ConstellationSegment(
+                    from_alt=f_alt,
+                    from_az=f_az,
+                    to_alt=t_alt,
+                    to_az=t_az,
+                    visible=(f_alt >= 0 and t_alt >= 0),
+                )
+            )
+        label_alt, label_az = float(alts[idx]), float(azs[idx])
+        idx += 1
+        out.append(
+            Constellation(
+                id=c["id"],
+                name=c["name"],
+                segments=segments,
+                label_alt=label_alt,
+                label_az=label_az,
+                label_visible=label_alt >= 0,
+            )
+        )
+    return out
