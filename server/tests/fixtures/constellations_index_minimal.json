@@ -1,0 +1,17 @@
+{
+  "id": "western",
+  "constellations": [
+    {
+      "id": "CON western Ori",
+      "lines": [[26727, 26311, 25336], [27989, 26727]],
+      "common_name": {"english": "Orion", "native": "Orion"},
+      "iau": "Ori"
+    },
+    {
+      "id": "CON western UMi",
+      "lines": [[11767, 85822, 82080]],
+      "common_name": {"english": "Little Bear", "native": "Ursa Minor"},
+      "iau": "UMi"
+    }
+  ]
+}
