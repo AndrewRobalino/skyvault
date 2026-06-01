@@ -1,0 +1,27 @@
+{
+  "source": {
+    "figures": "Stellarium Western sky culture",
+    "figures_license": "CC BY-SA 4.0",
+    "coordinates": "ESA Hipparcos (VizieR I/239/hip_main)",
+    "names": "IAU"
+  },
+  "constellations": [
+    {
+      "id": "Ori",
+      "name": "Orion",
+      "segments": [
+        { "from": [83.0016, -0.2991], "to": [84.0534, -1.2019] },
+        { "from": [84.0534, -1.2019], "to": [85.1897, -1.9426] }
+      ],
+      "label": [84.0816, -1.1479]
+    },
+    {
+      "id": "UMi",
+      "name": "Little Bear",
+      "segments": [
+        { "from": [37.9529, 89.2641], "to": [236.0150, 77.7944] }
+      ],
+      "label": [136.9839, 83.5292]
+    }
+  ]
+}
