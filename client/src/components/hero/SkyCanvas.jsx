@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { drawStar, drawPlanet } from "../../utils/drawing.js";
 import { drawDso } from "../../utils/dsoDrawing.js";
 
-export default function SkyCanvas({ projectedStars, projectedPlanets, projectedDsos, width, height, dpr }) {
+export default function SkyCanvas({ projectedStars, projectedPlanets, projectedDsos, projectedLines, width, height, dpr }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -19,6 +19,21 @@ export default function SkyCanvas({ projectedStars, projectedPlanets, projectedD
     if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
+
+    // Layer order: constellation lines first (behind DSOs/stars/planets).
+    const lines = projectedLines ?? [];
+    if (lines.length) {
+      ctx.save();
+      ctx.strokeStyle = "rgba(150, 180, 220, 0.22)";
+      ctx.lineWidth = dpr > 1 ? 1.5 : 1;
+      for (const ln of lines) {
+        ctx.beginPath();
+        ctx.moveTo(ln.x1, ln.y1);
+        ctx.lineTo(ln.x2, ln.y2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
 
     // Layer order: DSOs under stars (cluster stars pop through), planets on top.
     for (const d of projectedDsos ?? []) {
@@ -38,7 +53,7 @@ export default function SkyCanvas({ projectedStars, projectedPlanets, projectedD
       if (p.y < -32 || p.y > height + 32) continue;
       drawPlanet(ctx, p);
     }
-  }, [projectedStars, projectedPlanets, projectedDsos, width, height, dpr]);
+  }, [projectedStars, projectedPlanets, projectedDsos, projectedLines, width, height, dpr]);
 
   return (
     <canvas
