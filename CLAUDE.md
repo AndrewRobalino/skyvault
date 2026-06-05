@@ -44,7 +44,7 @@ All sources are real institutional datasets. **No faked, mocked, or approximated
 |---|---|---|---|
 | **Gaia DR3** (G < 8 subset, ~230k stars) | Star positions (ICRS), magnitudes, parallax, proper motion, BP-RP color | **ESA** | One-time ingest via Gaia TAP (astroquery.gaia), stored as parquet in `server/data/` |
 | **JPL DE421 ephemeris** | Sun, Moon, Mercury–Neptune positions | **NASA JPL** | Astropy's `solar_system_ephemeris.set('de421')` |
-| **IAU constellation data** | Official 88 constellations, stick figures, boundaries | **IAU** | Static data, committed to repo |
+| **Constellation figures** | 88 constellation stick-figure line patterns (Stellarium Western sky culture) + star coordinates (ESA Hipparcos) + names (IAU). NOTE: IAU officially defines only constellation *boundaries* and *names* — not stick figures. The figures are Stellarium's Western convention, a recognized de-facto standard. | **Stellarium (figures, CC BY-SA) · ESA Hipparcos (coords) · IAU (names)** | Baked to `server/data/constellations.json` via `scripts/ingest_constellations.py` |
 | **ESO/S. Brunier GigaGalaxy Zoom panorama** (eso0932a) | Photo-realistic Milky Way backdrop (galactic equirectangular, 4000×2000) | **ESO/S. Brunier** | Static asset at `client/public/milky-way.jpg`, sampled by WebGL shader (Phase 2c). Also used as ambient page backdrop via CSS. **CC BY 4.0 — attribution required.** |
 
 ### Tier 2 — Enrichment APIs (cold path, lazy, cached)
@@ -110,7 +110,7 @@ skyvault/
 │   │       └── schemas.py     # Pydantic models
 │   ├── data/
 │   │   ├── gaia_dr3_g8.parquet   # Gaia DR3 subset (downloaded via ingest script, gitignored)
-│   │   └── constellations.json   # IAU stick figures (committed)
+│   │   └── constellations.json   # Stellarium Western stick figures + Hipparcos coords (committed)
 │   ├── scripts/
 │   │   └── ingest_gaia.py     # One-time Gaia TAP download -> parquet
 │   ├── tests/
@@ -195,7 +195,7 @@ skyvault/
 Same observer params. Returns Sun, Moon, Mercury–Neptune with AltAz coordinates, distance from Earth, and `"source": "JPL DE421 via Astropy"`.
 
 ### `GET /api/v1/constellations`
-Returns IAU constellation stick-figure line segments and label positions. Static. Cached aggressively.
+Returns constellation stick-figure line segments (Stellarium Western sky culture; ESA Hipparcos coords; IAU names) and label positions, transformed to the observer's AltAz frame. Observer-parameterized (`lat`, `lon`, `datetime`). A segment is `visible` only if both endpoints are above the horizon.
 
 ### `GET /api/v1/objects/{id}` (Phase 3+)
 Enrichment lookup. Returns SIMBAD metadata + NASA Exoplanet Archive data if the object is an exoplanet host. Responses cached server-side.

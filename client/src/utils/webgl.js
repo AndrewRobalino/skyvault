@@ -1,5 +1,5 @@
 /**
- * Tiny WebGL helpers — just enough boilerplate for the Mellinger backdrop.
+ * Tiny WebGL helpers — just enough boilerplate for the Milky Way backdrop.
  *
  * Throws on failure with a useful message; callers handle the error and
  * fall back to dark-fill rendering.

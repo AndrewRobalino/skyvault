@@ -37,8 +37,8 @@ All real institutional datasets. Two-tier architecture: bulk render data loaded 
 |---|---|---|---|
 | **Gaia DR3** (G<8 subset, ~230k stars) | **ESA** | ICRS positions, magnitude, parallax, proper motion, BP-RP color | One-time TAP query via astroquery → parquet |
 | **JPL DE421** | **NASA/JPL** | Sun, Moon, Mercury–Neptune positions (arcsecond precision) | Astropy `solar_system_ephemeris.set('de421')` |
-| **IAU Constellation Data** | **IAU** | Official 88 constellation boundaries + stick figures | Static JSON committed to repo |
-| **Mellinger 2.0 All-Sky Milky Way Panorama** | **© Axel Mellinger** | Photo-realistic Milky Way backdrop (galactic equirectangular) | Static asset (gitignored), sampled by WebGL shader. Non-commercial license — see CLAUDE.md guardrail #11. |
+| **Constellation figures** | **Stellarium (figures) · ESA Hipparcos (coords) · IAU (names)** | 88 stick-figure line patterns (Stellarium Western sky culture — IAU defines only boundaries + names, not figures), Hipparcos star coordinates, IAU names | Baked to static JSON via `scripts/ingest_constellations.py` |
+| **ESO/S. Brunier GigaGalaxy Zoom Panorama** (eso0932a) | **ESO / Serge Brunier** | Photo-realistic all-sky Milky Way backdrop (galactic equirectangular, 4000×2000) | Static asset at `client/public/milky-way.jpg`, sampled by WebGL shader + ambient CSS layer. **CC BY 4.0 — attribution required** (see CLAUDE.md guardrail #11). |
 
 ### Tier 2 — Enrichment (cold path, cached)
 
@@ -48,7 +48,7 @@ All real institutional datasets. Two-tier architecture: bulk render data loaded 
 | **NASA Exoplanet Archive** | **NASA/IPAC** | ~5,600 confirmed exoplanets + host stars | Phase 3 |
 | **JPL Horizons** | **NASA/JPL** | Live ephemerides for asteroids, comets, spacecraft | Phase 4 |
 
-Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD · NASA Exoplanet Archive · Milky Way panorama © Axel Mellinger"*
+Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD · NASA Exoplanet Archive · Milky Way panorama: ESO/S. Brunier (CC BY 4.0)"*
 
 ---
 
@@ -137,18 +137,18 @@ Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD �
 
 > **Spec:** `docs/superpowers/specs/2026-04-27-phase-2c-visual-polish-design.md` · **Plan:** `docs/superpowers/plans/2026-04-27-phase-2c-visual-polish.md` · **Branch:** `feat/phase-2c-visual-polish`
 
-**Status:** All 17 implementation tasks shipped (134 frontend tests green, lint clean). Awaiting (a) Mellinger asset placement at `client/public/assets/mellinger_2_galactic.webp` and (b) manual visual QA against the three reference observers (NYC summer, Buenos Aires same-instant, Anchorage winter).
+**Status:** Shipped and merged to `main` (PR #1, 2026-05-17). Backdrop uses the **ESO/S. Brunier GigaGalaxy Zoom panorama** (eso0932a, CC BY 4.0) at `client/public/milky-way.jpg` — the original Mellinger 2.0 plan was dropped after its CMU host went unreachable; same shader path, friendlier license. Visual QA passed against the three reference observers.
 
 **Goal:** Transform the Phase 2b chart from "data viz of dots" into an immersive astrophotography-vibe night sky.
 
 **In scope:**
-- **Mellinger 2.0 Milky Way backdrop** — WebGL fragment shader samples the galactic equirectangular panorama, transforms galactic → equatorial → AltAz per fragment, renders behind the Canvas 2D star/planet layer
+- **ESO/S. Brunier Milky Way backdrop** — WebGL fragment shader samples the galactic equirectangular panorama, transforms galactic → equatorial → AltAz per fragment, renders behind the Canvas 2D star/planet layer
 - **Horizon haze ring** — atmospheric extinction tint near the horizon, both visually and as alpha falloff for low-altitude stars
 - **Star realism** — magnitude-driven color amplification on the bright tail (Sirius/Vega/Betelgeuse glow with their real BP-RP color), no diffraction spikes (real astrophotos don't have them — telescope artifact), no twinkle
 - **Planet differentiation** — per-planet color tints (Mars red-orange, Jupiter cream, Saturn pale gold, Venus white-blue, etc.), subtle glow rings to separate planets from stars at a glance, **always-on planet labels** (no need to hover)
 - **Full-rectangle projection** — `REFERENCE_ALT` drops from 20° to 0°, stereographic projection fills the entire canvas rect (no empty corners)
-- **Attribution footer** — persistent strip with Gaia/JPL/IAU/CDS/Exoplanet Archive/Mellinger credits
-- **License compliance** — Mellinger asset gitignored, attribution baked into source comments + footer + (future) `/about` page
+- **Attribution footer** — persistent strip with Gaia/JPL/IAU/CDS/Exoplanet Archive/ESO credits
+- **License compliance** — ESO/S. Brunier panorama (CC BY 4.0) committed, attribution baked into source comments + footer + (future) `/about` page
 
 **Out of scope:**
 - Constellation stick figures (Phase 3)
@@ -156,7 +156,7 @@ Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD �
 - `/about` page (Phase 5)
 - 3D flying camera (Phase 4)
 
-**Key technical decision:** WebGL chosen over CPU-in-Web-Worker or server-side rendering for the backdrop. WebGL gets us 60fps continuous sampling per pixel, frees the main thread for Canvas 2D star/planet rendering, and showcases shader work as a resume signal. Mellinger asset stays in galactic coords as distributed (no offline reprojection); shader does the galactic→equatorial rotation matrix internally.
+**Key technical decision:** WebGL chosen over CPU-in-Web-Worker or server-side rendering for the backdrop. WebGL gets us 60fps continuous sampling per pixel, frees the main thread for Canvas 2D star/planet rendering, and showcases shader work as a resume signal. The panorama stays in galactic coords as distributed (no offline reprojection); shader does the galactic→equatorial rotation matrix internally.
 
 ---
 
