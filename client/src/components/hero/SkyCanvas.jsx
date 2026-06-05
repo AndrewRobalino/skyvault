@@ -24,7 +24,7 @@ export default function SkyCanvas({ projectedStars, projectedPlanets, projectedD
     const lines = projectedLines ?? [];
     if (lines.length) {
       ctx.save();
-      ctx.strokeStyle = "rgba(150, 180, 220, 0.22)";
+      ctx.strokeStyle = "rgba(160, 190, 230, 0.44)";
       ctx.lineWidth = dpr > 1 ? 1.5 : 1;
       for (const ln of lines) {
         ctx.beginPath();

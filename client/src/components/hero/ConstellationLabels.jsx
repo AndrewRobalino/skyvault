@@ -16,11 +16,12 @@ export default function ConstellationLabels({ labels }) {
             left: `${l.x}px`,
             top: `${l.y}px`,
             transform: "translate(-50%, -50%)",
-            fontSize: "9px",
-            letterSpacing: "0.18em",
+            fontSize: "11px",
+            fontWeight: 500,
+            letterSpacing: "0.16em",
             textTransform: "uppercase",
-            color: "rgba(170, 195, 230, 0.45)",
-            textShadow: "0 0 4px rgba(0, 0, 0, 0.8)",
+            color: "rgba(205, 222, 245, 0.85)",
+            textShadow: "0 0 3px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.7)",
             whiteSpace: "nowrap",
           }}
         >
