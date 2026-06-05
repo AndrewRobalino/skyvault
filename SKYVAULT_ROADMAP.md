@@ -162,12 +162,17 @@ Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD �
 
 ## Phase 3 — Constellations + Enrichment
 
-**Goal:** IAU constellation stick figures overlayed on the Canvas 2D sky, plus click-to-enrich any star with SIMBAD + NASA Exoplanet Archive data.
+**Goal:** Constellation stick figures overlayed on the Canvas 2D sky, plus click-to-enrich any star with SIMBAD + NASA Exoplanet Archive data.
 
-- `/api/v1/constellations` — IAU stick-figure line segments
+### Phase 3a — Constellations ✅ (QA-passed 2026-06-05, PR #3 → main)
+- `/api/v1/constellations` — observer-parameterized stick-figure line segments (Stellarium Western figures; ESA Hipparcos coords; IAU names). A segment is visible only if both endpoints are above the horizon. NOTE: IAU defines only boundaries + names, not figures.
+- Toggleable overlay (default OFF), figure lines behind objects + name labels on a DOM overlay, brightened for opt-in visibility.
+
+### Phase 3b — Enrichment (next)
 - `/api/v1/objects/{id}` — SIMBAD lookup + exoplanet archive cross-match, server-side cached
+- Click-to-lookup on stars → info panel with alternate names, spectral class, object type
+- "Has confirmed exoplanets" badge on host stars (NASA Exoplanet Archive)
 - Info-panel tabs for "Catalog data" (Gaia) and "Enrichment" (SIMBAD / NASA)
-- Constellation-name labels drawn on the Canvas 2D chart
 
 ---
 
