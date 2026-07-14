@@ -42,6 +42,26 @@ CACHE_EVICT_BATCH = 32
 # Module-level cache: {cache_key: (cached_at_epoch, GeocodeResponse)}
 _CACHE: dict[tuple[str, int, str], tuple[float, GeocodeResponse]] = {}
 
+# Shared HTTP client so autocomplete traffic reuses pooled connections
+# instead of paying a fresh TCP+TLS handshake per keystroke. Created lazily,
+# closed via close_client() on app shutdown (see main.py lifespan).
+_client: httpx.AsyncClient | None = None
+
+
+def _get_client() -> httpx.AsyncClient:
+    global _client
+    if _client is None or _client.is_closed:
+        _client = httpx.AsyncClient(timeout=REQUEST_TIMEOUT_SECONDS)
+    return _client
+
+
+async def close_client() -> None:
+    """Close the shared HTTP client. Called from the app lifespan on shutdown."""
+    global _client
+    if _client is not None and not _client.is_closed:
+        await _client.aclose()
+    _client = None
+
 
 class GeocoderUnavailableError(RuntimeError):
     """Raised when Photon is unreachable or times out."""
@@ -183,8 +203,7 @@ async def _call_photon(query: str, limit: int, lang: str) -> GeocodeResponse:
     headers = {"User-Agent": USER_AGENT}
 
     try:
-        async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT_SECONDS) as client:
-            resp = await client.get(PHOTON_BASE_URL, params=params, headers=headers)
+        resp = await _get_client().get(PHOTON_BASE_URL, params=params, headers=headers)
     except httpx.TimeoutException as exc:
         raise GeocoderUnavailableError(f"Photon request timed out: {exc}") from exc
     except httpx.RequestError as exc:
@@ -218,8 +237,7 @@ async def _call_nominatim(query: str, limit: int, lang: str) -> GeocodeResponse:
     headers = {"User-Agent": USER_AGENT}
 
     try:
-        async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT_SECONDS) as client:
-            resp = await client.get(NOMINATIM_BASE_URL, params=params, headers=headers)
+        resp = await _get_client().get(NOMINATIM_BASE_URL, params=params, headers=headers)
     except httpx.TimeoutException as exc:
         raise GeocoderUnavailableError(f"Nominatim request timed out: {exc}") from exc
     except httpx.RequestError as exc:
