@@ -11,8 +11,8 @@ describe("inverseStereographic with refAlt=0 (1000x600 canvas)", () => {
     expect(altDeg).toBeCloseTo(90, 4);
   });
 
-  it("east horizon pixel → alt=0°, az=90°", () => {
-    const { altDeg, azDeg } = inverseStereographic(800, 300, W, H, REF_ALT);
+  it("east horizon pixel (LEFT side, inside view) → alt=0°, az=90°", () => {
+    const { altDeg, azDeg } = inverseStereographic(200, 300, W, H, REF_ALT);
     expect(altDeg).toBeCloseTo(0, 3);
     expect(azDeg).toBeCloseTo(90, 3);
   });
@@ -23,8 +23,8 @@ describe("inverseStereographic with refAlt=0 (1000x600 canvas)", () => {
     expect(((azDeg % 360) + 360) % 360).toBeCloseTo(0, 3);
   });
 
-  it("west horizon pixel → alt=0°, az=270°", () => {
-    const { altDeg, azDeg } = inverseStereographic(200, 300, W, H, REF_ALT);
+  it("west horizon pixel (RIGHT side, inside view) → alt=0°, az=270°", () => {
+    const { altDeg, azDeg } = inverseStereographic(800, 300, W, H, REF_ALT);
     expect(altDeg).toBeCloseTo(0, 3);
     expect(azDeg).toBeCloseTo(270, 3);
   });
@@ -35,7 +35,7 @@ describe("inverseStereographic with refAlt=0 (1000x600 canvas)", () => {
     expect(azDeg).toBeCloseTo(180, 3);
   });
 
-  it("beyond horizon (east 400px) → alt < 0", () => {
+  it("beyond horizon (400px from center) → alt < 0", () => {
     const { altDeg } = inverseStereographic(900, 300, W, H, REF_ALT);
     expect(altDeg).toBeLessThan(0);
   });

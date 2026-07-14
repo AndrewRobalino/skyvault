@@ -21,15 +21,17 @@ describe("projectAltAz", () => {
     expect(y).toBeLessThan(225);
   });
 
-  it("projects due east (alt=0, az=90) to the right of zenith", () => {
+  it("projects due east (alt=0, az=90) to the LEFT of zenith (inside view)", () => {
+    // Looking up at the sky with north at the top, east is on the left —
+    // planisphere convention. East-right is the mirrored outside-globe view.
     const { x, y } = projectAltAz({ alt: 0, az: 90 }, 800, 450);
-    expect(x).toBeGreaterThan(400);
+    expect(x).toBeLessThan(400);
     expect(y).toBeCloseTo(225, 5);
   });
 
-  it("projects due west (alt=0, az=270) to the left of zenith", () => {
+  it("projects due west (alt=0, az=270) to the RIGHT of zenith (inside view)", () => {
     const { x } = projectAltAz({ alt: 0, az: 270 }, 800, 450);
-    expect(x).toBeLessThan(400);
+    expect(x).toBeGreaterThan(400);
   });
 
   it("at REFERENCE_ALT, radial distance equals half the shorter side", () => {
