@@ -9,11 +9,12 @@ from __future__ import annotations
 import math
 
 import numpy as np
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 
 from app.config import settings
 from app.models.schemas import Observer, SkyResponse, Star
 from app.services import coordinates, star_catalog
+from app.services.time_utils import InvalidObservationTimeError
 
 
 router = APIRouter(prefix="/sky", tags=["sky"])
@@ -61,14 +62,21 @@ async def get_sky(
     ),
 ) -> SkyResponse:
     # Magnitude filter first (pure in-memory pandas), then AltAz transform.
-    filtered = star_catalog.query_visible_stars(mag_limit=mag_limit)
-    with_altaz = coordinates.compute_altaz(
-        filtered,
-        observer_lat=lat,
-        observer_lon=lon,
-        observer_time=datetime,
-        horizon_only=not include_below_horizon,
-    )
+    try:
+        filtered = star_catalog.query_visible_stars(mag_limit=mag_limit)
+    except star_catalog.CatalogNotIngestedError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    try:
+        with_altaz = coordinates.compute_altaz(
+            filtered,
+            observer_lat=lat,
+            observer_lon=lon,
+            observer_time=datetime,
+            horizon_only=not include_below_horizon,
+        )
+    except InvalidObservationTimeError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     # Vectorized distance conversion — cheaper than calling _distance_ly row by row.
     parallax = with_altaz["parallax"].to_numpy(dtype=float)
@@ -78,20 +86,22 @@ async def get_sky(
         np.nan,
     )
 
+    # to_dict("records") instead of iterrows(): this is the hot path (~5-9k
+    # rows per request) and iterrows() builds a pandas Series per row.
     stars: list[Star] = [
         Star(
-            source_id=str(int(row["source_id"])),
-            ra=float(row["ra"]),
-            dec=float(row["dec"]),
-            alt=float(row["alt"]),
-            az=float(row["az"]),
-            magnitude=float(row["phot_g_mean_mag"]),
-            bp_rp=_safe(row.get("bp_rp")),
-            parallax_mas=_safe(row.get("parallax")),
+            source_id=str(int(rec["source_id"])),
+            ra=float(rec["ra"]),
+            dec=float(rec["dec"]),
+            alt=float(rec["alt"]),
+            az=float(rec["az"]),
+            magnitude=float(rec["phot_g_mean_mag"]),
+            bp_rp=_safe(rec.get("bp_rp")),
+            parallax_mas=_safe(rec.get("parallax")),
             distance_ly=_safe(distance_ly[i]),
-            teff_k=_safe(row.get("teff_gspphot")),
+            teff_k=_safe(rec.get("teff_gspphot")),
         )
-        for i, (_, row) in enumerate(with_altaz.iterrows())
+        for i, rec in enumerate(with_altaz.to_dict("records"))
     ]
 
     return SkyResponse(
