@@ -74,6 +74,12 @@ def format_bayer(ident: str) -> str:
     return f"{letter} {genitive}"
 
 
+# The tooltip renders catalog_ids[0], so the order must be stable across stars.
+# SIMBAD returns identifiers in no guaranteed order; HD is the more commonly
+# cited designation, so it leads.
+_CATALOG_PRIORITY = ("HD", "HIP")
+
+
 def build_name_fields(identifiers: list[str]) -> tuple[str | None, str | None, list[str]]:
     """From a star's SIMBAD identifiers, derive (proper_name, designation, catalog_ids)."""
     proper_name: str | None = None
@@ -87,7 +93,17 @@ def build_name_fields(identifiers: list[str]) -> tuple[str | None, str | None, l
         elif s.startswith("* ") and designation is None:
             designation = format_bayer(s)
         elif s.startswith(("HD ", "HIP ")):
-            catalog_ids.append(s)
+            # SIMBAD right-aligns catalog numbers to a fixed width ("HD   3712");
+            # collapse that padding or it shows up verbatim in the tooltip.
+            catalog_ids.append(" ".join(s.split()))
+
+    catalog_ids.sort(
+        key=lambda cid: (
+            _CATALOG_PRIORITY.index(cid.split()[0])
+            if cid.split()[0] in _CATALOG_PRIORITY
+            else len(_CATALOG_PRIORITY)
+        )
+    )
 
     return proper_name, designation, catalog_ids
 
@@ -108,3 +124,54 @@ def merge_enrichment(simbad: dict, planets: dict) -> dict:
             "planet_source": PLANET_SOURCE if planet_block else None,
         }
     return out
+
+
+def load_bright_star_ids(mag_limit: float = 6.5) -> list[str]:
+    """Read the rendered bright-star source_ids from the Gaia parquet."""
+    import pandas as pd
+
+    from app.config import settings
+
+    df = pd.read_parquet(
+        settings.gaia_parquet_path, columns=["source_id", "phot_g_mean_mag"]
+    )
+    df = df[df["phot_g_mean_mag"] <= mag_limit]
+    return [str(sid) for sid in df["source_id"].tolist()]
+
+
+def main() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    from app.config import settings
+    from app.services.enrichment.exoplanet_archive import fetch_exoplanet_hosts
+    from app.services.enrichment.simbad import fetch_simbad
+
+    source_ids = load_bright_star_ids()
+    logger.info("Bright stars to resolve: %d", len(source_ids))
+
+    simbad = fetch_simbad(source_ids)
+    logger.info(
+        "SIMBAD resolved: %d/%d (%.1f%%)",
+        len(simbad),
+        len(source_ids),
+        100 * len(simbad) / max(len(source_ids), 1),
+    )
+
+    planets = fetch_exoplanet_hosts(set(source_ids))
+    logger.info("Exoplanet hosts: %d", len(planets))
+
+    baked = merge_enrichment(simbad, planets)
+    baked["__source__"] = {  # provenance block; loader skips dunder keys
+        "names": "SIMBAD (CDS Strasbourg)",
+        "spectral_type": "SIMBAD (CDS Strasbourg)",
+        "exoplanets": "NASA Exoplanet Archive (NASA/IPAC)",
+    }
+
+    out_path: Path = settings.star_enrichment_path
+    out_path.write_text(
+        json.dumps(baked, ensure_ascii=False, indent=1), encoding="utf-8"
+    )
+    logger.info("Wrote %s (%d entries)", out_path, len(baked) - 1)
+
+
+if __name__ == "__main__":
+    main()
