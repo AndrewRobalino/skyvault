@@ -170,3 +170,93 @@ describe("SkyTooltip DSO body", () => {
     expect(screen.getByText(/3.44/)).toBeInTheDocument();
   });
 });
+
+const baseStar = {
+  kind: "star",
+  source_id: "2667000000000000000",
+  magnitude: 0.03,
+  bp_rp: 0.13,
+  distance_ly: 25.0,
+  alt: 60,
+  az: 120,
+  source: "Gaia DR3",
+  x: 100,
+  y: 100,
+};
+
+describe("SkyTooltip star enrichment", () => {
+  it("falls back to the Gaia id header when there is no enrichment", () => {
+    render(<SkyTooltip object={baseStar} container={container} />);
+    // Match the id line specifically — a bare /Gaia DR3/ is ambiguous, since
+    // the source footer carries the same string.
+    expect(
+      screen.getByText(`Gaia DR3 · ${baseStar.source_id}`)
+    ).toBeInTheDocument();
+    expect(screen.getByText("Star")).toBeInTheDocument();
+  });
+
+  it("shows the proper name and spectral type when enriched", () => {
+    const enrichment = {
+      source_id: baseStar.source_id,
+      proper_name: "Vega",
+      designation: "α Lyrae",
+      catalog_ids: ["HD 172167"],
+      spectral_type: "A0Va",
+      planets: null,
+      sources: ["SIMBAD/CDS"],
+    };
+    render(
+      <SkyTooltip object={baseStar} enrichment={enrichment} container={container} />
+    );
+    // Rendered uppercase via CSS text-transform, so the accessible text — and
+    // what RTL matches on — is still the original "Vega".
+    expect(screen.getByText("Vega")).toBeInTheDocument();
+    expect(screen.getByText(/α Lyrae/)).toBeInTheDocument();
+    expect(screen.getByText("A0Va")).toBeInTheDocument();
+    expect(screen.getByText(/No known planets/)).toBeInTheDocument();
+  });
+
+  it("shows confirmed planet count for a host", () => {
+    const enrichment = {
+      source_id: baseStar.source_id,
+      proper_name: "51 Pegasi",
+      designation: "51 Peg",
+      catalog_ids: ["HD 217014"],
+      spectral_type: "G2IV",
+      planets: { count: 1, names: ["51 Peg b"] },
+      sources: ["SIMBAD/CDS", "NASA Exoplanet Archive"],
+    };
+    render(
+      <SkyTooltip object={baseStar} enrichment={enrichment} container={container} />
+    );
+    expect(screen.getByText(/1 confirmed planet\b/)).toBeInTheDocument();
+    expect(screen.getByText(/NASA Exoplanet Archive/)).toBeInTheDocument();
+  });
+
+  it("pluralizes the planet count for multi-planet hosts", () => {
+    const enrichment = {
+      source_id: baseStar.source_id,
+      proper_name: "55 Cancri",
+      designation: "55 Cancri",
+      catalog_ids: ["HD 75732"],
+      spectral_type: "G8V",
+      planets: { count: 5, names: ["55 Cnc b", "55 Cnc c"] },
+      sources: ["SIMBAD/CDS", "NASA Exoplanet Archive"],
+    };
+    render(
+      <SkyTooltip object={baseStar} enrichment={enrichment} container={container} />
+    );
+    expect(screen.getByText(/5 confirmed planets/)).toBeInTheDocument();
+  });
+
+  it("shows a loading shimmer while enrichment loads", () => {
+    render(
+      <SkyTooltip
+        object={baseStar}
+        enrichmentLoading={true}
+        container={container}
+      />
+    );
+    expect(screen.getByTestId("enrichment-loading")).toBeInTheDocument();
+  });
+});
