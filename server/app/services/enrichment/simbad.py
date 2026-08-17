@@ -20,7 +20,18 @@ def _clean(value: object) -> str | None:
     return None if text.lower() in _EMPTY_MARKERS else text
 
 
-def fetch_simbad(gaia_source_ids: list[str], chunk_size: int = 400) -> dict:
+# SIMBAD's TAP endpoint truncates any result set at this many rows, silently.
+# Exceeding it drops whole stars off the end of a chunk with no error raised.
+TAP_ROW_CAP = 10_000
+
+# Only these identifier prefixes are consumed by build_name_fields. Filtering the
+# join to them cuts the per-star row fan-out from ~30 to ~4, which is what keeps a
+# chunk under TAP_ROW_CAP. Joined as a LEFT JOIN so a star with none of them still
+# comes back (with spectral/object type but no names) instead of vanishing.
+_IDENT_PREFIXES = ("NAME ", "* ", "HD ", "HIP ")
+
+
+def fetch_simbad(gaia_source_ids: list[str], chunk_size: int = 300) -> dict:
     """Resolve Gaia DR3 source_ids to SIMBAD names/spectral type/identifiers.
 
     Returns ``{source_id: {proper_name, designation, catalog_ids, spectral_type,
@@ -29,13 +40,15 @@ def fetch_simbad(gaia_source_ids: list[str], chunk_size: int = 400) -> dict:
     """
     from scripts.ingest_star_enrichment import build_name_fields
 
+    ident_filter = " OR ".join(f"allids.id LIKE '{p}%'" for p in _IDENT_PREFIXES)
+
     out: dict = {}
     for start in range(0, len(gaia_source_ids), chunk_size):
         chunk = gaia_source_ids[start : start + chunk_size]
         gaia_ids = [f"Gaia DR3 {sid}" for sid in chunk]
         id_list = ", ".join(f"'{g}'" for g in gaia_ids)
         # basic gives sp_type/otype; ident (joined twice) gives the input Gaia id
-        # (to key on) and every other identifier (NAME/* /HD/HIP). otypedef turns
+        # (to key on) and the display identifiers (NAME/* /HD/HIP). otypedef turns
         # SIMBAD's short object-type code into readable text — basic.otype_txt is
         # a cryptic code ("PM*", "a2*"), not the display string we want to bake.
         query = f"""
@@ -43,11 +56,19 @@ def fetch_simbad(gaia_source_ids: list[str], chunk_size: int = 400) -> dict:
                    od.otype_longname AS otype, allids.id AS ident
             FROM ident AS gaia
             JOIN basic AS b ON b.oid = gaia.oidref
-            JOIN ident AS allids ON allids.oidref = b.oid
+            LEFT JOIN ident AS allids
+                   ON allids.oidref = b.oid AND ({ident_filter})
             LEFT JOIN otypedef AS od ON od.otype = b.otype
             WHERE gaia.id IN ({id_list})
         """
         table = Simbad.query_tap(query)
+
+        if len(table) >= TAP_ROW_CAP:
+            raise RuntimeError(
+                f"SIMBAD returned {len(table)} rows for a {len(chunk)}-star chunk, "
+                f"at or above the {TAP_ROW_CAP}-row TAP cap — the result is "
+                f"truncated and stars would be silently dropped. Lower chunk_size."
+            )
         # Group rows by gaia_id (one row per identifier).
         by_star: dict = {}
         for row in table:
