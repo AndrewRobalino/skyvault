@@ -80,3 +80,75 @@ def bp_rp_from_v_i(v_i: float | None) -> float | None:
     if not _in_range(v_i, V_I_VALID):
         return None
     return _poly(BP_RP_COEFFS, v_i)
+
+
+def hip_source_id(hip: int) -> str:
+    """Namespaced id for a Hipparcos-supplied star (spec decision 2)."""
+    return f"hip:{int(hip)}"
+
+
+def _opt_float(value: object) -> float | None:
+    """VizieR gives masked cells; normalise them to None."""
+    if value is None:
+        return None
+    try:
+        out = float(value)
+    except (TypeError, ValueError):
+        return None
+    return None if out != out else out  # NaN check
+
+
+def build_star_row(rec: dict) -> dict | None:
+    """Map one Hipparcos record onto the Gaia column names the pipeline expects.
+
+    Returns None when no magnitude can be derived — the renderer sizes stars by
+    magnitude, so dropping the star is honest and inventing one is not.
+    """
+    v = _opt_float(rec.get("Vmag"))
+    b_v = _opt_float(rec.get("B-V"))
+    v_i = _opt_float(rec.get("V-I"))
+    if v is None:
+        return None
+
+    g = gaia_g_from_v_bv(v, b_v)
+    if g is None:
+        return None
+
+    bp_rp = bp_rp_from_v_i(v_i)
+
+    return {
+        "source_id": hip_source_id(rec["HIP"]),
+        "ra": _opt_float(rec.get("RAICRS")),
+        "dec": _opt_float(rec.get("DEICRS")),
+        "pmra": _opt_float(rec.get("pmRA")),
+        "pmdec": _opt_float(rec.get("pmDE")),
+        "parallax": _opt_float(rec.get("Plx")),
+        "phot_g_mean_mag": g,
+        "bp_rp": bp_rp,
+        "epoch": HIPPARCOS_EPOCH,
+        "source": STAR_SOURCE,
+        "magnitude_source": MAGNITUDE_SOURCE,
+        "color_source": COLOR_SOURCE if bp_rp is not None else None,
+    }
+
+
+def select_missing(
+    hip_records: list[dict],
+    hip_to_gaia: dict[str, str],
+    gaia_ids: set[str],
+) -> list[dict]:
+    """Keep only Hipparcos stars that are not already in the Gaia catalog.
+
+    ``hip_to_gaia`` is SIMBAD's exact identifier cross-match; ``gaia_ids`` is the
+    set of source_ids actually present in our parquet. A star is dropped only
+    when both agree it is already rendered — Gaia's astrometry wins.
+    """
+    kept: list[dict] = []
+    for rec in hip_records:
+        gaia_id = hip_to_gaia.get(str(rec["HIP"]))
+        if gaia_id is not None and gaia_id in gaia_ids:
+            continue
+        row = build_star_row(rec)
+        if row is not None:
+            kept.append(row)
+    return kept
