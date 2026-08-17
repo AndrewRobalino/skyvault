@@ -103,3 +103,41 @@ class DsoResponse(BaseModel):
     observer: Observer
     dsos: list[DeepSkyObject]
     count: int
+
+
+class ConstellationSegment(BaseModel):
+    """One stick-figure line segment in the observer's AltAz frame.
+
+    ``visible`` is True only when BOTH endpoints are above the horizon.
+    Segments with an endpoint below the horizon are still returned with
+    ``visible=False`` — the client decides whether to draw them.
+    """
+
+    from_alt: float
+    from_az: float
+    to_alt: float
+    to_az: float
+    visible: bool
+
+
+class Constellation(BaseModel):
+    """A single constellation: its stick-figure segments + a name label.
+
+    ``id`` is the IAU abbreviation (e.g. "Ori"); ``name`` is the English
+    common name (e.g. "Orion"). The label sits at the figure's centroid;
+    ``label_visible`` is True only when the centroid is above the horizon.
+    """
+
+    id: str
+    name: str
+    segments: list[ConstellationSegment]
+    label_alt: float
+    label_az: float
+    label_visible: bool
+
+
+class ConstellationsResponse(BaseModel):
+    observer: Observer
+    constellations: list[Constellation]
+    count: int
+    source: dict[str, str]

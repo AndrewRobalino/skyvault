@@ -127,6 +127,35 @@ export function projectPlanets(planets, width, height) {
   });
 }
 
+export function projectConstellations(constellations, width, height) {
+  if (!constellations || !constellations.length || !width || !height) {
+    return { lines: [], labels: [] };
+  }
+
+  const lines = [];
+  const labels = [];
+
+  for (const c of constellations) {
+    let drewSegment = false;
+    for (const seg of c.segments) {
+      if (!seg.visible) continue;
+      const a = projectAltAz({ alt: seg.from_alt, az: seg.from_az }, width, height);
+      const b = projectAltAz({ alt: seg.to_alt, az: seg.to_az }, width, height);
+      lines.push({ x1: a.x, y1: a.y, x2: b.x, y2: b.y });
+      drewSegment = true;
+    }
+    // Only label a figure we actually drew — a centroid can be above the
+    // horizon while every segment is below it, which would otherwise render
+    // an orphan name with no stick figure beneath it.
+    if (c.label_visible && drewSegment) {
+      const p = projectAltAz({ alt: c.label_alt, az: c.label_az }, width, height);
+      labels.push({ id: c.id, name: c.name, x: p.x, y: p.y });
+    }
+  }
+
+  return { lines, labels };
+}
+
 export function projectDsos(dsos, width, height) {
   if (!dsos || !dsos.length || !width || !height) return [];
 

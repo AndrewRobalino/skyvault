@@ -2,7 +2,7 @@
 
 > Explore the night sky from any place, any moment in time.
 
-**SkyVault** is an interactive web app that renders an accurate night sky for any date, time, and location on Earth. Star positions come from **ESA Gaia DR3**, planet positions from **NASA JPL DE421**, constellations from the **IAU**, enrichment data from **NASA Exoplanet Archive** and **CDS SIMBAD**, and the photo-realistic Milky Way backdrop is the **ESO/S. Brunier GigaGalaxy Zoom panorama** (eso0932a). Every data point is attributed — no faked values, no approximations.
+**SkyVault** is an interactive web app that renders an accurate night sky for any date, time, and location on Earth. Star positions come from **ESA Gaia DR3**, planet positions from **NASA JPL DE421**, constellation names from the **IAU** (public domain) with stick-figure line topology from the **Stellarium Western sky culture** (CC BY-SA), enrichment data from **NASA Exoplanet Archive** and **CDS SIMBAD**, and the photo-realistic Milky Way backdrop is the **ESO/S. Brunier GigaGalaxy Zoom panorama** (eso0932a). Every data point is attributed — no faked values, no approximations.
 
 Built with React, Vite, Canvas 2D + WebGL, FastAPI, and Astropy.
 
@@ -23,7 +23,9 @@ SkyVault uses real, attributed institutional data sources. No values are faked o
 |---|---|---|---|
 | **Gaia DR3** | Star positions, magnitudes, parallax, BP-RP color | ESA | CC BY-SA 3.0 IGO |
 | **JPL DE421 ephemeris** | Sun, Moon, Mercury–Neptune positions | NASA JPL | Public domain (US Gov) |
-| **IAU constellations** | Official 88 constellations + stick figures (Phase 3) | IAU | Public domain |
+| **IAU constellations** | Official 88 constellation names | IAU | Public domain |
+| **Stellarium Western sky culture** | Constellation stick-figure line topology | Stellarium | CC BY-SA (attribution + ShareAlike on the derived data file) |
+| **ESA Hipparcos** (VizieR I/239/hip_main) | J2000 ICRS coordinates for constellation stars | ESA | Public / scientific data |
 | **NASA Exoplanet Archive** | Confirmed exoplanets and host stars (Phase 3) | NASA / IPAC | Public domain |
 | **CDS SIMBAD** | Canonical object metadata (Phase 3) | CDS Strasbourg | Free for academic / non-commercial use |
 | **ESO/S. Brunier panorama** (eso0932a) | All-sky Milky Way backdrop image (galactic equirectangular, 4000×2000) | ESO / Serge Brunier (GigaGalaxy Zoom Project) | CC BY 4.0 |

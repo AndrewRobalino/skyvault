@@ -44,7 +44,7 @@ All sources are real institutional datasets. **No faked, mocked, or approximated
 |---|---|---|---|
 | **Gaia DR3** (G < 8 subset, ~230k stars) | Star positions (ICRS), magnitudes, parallax, proper motion, BP-RP color | **ESA** | One-time ingest via Gaia TAP (astroquery.gaia), stored as parquet in `server/data/` |
 | **JPL DE421 ephemeris** | Sun, Moon, Mercury–Neptune positions | **NASA JPL** | Astropy's `solar_system_ephemeris.set('de421')` |
-| **IAU constellation data** | Official 88 constellations, stick figures, boundaries | **IAU** | Static data, committed to repo |
+| **Constellation figures** | 88 constellation stick-figure line patterns (Stellarium Western sky culture) + star coordinates (ESA Hipparcos) + names (IAU). NOTE: IAU officially defines only constellation *boundaries* and *names* — not stick figures. The figures are Stellarium's Western convention, a recognized de-facto standard. | **Stellarium (figures, CC BY-SA) · ESA Hipparcos (coords) · IAU (names)** | Baked to `server/data/constellations.json` via `scripts/ingest_constellations.py` |
 | **ESO/S. Brunier GigaGalaxy Zoom panorama** (eso0932a) | Photo-realistic Milky Way backdrop (galactic equirectangular, 4000×2000) | **ESO/S. Brunier** | Static asset at `client/public/milky-way.jpg`, sampled by WebGL shader (Phase 2c). Also used as ambient page backdrop via CSS. **CC BY 4.0 — attribution required.** |
 
 ### Tier 2 — Enrichment APIs (cold path, lazy, cached)
@@ -110,7 +110,7 @@ skyvault/
 │   │       └── schemas.py     # Pydantic models
 │   ├── data/
 │   │   ├── gaia_dr3_g8.parquet   # Gaia DR3 subset (downloaded via ingest script, gitignored)
-│   │   └── constellations.json   # IAU stick figures (committed)
+│   │   └── constellations.json   # Stellarium Western stick figures + Hipparcos coords (committed)
 │   ├── scripts/
 │   │   └── ingest_gaia.py     # One-time Gaia TAP download -> parquet
 │   ├── tests/
@@ -195,7 +195,7 @@ skyvault/
 Same observer params. Returns Sun, Moon, Mercury–Neptune with AltAz coordinates, distance from Earth, and `"source": "JPL DE421 via Astropy"`.
 
 ### `GET /api/v1/constellations`
-Returns IAU constellation stick-figure line segments and label positions. Static. Cached aggressively.
+Returns constellation stick-figure line segments (Stellarium Western sky culture; ESA Hipparcos coords; IAU names) and label positions, transformed to the observer's AltAz frame. Observer-parameterized (`lat`, `lon`, `datetime`). A segment is `visible` only if both endpoints are above the horizon.
 
 ### `GET /api/v1/objects/{id}` (Phase 3+)
 Enrichment lookup. Returns SIMBAD metadata + NASA Exoplanet Archive data if the object is an exoplanet host. Responses cached server-side.
@@ -221,7 +221,8 @@ This project lives or dies on accuracy. Non-negotiable:
 - [x] **Phase 2b** — 2D Sky Chart: Canvas 2D stereographic projection inside the hero placeholder
 - [x] **Phase 2c** — Visual Polish + Milky Way Backdrop: WebGL panorama backdrop (ESO/S. Brunier, galactic equirectangular) + ambient CSS galaxy layer; point-based star rendering (halos only on mag ≤ 2); per-planet color tints + always-on labels; full-rectangle stereographic fill (REFERENCE_ALT = 0°); attribution footer. **Merged to main 2026-05-17 (PR #1).**
 - [x] **Phase 2d** — Celestial Objects: planet sprite icons (procedural + photo-texture tooltip thumbnails) + Moon texture with phase shadow + apparent-size scaling + 25 naked-eye DSOs as soft glows with bright nuclei. Backend: `GET /api/v1/dso`, dso_catalog service, ingest_dso.py (TAP query + reference fallbacks), naked_eye_dso.json seeded with 25 objects. Frontend: textureCache, sprite renderers (planet + moon), dsoDrawing, useDso hook, projectDsos, SkyChart/SkyCanvas wired, SkyTooltip extended with DsoBody + planet photo. **Merged to main 2026-05-29 (PR #2, commit `f17dccb`).**
-- [ ] **Phase 3** — Constellations + Enrichment: IAU overlays, NASA Exoplanet Archive (SIMBAD already integrated for DSOs in 2d)
+- [x] **Phase 3a** — Constellations: toggleable Western stick-figure overlay (lines + name labels), observer-parameterized `GET /api/v1/constellations` (ICRS→AltAz, both-endpoints-visible rule). Backend: `constellation_catalog` service, `ingest_constellations.py` (Stellarium `index.json` HIP polylines → VizieR Hipparcos → baked `constellations.json`, 88 constellations / 674 segments). Frontend: `showConstellations` store toggle (default OFF), gated `useConstellations` hook, `projectConstellations`, SkyCanvas line layer (behind objects), `ConstellationLabels` DOM overlay, `ConstellationToggle` control. Triple-attributed: Stellarium Western (CC BY-SA) + ESA Hipparcos + IAU. **QA-passed 2026-06-05; PR #3 → main, awaiting merge.**
+- [ ] **Phase 3b** — Enrichment: click-to-lookup SIMBAD on stars + NASA Exoplanet Archive host-star badges (cold-path cached `/objects/{id}` infra; backend stubs today).
 - [ ] **Phase 4** — Explore Mode: Three.js 3D flyable celestial sphere (behind the "Explore in 3D" button)
 - [ ] **Phase 5** — Polish + Deploy: landing, about, docker-compose, live URL
 
@@ -233,16 +234,20 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 ## Resume Here — Next Session
 
-**Paused:** 2026-05-29, after merging Phase 2d.
+**Paused:** 2026-06-05, after Phase 3a (Constellations) passed live visual QA — now **PR #3 → main**, awaiting Andrew's merge.
 
-**Current state:** Phase 1 + 2a + 2b + 2c + **2d all shipped to main** (PR #2 merged 2026-05-29, commit `f17dccb`). Frontend 169 tests / backend 74 tests, all green; lint clean (0 warnings); production build 236 KB JS (75 KB gzip). Andrew did a live visual-QA pass across the reference observers — holds up; no fixes flagged.
+**Current state:** Phase 1 + 2a + 2b + 2c + 2d shipped to main; **Phase 3a QA-passed and in PR #3** (https://github.com/AndrewRobalino/skyvault/pull/3), branch `feat/phase-3a-constellations`, 24 commits ahead of `main`, clean fast-forward. Spec + plan in `docs/superpowers/`. Frontend 185 tests / backend 94 tests, all green; lint clean (0 warnings); production build ~238 KB JS (~75 KB gzip). Built subagent-driven, TDD per task, two-stage review. During the bake, found Stellarium `lines` carry style markers (e.g. `"thin"`) — parser strips them; without that fix Canis Major + Ursa Major were silently dropped.
 
-### Next up — Phase 3 (Constellations + Enrichment)
+**2026-06-05 session:** Live visual QA passed (NYC/Buenos Aires/Reykjavík). Brightened constellations for opt-in visibility (lines alpha 0.22→0.44; labels 0.45→0.85, 9px→11px, weight 500, double dark text-shadow). Accuracy audit verified: 674/674 source segments baked (zero dropped, every Hipparcos star resolved), Orion anchor stars match published J2000 ICRS to sub-arcsecond. Corrected stale doc wording — constellation figures are Stellarium Western (CC BY-SA), NOT IAU (IAU defines only boundaries + names); and leftover Mellinger 2.0 references → ESO/S. Brunier (the backdrop switched 2026-05-17). README was already correct. Two commits: `b18e173` (style) + `1d01b67` (docs), pushed.
+
+### Next up — Phase 3b (Enrichment)
 
 Needs a spec + plan (brainstorm first). Scope:
-1. **IAU constellation overlays** — stick figures + (optional) boundaries. `GET /api/v1/constellations` is already in the contract; `constellations.json` (IAU stick figures) needs sourcing/committing. Render as a toggleable line layer in SkyCanvas.
-2. **Click-to-lookup SIMBAD on stars** — SIMBAD is already wired (used by DSO ingest), but not yet for interactive star lookups. Add `GET /api/v1/objects/{id}` enrichment path (cached) + frontend click → info panel with alternate names, spectral class, object type.
-3. **NASA Exoplanet Archive overlay** — "has confirmed exoplanets" badge on host stars. Cold-path, cached service under `server/app/services/enrichment/exoplanet_archive.py`.
+1. **Click-to-lookup SIMBAD on stars** — SIMBAD is already wired (used by DSO ingest), but not yet for interactive star lookups. Add `GET /api/v1/objects/{id}` enrichment path (cached) + frontend click → info panel with alternate names, spectral class, object type. (`objects.py` router + `enrichment/simbad.py` are stubs today.)
+2. **NASA Exoplanet Archive overlay** — "has confirmed exoplanets" badge on host stars. Cold-path, cached service under `server/app/services/enrichment/exoplanet_archive.py`.
+
+### Tech debt noted during 3a (not a blocker)
+- `time_utc.replace("Z", "")` is duplicated across `constellation_catalog.py`, `dso_catalog.py`, `coordinates.py`, `ephemeris.py` and only handles `Z`-suffix ISO. The frontend always sends `Z`, so no live bug — but a shared UTC-parse helper would remove the latent `+00:00` failure mode.
 
 ### Known follow-ups (deferred, not blockers)
 - Planet apparent-size scaling and Saturn's ring tilt are stylized for v1; real ring-plane geometry waits for Phase 4 Three.js.
@@ -276,6 +281,7 @@ When working in this repo:
 18. **DSO magnitudes/sizes have a dual-source fallback model.** SIMBAD doesn't have V magnitudes for diffuse nebulae or angular sizes for some extended objects (M82, M8, NGC 3372), and it returns the *central star* magnitude for planetary nebulae (M27=14, M57=16 — wrong for our "naked-eye visibility" framing). The ingest script's `CURATED` list carries `magnitude_fallback`, `angular_size_fallback_arcmin`, `minor_axis_fallback_arcmin`, and `prefer_reference_magnitude` flags, all sourced from published catalogs (RC3, Harris96, SkyCat, NED-L5, H&W67, Acker92, Burnham). Output JSON includes `magnitude_source` and `angular_size_source` ("SIMBAD" or "reference") for provenance. **Never** silently substitute values without a citation in the script.
 19. **Curated DSO `type` always wins over SIMBAD `OTYPE`.** SIMBAD classifies M8 (Lagoon Nebula) and NGC 2070 (Tarantula Nebula) as `open_cluster` because of embedded star clusters (NGC 6530 / cluster cores). Our user-facing identity is `nebula` for both. The ingest script discards SIMBAD's OTYPE and uses `spec["type"]` directly. Don't reintroduce a SIMBAD-OTYPE inference map.
 20. **DSOs render as soft glow + bright nucleus — NOT iconographic glyphs.** Tried glyphs (spiral/puff/dots/ring SVG-style icons) on 2026-05-18; they read as UI chips against the immersive sky and broke the "real-looking sky" feel. The current approach (colored soft glow at real angular size + 5px bright nucleus colored by type) is scientifically honest (real galaxies have bright cores, real nebulae have illuminated centers) and doesn't introduce graphic-design elements. Don't re-add type icons.
+21. **Constellation figures are Stellarium Western sky culture (CC BY-SA) — attribution + ShareAlike on the data file.** The line topology baked into `server/data/constellations.json` is derived from Stellarium's `western/index.json` (CC BY-SA "data"). The vendored source lives at `server/data/sources/stellarium_western_index.json`. **Implementation requirements:** (a) `constellations.json` carries a `source` block naming Stellarium (figures, CC BY-SA 4.0) + ESA Hipparcos (coords) + IAU (names); (b) `AttributionFooter` credits "Constellation figures: Stellarium · CC BY-SA"; (c) README data-sources table + future `/about` page credit + license link. ShareAlike applies ONLY to the baked data file — it does NOT affect the rest of the codebase. We use NO Stellarium illustrations (Free Art License), stick figures only. Coordinates (Hipparcos) + names (IAU) are not the ShareAlike part. The ingest parser also strips Stellarium per-line style markers (e.g. "thin") — do not treat those tokens as HIP ids.
 
 ---
 

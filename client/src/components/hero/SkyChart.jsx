@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useObserverStore } from "../../stores/observerStore.js";
+import { useUiStateStore } from "../../stores/uiStateStore.js";
 import { useSky } from "../../hooks/useSky.js";
 import { usePlanets } from "../../hooks/usePlanets.js";
 import { useDso } from "../../hooks/useDso.js";
+import { useConstellations } from "../../hooks/useConstellations.js";
 import { useCanvasSize } from "../../hooks/useCanvasSize.js";
-import { projectStars, projectPlanets, projectDsos } from "../../utils/projection.js";
+import { projectStars, projectPlanets, projectDsos, projectConstellations } from "../../utils/projection.js";
 import { findNearestWithinRadius } from "../../utils/hitTest.js";
 import SkyCanvas from "./SkyCanvas.jsx";
 import CardinalLabels from "./CardinalLabels.jsx";
@@ -13,7 +15,9 @@ import SkyTooltip from "./SkyTooltip.jsx";
 import SkyStatusOverlay from "./SkyStatusOverlay.jsx";
 import MilkyWayBackdrop from "./MilkyWayBackdrop.jsx";
 import PlanetLabels from "./PlanetLabels.jsx";
+import ConstellationLabels from "./ConstellationLabels.jsx";
 import AttributionFooter from "./AttributionFooter.jsx";
+import ConstellationToggle from "./ConstellationToggle.jsx";
 
 function statusFor({ selected, skyQuery, planetsQuery, dsoQuery }) {
   if (!selected) return "idle";
@@ -31,6 +35,9 @@ export default function SkyChart() {
   const planetsQuery = usePlanets(selected, datetimeUtc);
   const dsoQuery = useDso(selected, datetimeUtc);
 
+  const showConstellations = useUiStateStore((s) => s.showConstellations);
+  const constellationsQuery = useConstellations(selected, datetimeUtc, showConstellations);
+
   const containerRef = useRef(null);
   const { width, height, dpr } = useCanvasSize(containerRef);
 
@@ -40,6 +47,16 @@ export default function SkyChart() {
     const dsos = projectDsos(dsoQuery.data?.dsos ?? [], width, height);
     return { stars, planets, dsos, all: [...stars, ...planets, ...dsos] };
   }, [skyQuery.data, planetsQuery.data, dsoQuery.data, width, height]);
+
+  const constellationGeom = useMemo(
+    () =>
+      projectConstellations(
+        constellationsQuery.data?.constellations ?? [],
+        width,
+        height
+      ),
+    [constellationsQuery.data, width, height]
+  );
 
   const [hoveredId, setHoveredId] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
@@ -115,6 +132,7 @@ export default function SkyChart() {
         projectedStars={status === "ready" ? projected.stars : []}
         projectedPlanets={status === "ready" ? projected.planets : []}
         projectedDsos={status === "ready" ? projected.dsos : []}
+        projectedLines={showConstellations ? constellationGeom.lines : []}
         width={width}
         height={height}
         dpr={dpr}
@@ -124,6 +142,10 @@ export default function SkyChart() {
         projectedPlanets={status === "ready" ? projected.planets : []}
         width={width}
       />
+
+      {showConstellations && (
+        <ConstellationLabels labels={constellationGeom.labels} />
+      )}
 
       {status === "ready" && <CardinalLabels />}
 
@@ -144,6 +166,8 @@ export default function SkyChart() {
           dsoQuery.refetch();
         }}
       />
+
+      <ConstellationToggle />
 
       <AttributionFooter />
     </div>
