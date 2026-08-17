@@ -221,8 +221,9 @@ This project lives or dies on accuracy. Non-negotiable:
 - [x] **Phase 2b** — 2D Sky Chart: Canvas 2D stereographic projection inside the hero placeholder
 - [x] **Phase 2c** — Visual Polish + Milky Way Backdrop: WebGL panorama backdrop (ESO/S. Brunier, galactic equirectangular) + ambient CSS galaxy layer; point-based star rendering (halos only on mag ≤ 2); per-planet color tints + always-on labels; full-rectangle stereographic fill (REFERENCE_ALT = 0°); attribution footer. **Merged to main 2026-05-17 (PR #1).**
 - [x] **Phase 2d** — Celestial Objects: planet sprite icons (procedural + photo-texture tooltip thumbnails) + Moon texture with phase shadow + apparent-size scaling + 25 naked-eye DSOs as soft glows with bright nuclei. Backend: `GET /api/v1/dso`, dso_catalog service, ingest_dso.py (TAP query + reference fallbacks), naked_eye_dso.json seeded with 25 objects. Frontend: textureCache, sprite renderers (planet + moon), dsoDrawing, useDso hook, projectDsos, SkyChart/SkyCanvas wired, SkyTooltip extended with DsoBody + planet photo. **Merged to main 2026-05-29 (PR #2, commit `f17dccb`).**
-- [x] **Phase 3a** — Constellations: toggleable Western stick-figure overlay (lines + name labels), observer-parameterized `GET /api/v1/constellations` (ICRS→AltAz, both-endpoints-visible rule). Backend: `constellation_catalog` service, `ingest_constellations.py` (Stellarium `index.json` HIP polylines → VizieR Hipparcos → baked `constellations.json`, 88 constellations / 674 segments). Frontend: `showConstellations` store toggle (default OFF), gated `useConstellations` hook, `projectConstellations`, SkyCanvas line layer (behind objects), `ConstellationLabels` DOM overlay, `ConstellationToggle` control. Triple-attributed: Stellarium Western (CC BY-SA) + ESA Hipparcos + IAU. **QA-passed 2026-06-05; PR #3 → main, awaiting merge.**
-- [ ] **Phase 3b** — Enrichment: click-to-lookup SIMBAD names/spectral type + NASA Exoplanet Archive host data, **fully baked** (zero runtime external calls), shown by expanding the star tooltip. **Spec + plan DONE on `feat/phase-3b-enrichment`; execution held for next session.** See `docs/superpowers/specs/2026-06-05-phase-3b-enrichment-design.md` + plan.
+- [x] **Phase 3a** — Constellations: toggleable Western stick-figure overlay (lines + name labels), observer-parameterized `GET /api/v1/constellations` (ICRS→AltAz, both-endpoints-visible rule). Backend: `constellation_catalog` service, `ingest_constellations.py` (Stellarium `index.json` HIP polylines → VizieR Hipparcos → baked `constellations.json`, 88 constellations / 674 segments). Frontend: `showConstellations` store toggle (default OFF), gated `useConstellations` hook, `projectConstellations`, SkyCanvas line layer (behind objects), `ConstellationLabels` DOM overlay, `ConstellationToggle` control. Triple-attributed: Stellarium Western (CC BY-SA) + ESA Hipparcos + IAU. **QA-passed 2026-06-05; merged to main 2026-08-17 (PR #3, commit `1f0c984`).**
+- [x] **Accuracy audit** — 2026-07-13 full-codebase correctness + optimization pass: inside-view chart orientation (E left), verified Milky Way projection, shared UTC parsing with 422/503 mapping, 14x `/sky` serialization, pooled geocoder client. **Merged to main 2026-08-17 (PR #4, commit `0dd3a1e`).** Guardrails #22–24.
+- [ ] **Phase 3b** — Enrichment: click-to-lookup SIMBAD names/spectral type + NASA Exoplanet Archive host data, **fully baked** (zero runtime external calls), shown by expanding the star tooltip. **Spec + plan DONE and now on main; branch `feat/phase-3b-enrichment` repointed to the main tip. Execution is the next task.** See `docs/superpowers/specs/2026-06-05-phase-3b-enrichment-design.md` + plan.
 - [ ] **Phase 4** — Explore Mode: Three.js 3D flyable celestial sphere (behind the "Explore in 3D" button)
 - [ ] **Phase 5** — Polish + Deploy: landing, about, docker-compose, live URL
 
@@ -234,9 +235,15 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 ## Resume Here — Next Session
 
-**Paused:** 2026-07-13, after a full-codebase accuracy + optimization audit. **Andrew ran the dev server and visually QA'd the fixes — PASSED** — and approved committing them to a dedicated **`fix/accuracy-audit`** branch (branched from the 3b docs tip `390acee`, so it also carries the three docs-only 3b spec/plan commits — intentional; they land on main with the audit PR). **PR to main after PR #3 (Phase 3a) merges.** Afterward, repoint `feat/phase-3b-enrichment` onto the audit branch tip before executing the 3b plan.
+**Paused:** 2026-08-17. **Everything built so far is now on `main`.** Phase 3a merged via PR #3 (`1f0c984`), then the 2026-07-13 accuracy audit merged via PR #4 (`0dd3a1e`) — which also carried the three docs-only Phase 3b spec/plan commits it was branched on top of. `feat/phase-3b-enrichment` has been fast-forwarded to the main tip and is ready to execute against.
 
-### 2026-07-13 audit — what changed (QA-passed, committed on `fix/accuracy-audit`)
+**Verified on the merged `main` (2026-08-17):** backend **109/109** in a single session (106 default + 3 `network`-marked), frontend **185/185** (29 files), ESLint clean, production build 238.86 KB JS / **76.01 KB gzip**, and `verify_backdrop_projection.py` green at **0.375°** worst separation (budget 0.6°).
+
+**Found and fixed while verifying the merge** (`b569523`): the audit's pooled `httpx.AsyncClient` was cached in module state with nothing resetting it between tests. pytest-asyncio gives each test its own event loop, so the second test to reuse it hit connections bound to a closed loop → `RuntimeError: Event loop is closed`. `_get_client()` can't detect this, because a client whose loop died still reports `is_closed == False`. Fixed with autouse teardown fixtures in both geocoder test modules. Not a production defect (uvicorn = one loop for the process lifetime, closed by the lifespan hook on that same loop) — but **if a future change ever runs the app across more than one event loop, `geocoder._client` is the thing that will break first.**
+
+**NEXT: execute the Phase 3b plan** — `superpowers:subagent-driven-development` on `docs/superpowers/plans/2026-06-05-phase-3b-enrichment.md`, 9 TDD tasks, on branch `feat/phase-3b-enrichment`. Note the plan reserves "guardrail #22" for the enrichment rule; the audit took #22–24, so it lands as **#25**.
+
+### 2026-07-13 audit — what changed (QA-passed, merged via PR #4)
 
 **Accuracy fixes (frontend):**
 1. **East-west mirror fixed.** The chart rendered the outside-globe convention (N up, E right) — a mirror image of the real sky. Now inside view (E left): `projectAltAz` x-sign, `inverseStereographic`, `CardinalLabels` E/W swap, orientation tests updated. See guardrail #22. **The rendered sky is now horizontally flipped vs every prior screenshot — this is correct, not a regression.**
@@ -253,13 +260,13 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 **Known accepted approximations (documented, not bugs):** no atmospheric refraction (<0.5°, needs weather data); backdrop uses of-date coords with J2000 galactic rotation (~0.4° in 2026, sub-pixel-blur on a diffuse image); simplified GMST without UT1−UTC (≤~13 arcsec); Moon chart-icon terminator vertical + lit-side heuristic (Phase 4); DSO pxPerArcmin linearization; "Local" timezone toggle = browser-local, not searched-location-local (Phase 5 candidate: tz lookup from lat/lon).
 
-**Current state:** Phase 1 + 2a + 2b + 2c + 2d shipped to main; **Phase 3a QA-passed and in PR #3** (https://github.com/AndrewRobalino/skyvault/pull/3), branch `feat/phase-3a-constellations`, clean fast-forward. Spec + plan in `docs/superpowers/`. Frontend **185** tests / backend **106** tests (post-audit counts), all green; lint clean (0 warnings); production build ~239 KB JS (~76 KB gzip). Built subagent-driven, TDD per task, two-stage review. During the bake, found Stellarium `lines` carry style markers (e.g. `"thin"`) — parser strips them; without that fix Canis Major + Ursa Major were silently dropped.
+**Current state:** Phase 1 + 2a + 2b + 2c + 2d + **3a** + the accuracy audit are all shipped to `main` (PR #3 `1f0c984`, PR #4 `0dd3a1e`, both 2026-08-17). Spec + plan for 3b in `docs/superpowers/`, also on main. Frontend **185** tests / backend **106** default + **3** network-marked, all green; lint clean (0 warnings); production build 238.86 KB JS (76.01 KB gzip). Built subagent-driven, TDD per task, two-stage review. During the bake, found Stellarium `lines` carry style markers (e.g. `"thin"`) — parser strips them; without that fix Canis Major + Ursa Major were silently dropped.
 
 **2026-06-05 session:** Live visual QA passed (NYC/Buenos Aires/Reykjavík). Brightened constellations for opt-in visibility (lines alpha 0.22→0.44; labels 0.45→0.85, 9px→11px, weight 500, double dark text-shadow). Accuracy audit verified: 674/674 source segments baked (zero dropped, every Hipparcos star resolved), Orion anchor stars match published J2000 ICRS to sub-arcsecond. Corrected stale doc wording — constellation figures are Stellarium Western (CC BY-SA), NOT IAU (IAU defines only boundaries + names); and leftover Mellinger 2.0 references → ESO/S. Brunier (the backdrop switched 2026-05-17). README was already correct. Two commits: `b18e173` (style) + `1d01b67` (docs), pushed.
 
 ### Next up — Phase 3b (Enrichment): spec + plan DONE, EXECUTE next session
 
-Brainstorm → spec → plan are complete on branch **`feat/phase-3b-enrichment`** (off the 3a tip; commits `da4c4a2` spec, `7740254` plan). **Andrew held execution for next session.** Next session: run `superpowers:subagent-driven-development` on the plan, task by task.
+Brainstorm → spec → plan are complete and now merged to `main` (commits `da4c4a2` spec, `7740254` plan). Branch **`feat/phase-3b-enrichment`** has been fast-forwarded to the main tip — no unique commits, nothing to rebase. Next: run `superpowers:subagent-driven-development` on the plan, task by task.
 
 - **Spec:** `docs/superpowers/specs/2026-06-05-phase-3b-enrichment-design.md`
 - **Plan:** `docs/superpowers/plans/2026-06-05-phase-3b-enrichment.md` (9 TDD tasks)
@@ -268,7 +275,7 @@ Brainstorm → spec → plan are complete on branch **`feat/phase-3b-enrichment`
 
 **Execution gotcha:** the real bake (Task 5) needs network (live SIMBAD TAP + NASA Exoplanet Archive) + the Gaia parquet. All other tasks are network-free (fixtures/mocks). If the exec env lacks network, build against fixtures and run the one bake command locally.
 
-**Also pending (Andrew's call):** merge PR #3 (Phase 3a) — independent of 3b, which already stacks on it.
+**Guardrail numbering:** the 3b plan reserves "#22" for the enrichment rule, but the accuracy audit took #22–24 — so the enrichment guardrail lands as **#25**.
 
 ### Tech debt noted during 3a
 - ~~`time_utc.replace("Z", "")` duplicated across 4 services~~ — **RESOLVED 2026-07-13** by `app/services/time_utils.parse_utc_time` (guardrail #24).

@@ -164,7 +164,7 @@ Footer attribution: *"Powered by ESA Gaia DR3 · NASA JPL · IAU · CDS SIMBAD �
 
 **Goal:** Constellation stick figures overlayed on the Canvas 2D sky, plus click-to-enrich any star with SIMBAD + NASA Exoplanet Archive data.
 
-### Phase 3a — Constellations ✅ (QA-passed 2026-06-05, PR #3 → main)
+### Phase 3a — Constellations ✅ COMPLETE (QA-passed 2026-06-05; merged to main 2026-08-17, PR #3)
 - `/api/v1/constellations` — observer-parameterized stick-figure line segments (Stellarium Western figures; ESA Hipparcos coords; IAU names). A segment is visible only if both endpoints are above the horizon. NOTE: IAU defines only boundaries + names, not figures.
 - Toggleable overlay (default OFF), figure lines behind objects + name labels on a DOM overlay, brightened for opt-in visibility.
 
