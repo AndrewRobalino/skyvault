@@ -29,6 +29,7 @@ from astropy.coordinates import AltAz, EarthLocation, get_body, solar_system_eph
 from astropy.time import Time
 
 from app.config import settings
+from app.services.time_utils import parse_utc_time
 
 
 # Order matters for deterministic output — Sun first, then Moon, then planets
@@ -176,7 +177,7 @@ def compute_planet_positions(
         If True, drop bodies below the local horizon.
     """
     location = EarthLocation(lat=observer_lat * u.deg, lon=observer_lon * u.deg)
-    obs_time = Time(observer_time.replace("Z", ""), scale="utc")
+    obs_time = parse_utc_time(observer_time)
     altaz_frame = AltAz(obstime=obs_time, location=location)
 
     kernel = _resolve_kernel()

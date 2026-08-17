@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 
 from app.models.schemas import Observer, Planet, PlanetsResponse
 from app.services import ephemeris
+from app.services.time_utils import InvalidObservationTimeError
 
 
 router = APIRouter(prefix="/planets", tags=["planets"])
@@ -21,12 +22,17 @@ async def get_planets(
         description="If true, include bodies below the horizon in the response.",
     ),
 ) -> PlanetsResponse:
-    results = ephemeris.compute_planet_positions(
-        observer_lat=lat,
-        observer_lon=lon,
-        observer_time=datetime,
-        horizon_only=not include_below_horizon,
-    )
+    try:
+        results = ephemeris.compute_planet_positions(
+            observer_lat=lat,
+            observer_lon=lon,
+            observer_time=datetime,
+            horizon_only=not include_below_horizon,
+        )
+    except InvalidObservationTimeError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except ephemeris.EphemerisNotDownloadedError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
     planets = [
         Planet(

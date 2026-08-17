@@ -16,10 +16,10 @@ from pathlib import Path
 
 from astropy import units as u
 from astropy.coordinates import AltAz, EarthLocation, SkyCoord
-from astropy.time import Time
 
 from app.config import settings
 from app.models.schemas import DeepSkyObject
+from app.services.time_utils import parse_utc_time
 
 
 class DsoCatalogNotFoundError(FileNotFoundError):
@@ -63,7 +63,7 @@ def dsos_for_observer(
         return []
 
     location = EarthLocation(lat=lat * u.deg, lon=lon * u.deg)
-    time = Time(time_utc.replace("Z", ""), scale="utc")
+    time = parse_utc_time(time_utc)
     frame = AltAz(obstime=time, location=location)
 
     ras = [obj["ra"] for obj in raw]

@@ -10,6 +10,13 @@
  * Azimuth convention: 0° = north, 90° = east, 180° = south, 270° = west.
  * Canvas y increases downward, so north appears above zenith on screen.
  *
+ * Screen orientation is the INSIDE view of the celestial sphere — the sky
+ * as the observer actually sees it looking up: with north at the top,
+ * EAST is on the LEFT (x = -sin(az)). This matches every real sky chart
+ * (planispheres, Stellarium, Sky & Telescope). The opposite convention
+ * (east right) is how a celestial globe looks from OUTSIDE and renders
+ * every constellation mirror-imaged — do not "fix" the sign back.
+ *
  * Phase 3+ will add new kinds (constellation_line, galaxy, comet). The
  * projection pipeline stays the same for any point object.
  */
@@ -23,7 +30,7 @@ export function projectAltAz({ alt, az }, width, height) {
   const r = Math.tan(zenithAngle / 2);      // stereographic radial distance
 
   const azRad = az * DEG;
-  const xNorm = r * Math.sin(azRad);        // east positive
+  const xNorm = -r * Math.sin(azRad);       // inside view: east on the LEFT
   const yNorm = -r * Math.cos(azRad);       // screen y down, north up
 
   const halfShort = Math.min(width, height) / 2;

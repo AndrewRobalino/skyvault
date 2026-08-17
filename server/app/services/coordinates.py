@@ -33,6 +33,8 @@ from astropy import units as u
 from astropy.coordinates import AltAz, EarthLocation, SkyCoord
 from astropy.time import Time
 
+from app.services.time_utils import parse_utc_time
+
 
 # Gaia DR3 reference epoch — all catalog positions are as-of this instant.
 GAIA_REFERENCE_EPOCH = Time("J2016.0")
@@ -92,8 +94,7 @@ def compute_altaz(
         return out
 
     location = EarthLocation(lat=observer_lat * u.deg, lon=observer_lon * u.deg)
-    # Astropy parses trailing "Z" fine, but normalize for clarity.
-    obs_time = Time(observer_time.replace("Z", ""), scale="utc")
+    obs_time = parse_utc_time(observer_time)
 
     parallax_raw = stars["parallax"].to_numpy(dtype=float)
     distance_pc = _parallax_to_distance_pc(parallax_raw)

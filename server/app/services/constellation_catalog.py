@@ -17,10 +17,10 @@ from pathlib import Path
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import AltAz, EarthLocation, SkyCoord
-from astropy.time import Time
 
 from app.config import settings
 from app.models.schemas import Constellation, ConstellationSegment
+from app.services.time_utils import parse_utc_time
 
 
 class ConstellationCatalogNotFoundError(FileNotFoundError):
@@ -58,8 +58,7 @@ def constellations_for_observer(
         return []
 
     location = EarthLocation(lat=lat * u.deg, lon=lon * u.deg)
-    # Strips a trailing "Z"; the frontend always sends Z-suffixed ISO UTC.
-    time = Time(time_utc.replace("Z", ""), scale="utc")
+    time = parse_utc_time(time_utc)
     frame = AltAz(obstime=time, location=location)
 
     # Flatten every endpoint + every label into one SkyCoord for a single

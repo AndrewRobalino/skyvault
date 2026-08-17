@@ -77,6 +77,19 @@ def clear_cache():
     geocoder._CACHE.clear()
 
 
+@pytest.fixture(autouse=True)
+async def close_shared_client():
+    """Discard the shared client between tests.
+
+    These tests patch ``httpx.AsyncClient.get``, so no real connection is opened —
+    but ``_get_client()`` still constructs and caches a real client in module state.
+    Closing it here keeps that state from leaking across tests (and across event
+    loops, which is what breaks the acceptance suite).
+    """
+    yield
+    await geocoder.close_client()
+
+
 @pytest.mark.asyncio
 async def test_geocode_returns_parsed_candidates():
     mock_response = httpx.Response(200, json=SAMPLE_PHOTON_RESPONSE)

@@ -10,6 +10,7 @@ from fastapi import APIRouter, HTTPException, Query
 
 from app.models.schemas import ConstellationsResponse, Observer
 from app.services import constellation_catalog
+from app.services.time_utils import InvalidObservationTimeError
 
 router = APIRouter(prefix="/constellations", tags=["constellations"])
 
@@ -25,9 +26,12 @@ async def get_constellations(
     except constellation_catalog.ConstellationCatalogNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
-    constellations = constellation_catalog.constellations_for_observer(
-        lat=lat, lon=lon, time_utc=datetime
-    )
+    try:
+        constellations = constellation_catalog.constellations_for_observer(
+            lat=lat, lon=lon, time_utc=datetime
+        )
+    except InvalidObservationTimeError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     return ConstellationsResponse(
         observer=Observer(lat=lat, lon=lon, datetime=datetime),
         constellations=constellations,

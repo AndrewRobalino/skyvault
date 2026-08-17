@@ -7,6 +7,8 @@
  *
  * Azimuth convention matches projection.js:
  *   0° = north, 90° = east, 180° = south, 270° = west.
+ * Screen orientation is the inside view (north up, east LEFT), mirroring
+ * projection.js's forward map x = -sin(az), y = -cos(az).
  * Returned azimuth is normalized to [0, 360).
  *
  * @param {number} x — pixel x (0 = canvas left edge)
@@ -35,7 +37,7 @@ export function inverseStereographic(x, y, width, height, refAltDeg) {
     return { altDeg, azDeg: 0 };
   }
 
-  let azRad = Math.atan2(dx, -dy);
+  let azRad = Math.atan2(-dx, -dy);
   if (azRad < 0) azRad += 2 * Math.PI;
   const azDeg = azRad * (180 / Math.PI);
 
