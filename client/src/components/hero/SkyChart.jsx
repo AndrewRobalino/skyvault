@@ -5,6 +5,7 @@ import { useSky } from "../../hooks/useSky.js";
 import { usePlanets } from "../../hooks/usePlanets.js";
 import { useDso } from "../../hooks/useDso.js";
 import { useConstellations } from "../../hooks/useConstellations.js";
+import { useObject } from "../../hooks/useObject.js";
 import { useCanvasSize } from "../../hooks/useCanvasSize.js";
 import { projectStars, projectPlanets, projectDsos, projectConstellations } from "../../utils/projection.js";
 import { findNearestWithinRadius } from "../../utils/hitTest.js";
@@ -69,6 +70,13 @@ export default function SkyChart() {
     () => projected.all.find((o) => o.id === selectedId) ?? null,
     [selectedId, projected.all]
   );
+
+  // Enrichment is star-only and fetched on selection (never hover), so planets
+  // and DSOs never trigger a lookup.
+  const selectedStarSourceId =
+    selectedObj?.kind === "star" ? selectedObj.source_id : null;
+  const objectQuery = useObject(selectedStarSourceId, Boolean(selectedStarSourceId));
+  const enrichment = objectQuery.data?.found ? objectQuery.data.enrichment : null;
 
   const status = statusFor({ selected, skyQuery, planetsQuery, dsoQuery });
 
@@ -154,7 +162,12 @@ export default function SkyChart() {
         variant={selectedObj ? "selected" : "hover"}
       />
 
-      <SkyTooltip object={selectedObj} container={{ width, height }} />
+      <SkyTooltip
+        object={selectedObj}
+        enrichment={enrichment}
+        enrichmentLoading={objectQuery.isLoading && Boolean(selectedStarSourceId)}
+        container={{ width, height }}
+      />
 
       <SkyStatusOverlay
         state={status}

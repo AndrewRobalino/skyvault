@@ -1,14 +1,24 @@
-"""GET /api/v1/objects/{id} — enrichment lookup for a single object.
+"""GET /api/v1/objects/{source_id} — baked enrichment lookup for one star.
 
-Phase 3+: SIMBAD metadata + NASA Exoplanet Archive host-star data.
+SIMBAD names/spectral type + NASA Exoplanet Archive host data, served from an
+in-memory map (no external calls at runtime).
 """
 
-from fastapi import APIRouter
+from __future__ import annotations
+
+from fastapi import APIRouter, HTTPException
+
+from app.models.schemas import ObjectResponse
+from app.services import star_enrichment
 
 router = APIRouter(prefix="/objects", tags=["objects"])
 
 
-@router.get("/{object_id}")
-async def get_object(object_id: str) -> dict:
-    # TODO(phase-3): SIMBAD + NASA Exoplanet Archive lookup, cached
-    return {"id": object_id, "enrichment": None, "sources": []}
+@router.get("/{source_id}", response_model=ObjectResponse)
+async def get_object(source_id: str) -> ObjectResponse:
+    try:
+        enrichment = star_enrichment.enrichment_for(source_id)
+    except star_enrichment.StarEnrichmentNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    return ObjectResponse(found=enrichment is not None, enrichment=enrichment)

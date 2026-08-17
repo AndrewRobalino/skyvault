@@ -36,6 +36,7 @@ server/data/*.csv
 server/data/*.fits
 server/data/*.bsp
 !server/data/constellations.json
+!server/data/star_enrichment.json
 !server/data/.gitkeep
 
 # Astropy cache
