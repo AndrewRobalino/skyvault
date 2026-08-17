@@ -61,4 +61,5 @@ export const api = {
     request("/dso", { lat, lon, datetime, include_below_horizon }),
   constellations: (lat, lon, datetime) =>
     request("/constellations", { lat, lon, datetime }),
+  object: (sourceId) => request(`/objects/${sourceId}`),
 };
