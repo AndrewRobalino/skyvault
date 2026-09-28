@@ -37,6 +37,11 @@ def _safe(value) -> float | None:
     return f
 
 
+def _safe_str(value) -> str | None:
+    """Collapse the NaN that pd.concat puts in Gaia rows' Hipparcos-only columns."""
+    return value if isinstance(value, str) else None
+
+
 def _distance_ly(parallax_mas: float | None) -> float | None:
     """Convert Gaia parallax (mas) to distance in light-years."""
     if parallax_mas is None or parallax_mas <= 0:
@@ -90,7 +95,8 @@ async def get_sky(
     # rows per request) and iterrows() builds a pandas Series per row.
     stars: list[Star] = [
         Star(
-            source_id=str(int(rec["source_id"])),
+            # Gaia ids arrive as int64 or str, Hipparcos ids as "hip:<n>".
+            source_id=str(rec["source_id"]),
             ra=float(rec["ra"]),
             dec=float(rec["dec"]),
             alt=float(rec["alt"]),
@@ -100,6 +106,9 @@ async def get_sky(
             parallax_mas=_safe(rec.get("parallax")),
             distance_ly=_safe(distance_ly[i]),
             teff_k=_safe(rec.get("teff_gspphot")),
+            source=_safe_str(rec.get("source")) or "Gaia DR3",
+            magnitude_source=_safe_str(rec.get("magnitude_source")),
+            color_source=_safe_str(rec.get("color_source")),
         )
         for i, rec in enumerate(with_altaz.to_dict("records"))
     ]

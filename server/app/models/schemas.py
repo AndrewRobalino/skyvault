@@ -42,6 +42,10 @@ class Star(BaseModel):
     distance_ly: float | None = None
     teff_k: float | None = None
     source: str = "Gaia DR3"
+    # Provenance for values that were transformed rather than measured. Present
+    # only on stars supplemented from Hipparcos; None for Gaia rows.
+    magnitude_source: str | None = None
+    color_source: str | None = None
 
 
 class SkyResponse(BaseModel):
