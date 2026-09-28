@@ -26,8 +26,8 @@ SkyVault uses real, attributed institutional data sources. No values are faked o
 | **IAU constellations** | Official 88 constellation names | IAU | Public domain |
 | **Stellarium Western sky culture** | Constellation stick-figure line topology | Stellarium | CC BY-SA (attribution + ShareAlike on the derived data file) |
 | **ESA Hipparcos** (VizieR I/239/hip_main) | J2000 ICRS coordinates for constellation stars | ESA | Public / scientific data |
-| **NASA Exoplanet Archive** | Confirmed exoplanets and host stars (Phase 3) | NASA / IPAC | Public domain |
-| **CDS SIMBAD** | Canonical object metadata (Phase 3) | CDS Strasbourg | Free for academic / non-commercial use |
+| **NASA Exoplanet Archive** | Confirmed exoplanets and host stars, cross-matched to Gaia DR3 source ids and baked into the star enrichment catalog | NASA / IPAC | Public domain |
+| **CDS SIMBAD** | Canonical object metadata — proper names, Bayer/Flamsteed designations, HD/HIP ids, spectral and object types for naked-eye stars, plus DSO metadata | CDS Strasbourg | Free for academic / non-commercial use |
 | **ESO/S. Brunier panorama** (eso0932a) | All-sky Milky Way backdrop image (galactic equirectangular, 4000×2000) | ESO / Serge Brunier (GigaGalaxy Zoom Project) | CC BY 4.0 |
 
 The Milky Way panorama is © ESO/S. Brunier from the GigaGalaxy Zoom Project,

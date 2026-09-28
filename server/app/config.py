@@ -37,6 +37,9 @@ class Settings(BaseSettings):
     # Constellation figures catalog (produced once via scripts/ingest_constellations.py)
     constellations_catalog_path: Path = DATA_DIR / "constellations.json"
 
+    # Star enrichment catalog (produced once via scripts/ingest_star_enrichment.py)
+    star_enrichment_path: Path = DATA_DIR / "star_enrichment.json"
+
     # Sky query defaults
     default_mag_limit: float = 6.5
 

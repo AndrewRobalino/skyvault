@@ -141,3 +141,34 @@ class ConstellationsResponse(BaseModel):
     constellations: list[Constellation]
     count: int
     source: dict[str, str]
+
+
+class ExoplanetInfo(BaseModel):
+    """Confirmed exoplanets for a host star (NASA Exoplanet Archive)."""
+
+    count: int = Field(..., ge=0, description="Number of confirmed planets")
+    names: list[str] = Field(default_factory=list, description="Planet designations")
+
+
+class ObjectEnrichment(BaseModel):
+    """SIMBAD + NASA Exoplanet Archive enrichment for one star.
+
+    Every field except ``source_id`` may be missing — enrichment coverage is
+    partial and honest. ``planets`` is present only for confirmed hosts.
+    """
+
+    source_id: str
+    proper_name: str | None = None
+    designation: str | None = None
+    catalog_ids: list[str] = Field(default_factory=list)
+    spectral_type: str | None = None
+    object_type: str | None = None
+    planets: ExoplanetInfo | None = None
+    sources: list[str] = Field(default_factory=list)
+
+
+class ObjectResponse(BaseModel):
+    """Enrichment lookup response. ``found`` is False for stars with no entry."""
+
+    found: bool
+    enrichment: ObjectEnrichment | None = None

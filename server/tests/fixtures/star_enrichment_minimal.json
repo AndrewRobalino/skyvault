@@ -1,0 +1,32 @@
+{
+  "2667000000000000000": {
+    "proper_name": "Vega",
+    "designation": "α Lyrae",
+    "catalog_ids": ["HD 172167", "HIP 91262"],
+    "spectral_type": "A0Va",
+    "object_type": "Variable Star",
+    "planets": { "count": 0, "names": [] },
+    "name_source": "SIMBAD/CDS",
+    "planet_source": "NASA Exoplanet Archive"
+  },
+  "2835000000000000000": {
+    "proper_name": "51 Pegasi",
+    "designation": "51 Peg",
+    "catalog_ids": ["HD 217014", "HIP 113357"],
+    "spectral_type": "G2IV",
+    "object_type": "High Proper Motion Star",
+    "planets": { "count": 1, "names": ["51 Peg b"] },
+    "name_source": "SIMBAD/CDS",
+    "planet_source": "NASA Exoplanet Archive"
+  },
+  "4000000000000000000": {
+    "proper_name": null,
+    "designation": null,
+    "catalog_ids": ["HD 999999"],
+    "spectral_type": "K0",
+    "object_type": "Star",
+    "planets": null,
+    "name_source": "SIMBAD/CDS",
+    "planet_source": null
+  }
+}

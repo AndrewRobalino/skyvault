@@ -32,24 +32,72 @@ function Row({ label, value }) {
   );
 }
 
-function StarBody({ object }) {
+function pluralPlanets(count) {
+  return `${count} confirmed planet${count === 1 ? "" : "s"}`;
+}
+
+function StarBody({ object, enrichment, loading }) {
+  const name = enrichment?.proper_name;
+  const subtitle = [enrichment?.designation, enrichment?.catalog_ids?.[0]]
+    .filter(Boolean)
+    .join(" · ");
+  const sourceLine = enrichment?.sources?.length
+    ? enrichment.sources.join(" · ")
+    : object.source;
+
   return (
     <>
       <div className="mb-2">
-        <p className="text-ink-dim text-[11px] uppercase tracking-[0.18em]">Star</p>
-        <p className="font-mono text-[11px] text-ink-dim mt-0.5 break-all">
-          Gaia DR3 · {object.source_id}
-        </p>
+        {name ? (
+          <>
+            <p className="text-ink text-sm font-medium uppercase tracking-wide">{name}</p>
+            {subtitle && (
+              <p className="font-mono text-[11px] text-ink-dim mt-0.5">{subtitle}</p>
+            )}
+          </>
+        ) : (
+          <>
+            <p className="text-ink-dim text-[11px] uppercase tracking-[0.18em]">Star</p>
+            <p className="font-mono text-[11px] text-ink-dim mt-0.5 break-all">
+              Gaia DR3 · {object.source_id}
+            </p>
+          </>
+        )}
       </div>
       <div className="border-t border-rule/60 pt-2 pb-2">
         <Row label="Magnitude" value={formatNumber(object.magnitude, 2)} />
+        {enrichment?.spectral_type && (
+          <Row label="Spectral type" value={enrichment.spectral_type} />
+        )}
         <Row label="Color index" value={formatNumber(object.bp_rp, 2)} />
         <Row label="Distance" value={formatLy(object.distance_ly)} />
         <Row label="Altitude" value={formatDeg(object.alt)} />
         <Row label="Azimuth" value={formatDeg(object.az)} />
       </div>
+
+      {loading && (
+        <div
+          data-testid="enrichment-loading"
+          className="border-t border-rule/60 pt-2 pb-2"
+        >
+          <div className="h-3 w-3/4 animate-pulse rounded bg-rule/40" />
+        </div>
+      )}
+
+      {!loading && enrichment && (
+        <div className="border-t border-rule/60 pt-2 pb-2">
+          {enrichment.planets ? (
+            <p className="text-[13px] text-ink">
+              ✦ {pluralPlanets(enrichment.planets.count)}
+            </p>
+          ) : (
+            <p className="text-[13px] text-ink-dim">✦ No known planets</p>
+          )}
+        </div>
+      )}
+
       <div className="border-t border-rule/60 pt-2 font-mono text-[11px] text-accent-dim">
-        Source: {object.source}
+        Source: {sourceLine}
       </div>
     </>
   );
@@ -129,7 +177,12 @@ function DsoBody({ object }) {
   );
 }
 
-export default function SkyTooltip({ object, container }) {
+export default function SkyTooltip({
+  object,
+  enrichment,
+  enrichmentLoading,
+  container,
+}) {
   if (!object) return null;
 
   const anchorX = object.x;
@@ -154,7 +207,9 @@ export default function SkyTooltip({ object, container }) {
       "
       style={{ left, top, width: TOOLTIP_W }}
     >
-      {object.kind === "star" && <StarBody object={object} />}
+      {object.kind === "star" && (
+        <StarBody object={object} enrichment={enrichment} loading={enrichmentLoading} />
+      )}
       {object.kind === "planet" && <PlanetBody object={object} />}
       {object.kind === "dso" && <DsoBody object={object} />}
     </div>
