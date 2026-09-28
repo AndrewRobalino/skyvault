@@ -5,9 +5,11 @@ Astronomy notes — because this is where physics mistakes would hide:
 1. **Source frame:** Gaia DR3 positions are ICRS at reference epoch **J2016.0**.
    They are *not* the current position of the star. Over a decade, high
    proper-motion stars (Barnard's, Kapteyn's, ε Eri, etc.) drift by several
-   arcseconds — visible in a rendered sky.
+   arcseconds — visible in a rendered sky. The Hipparcos bright-star
+   supplement is ICRS at **J1991.25**; each row's ``epoch`` column says which,
+   and rows without one are Gaia.
 
-2. **Proper motion:** We apply space motion from J2016.0 to the observation
+2. **Proper motion:** We apply space motion from each star's epoch to the observation
    epoch using ``SkyCoord.apply_space_motion``. This requires ``pm_ra_cosdec``,
    ``pm_dec``, a ``distance`` (computed from parallax), and an ``obstime``.
 
@@ -55,6 +57,25 @@ def _parallax_to_distance_pc(parallax_mas: np.ndarray) -> np.ndarray:
     safe = np.where((parallax > 0) & np.isfinite(parallax), parallax, np.nan)
     distance = 1000.0 / safe  # mas -> parsecs
     return np.where(np.isnan(distance), FALLBACK_DISTANCE_PC, distance)
+
+
+def _reference_epochs(stars: pd.DataFrame) -> Time:
+    """Per-star catalog reference epoch.
+
+    Gaia DR3 is J2016.0; the Hipparcos bright-star supplement is J1991.25.
+    Frames that are all-Gaia (no ``epoch`` column, or every row J2016.0 / NaN)
+    get the scalar Gaia epoch, so that path is exactly what it was before
+    mixed catalogs existed.
+    """
+    if "epoch" not in stars.columns:
+        return GAIA_REFERENCE_EPOCH
+    epochs = stars["epoch"].fillna(GAIA_REFERENCE_EPOCH.jyear_str)
+    unique = epochs.unique()
+    if len(unique) == 1 and Time(unique[0]) == GAIA_REFERENCE_EPOCH:
+        return GAIA_REFERENCE_EPOCH
+    # Parse each distinct label once; the column holds only a handful.
+    jyear = {label: Time(label).jyear for label in unique}
+    return Time(epochs.map(jyear).to_numpy(dtype=float), format="jyear")
 
 
 def compute_altaz(
@@ -112,15 +133,15 @@ def compute_altaz(
     pmra = np.where(np.isfinite(pmra), pmra, 0.0)
     pmdec = np.where(np.isfinite(pmdec), pmdec, 0.0)
 
-    # Build the SkyCoord at the Gaia reference epoch with full 6D state so
-    # apply_space_motion can propagate it to the observation epoch.
+    # Build the SkyCoord at each star's catalog reference epoch with full 6D
+    # state so apply_space_motion can propagate it to the observation epoch.
     catalog = SkyCoord(
         ra=stars["ra"].to_numpy() * u.deg,
         dec=stars["dec"].to_numpy() * u.deg,
         pm_ra_cosdec=pmra * (u.mas / u.yr),
         pm_dec=pmdec * (u.mas / u.yr),
         distance=distance_pc * u.pc,
-        obstime=GAIA_REFERENCE_EPOCH,
+        obstime=_reference_epochs(stars),
         frame="icrs",
     )
 
