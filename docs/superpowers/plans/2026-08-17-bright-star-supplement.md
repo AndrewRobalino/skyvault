@@ -600,6 +600,8 @@ Sanity floor: the count of added stars must be **at least 15**, because we know 
 
 > **If this environment has no network:** commit Steps 1–2 and hand the bake to Andrew, exactly as the Gaia/DSO/constellation ingests are handled. Tasks 4–6 use fixtures and do not need the real parquet; Task 8 does.
 
+> **Amendment (2026-09-28) — identifier dedupe alone is wrong; positional pass added.** The first bake kept **656** stars and cleared the ≥15 floor, but ~578 of them had a Gaia source within 1″ at the same magnitude and would have rendered twice. For those stars SIMBAD links only a *Gaia DR2* id (e.g. `HIP 25` → `Gaia DR2 4994581292009978112`), and ESA's `gaiadr3.hipparcos2_best_neighbour` omits them too, so no identifier path reaches the DR3 row in our parquet. Fix (Andrew-approved): after `select_missing`, `drop_positional_duplicates` propagates each HIP star to J2016.0 and drops it if any Gaia source is within **3″** with derived-minus-Gaia G in **[−1.5, +0.5]**; `assert_no_gaia_twins` then fails the bake if any kept star has a Gaia source within **1″**. Wider binaries (Castor, 5.4″) keep the Hipparcos combined light. `build_star_row` also now drops Hipparcos entries with no astrometric solution. Result: **72** stars, G −1.49 … 2.65, all 20 canonical stars present. Photometry check: mean −0.037, RMS 0.160 mag over 14,874 overlapping stars. Run the bake as `python -m scripts.ingest_bright_stars` (the script form can't import `app`). The Vega network test was also wrong: Vega has no Gaia id in SIMBAD, so it now checks HIP 1.
+
 - [ ] **Step 4: Confirm the parquet is committable**
 
 Run: `git check-ignore -v server/data/bright_stars.parquet`
