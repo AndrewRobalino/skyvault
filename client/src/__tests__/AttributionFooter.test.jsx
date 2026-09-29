@@ -37,6 +37,16 @@ describe("AttributionFooter", () => {
     expect(root.className).toMatch(/absolute/);
   });
 
+  it("credits ESA Hipparcos for the bright stars Gaia saturates on", () => {
+    render(<AttributionFooter />);
+    expect(screen.getByText(/Gaia DR3 \+ ESA Hipparcos/)).toBeInTheDocument();
+  });
+
+  it("credits the IAU WGSN for star names (CC BY — attribution required)", () => {
+    render(<AttributionFooter />);
+    expect(screen.getByText(/Star names: IAU WGSN · CC BY/)).toBeInTheDocument();
+  });
+
   it("credits the constellation figure source", () => {
     render(<AttributionFooter />);
     expect(screen.getByText(/Constellation figures: Stellarium · CC BY-SA/)).toBeInTheDocument();
