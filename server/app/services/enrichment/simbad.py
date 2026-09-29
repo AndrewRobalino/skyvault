@@ -71,7 +71,7 @@ def _fetch_by_ident(
 
     ``iau_names`` (IAU WGSN, keyed 'HIP n' / 'HD n') overrides SIMBAD's names.
     """
-    from scripts.ingest_star_enrichment import build_name_fields
+    from scripts.ingest_star_enrichment import build_name_fields, name_source_for
 
     ident_filter = " OR ".join(f"allids.id LIKE '{p}%'" for p in _IDENT_PREFIXES)
 
@@ -124,6 +124,7 @@ def _fetch_by_ident(
                 "catalog_ids": catalog_ids,
                 "spectral_type": rec["sp_type"],
                 "object_type": rec["otype"],
+                "name_source": name_source_for(catalog_ids, iau_names),
             }
         logger.info("SIMBAD resolved %d/%d so far", len(out), start + len(chunk))
     return out

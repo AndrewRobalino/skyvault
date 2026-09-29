@@ -3,6 +3,7 @@ from scripts.ingest_star_enrichment import (
     build_name_fields,
     parse_iau_csn,
     merge_enrichment,
+    name_source_for,
 )
 
 
@@ -201,3 +202,18 @@ def test_format_bayer_uses_simbads_spelling_of_theta_and_xi():
     assert format_bayer("* tet Leo") == "θ Leonis"
     assert format_bayer("* ksi Tau") == "ξ Tauri"
     assert format_bayer("* tet02 Tau") == "θ² Tauri"
+
+
+def test_name_source_credits_iau_when_the_name_came_from_it():
+    iau = {"HIP 11767": "Polaris"}
+    assert name_source_for(["HD 8890", "HIP 11767"], iau) == "IAU WGSN · SIMBAD/CDS"
+
+
+def test_name_source_is_simbad_otherwise():
+    assert name_source_for(["HD 1"], {"HIP 11767": "Polaris"}) == "SIMBAD/CDS"
+    assert name_source_for(["HD 1"], None) == "SIMBAD/CDS"
+
+
+def test_merge_enrichment_keeps_a_per_star_name_source():
+    simbad = {"hip:11767": {"proper_name": "Polaris", "name_source": "IAU WGSN · SIMBAD/CDS"}}
+    assert merge_enrichment(simbad, {})["hip:11767"]["name_source"] == "IAU WGSN · SIMBAD/CDS"

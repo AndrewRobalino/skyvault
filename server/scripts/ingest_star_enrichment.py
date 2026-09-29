@@ -19,6 +19,8 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 NAME_SOURCE = "SIMBAD/CDS"
+# Proper name from the IAU list; designation/spectral type still from SIMBAD.
+IAU_NAME_SOURCE = "IAU WGSN · SIMBAD/CDS"
 PLANET_SOURCE = "NASA Exoplanet Archive"
 
 # SIMBAD abbreviates Greek letters in Bayer designations. Map to Unicode.
@@ -181,6 +183,13 @@ def parse_iau_csn(text: str) -> dict[str, str]:
     return names
 
 
+def name_source_for(catalog_ids: list[str], iau_names: dict[str, str] | None) -> str:
+    """Attribution for a star's name fields: IAU when its name came from there."""
+    if iau_names and any(cid in iau_names for cid in catalog_ids):
+        return IAU_NAME_SOURCE
+    return NAME_SOURCE
+
+
 def merge_enrichment(simbad: dict, planets: dict) -> dict:
     """Combine the SIMBAD map and the exoplanet-host map into baked entries."""
     out: dict = {}
@@ -193,7 +202,7 @@ def merge_enrichment(simbad: dict, planets: dict) -> dict:
             "spectral_type": fields.get("spectral_type"),
             "object_type": fields.get("object_type"),
             "planets": planet_block if planet_block else None,
-            "name_source": NAME_SOURCE,
+            "name_source": fields.get("name_source") or NAME_SOURCE,
             "planet_source": PLANET_SOURCE if planet_block else None,
         }
     return out

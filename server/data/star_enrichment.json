@@ -404,7 +404,7 @@
   "spectral_type": "B8Vn",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "116682308540804224": {
@@ -741,7 +741,7 @@
   "spectral_type": "K0.5IIIb",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "128953957819400064": {
@@ -1625,7 +1625,7 @@
   "spectral_type": "K3II-III",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "161175622809301120": {
@@ -2593,7 +2593,7 @@
     "eps Tau b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "48794509270782976": {
@@ -2868,7 +2868,7 @@
   "spectral_type": "G9.5IIIb",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "60494103263991168": {
@@ -3063,7 +3063,7 @@
   "spectral_type": "B6IV(e)",
   "object_type": "Be Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "65271996684817280": {
@@ -3076,7 +3076,7 @@
   "spectral_type": "B6IIIe",
   "object_type": "Be Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "65283232316451328": {
@@ -3089,7 +3089,7 @@
   "spectral_type": "B7III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "65287458566524928": {
@@ -3102,7 +3102,7 @@
   "spectral_type": "B7V",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "65296907494549120": {
@@ -3115,7 +3115,7 @@
   "spectral_type": "B6IV",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "65319619282119808": {
@@ -3207,7 +3207,7 @@
   "spectral_type": "B8III",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "66529975427235712": {
@@ -3220,7 +3220,7 @@
   "spectral_type": "B8Vne",
   "object_type": "Be Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "66714384142368256": {
@@ -3233,7 +3233,7 @@
   "spectral_type": "B7III",
   "object_type": "Be Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "66715105696289024": {
@@ -3271,7 +3271,7 @@
   "spectral_type": "B8V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "66830279539033472": {
@@ -3722,7 +3722,7 @@
   "spectral_type": "A0Vnp_lB",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "93806419367308544": {
@@ -4684,7 +4684,7 @@
   "spectral_type": "K5II+B7V",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "200959668654651520": {
@@ -4710,7 +4710,7 @@
   "spectral_type": "B3V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "201773994454214144": {
@@ -4866,7 +4866,7 @@
   "spectral_type": "A9Ia",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "206651737271040000": {
@@ -5087,7 +5087,7 @@
   "spectral_type": "B1III",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "216896093265184512": {
@@ -5178,7 +5178,7 @@
   "spectral_type": "O7.5III(n)((f))",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "219547565555375488": {
@@ -6833,7 +6833,7 @@
   "spectral_type": "F5III",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "299807619412692224": {
@@ -7707,7 +7707,7 @@
     "ups And d"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "348515297330773120": {
@@ -9218,7 +9218,7 @@
   "spectral_type": "K0-IIIb",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "398514145494242560": {
@@ -9257,7 +9257,7 @@
   "spectral_type": "K3-IIICN0.5",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "399594587467372544": {
@@ -9741,7 +9741,7 @@
   "spectral_type": "B2IV",
   "object_type": "beta Cep Variable Candidate",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "418030923572427520": {
@@ -9811,7 +9811,7 @@
   "spectral_type": "K0-IIIa",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "418916648901801728": {
@@ -9902,7 +9902,7 @@
   "spectral_type": "F2III",
   "object_type": "delta Sct Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "423075173680043904": {
@@ -9981,7 +9981,7 @@
   "spectral_type": "F9V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "425352708938778368": {
@@ -10046,7 +10046,7 @@
   "spectral_type": "G8.5IIIbFe-0.5",
   "object_type": "Chemically Peculiar Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "425955069515091456": {
@@ -10423,7 +10423,7 @@
   "spectral_type": "G9.5IIIb",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "433806578959894400": {
@@ -11124,7 +11124,7 @@
   "spectral_type": "K3-Ib-IIa",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "455181085007127040": {
@@ -12273,7 +12273,7 @@
     "HD 32518 b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "498167866481976704": {
@@ -12669,7 +12669,7 @@
   "spectral_type": "A5IV",
   "object_type": "Eclipsing Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "511260782234988672": {
@@ -12695,7 +12695,7 @@
   "spectral_type": "B3Vp_sh",
   "object_type": "Be Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "512167948043650816": {
@@ -14475,7 +14475,7 @@
   "spectral_type": "G1III+A8V",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "583286146827230592": {
@@ -14580,7 +14580,7 @@
   "spectral_type": "F8-G0III+A7m",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "588904994842564480": {
@@ -14906,7 +14906,7 @@
   "spectral_type": "kA7VmF0/2III/IVSr",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "605308711896375168": {
@@ -15223,7 +15223,7 @@
     "mu Leo b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "644306911864817152": {
@@ -15236,7 +15236,7 @@
   "spectral_type": "K4.5III",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "644921092188239488": {
@@ -15405,7 +15405,7 @@
   "spectral_type": "A5m",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "668781662744133120": {
@@ -16061,7 +16061,7 @@
   "spectral_type": null,
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "657244586015485440": {
@@ -16087,7 +16087,7 @@
   "spectral_type": "K0+IIIb",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "660611363636799872": {
@@ -16203,7 +16203,7 @@
   "spectral_type": "A1Va",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "666735780843072256": {
@@ -16412,7 +16412,7 @@
   "spectral_type": "B9.5V",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "680022210631907456": {
@@ -16554,7 +16554,7 @@
   "spectral_type": "G8.5IIIFe-0.5CH-1",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "688237795874306944": {
@@ -16811,7 +16811,7 @@
     "55 Cnc f"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "705832623326195456": {
@@ -17187,7 +17187,7 @@
   "spectral_type": "F0IIIa",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "725469767850488064": {
@@ -17395,7 +17395,7 @@
   "spectral_type": "K0+III-IV",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "739382090340176768": {
@@ -17756,7 +17756,7 @@
   "spectral_type": "F8.5:V",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "757499263122493824": {
@@ -17782,7 +17782,7 @@
   "spectral_type": "K3-III:",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "758383785867118848": {
@@ -18061,7 +18061,7 @@
     "47 UMa d"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "778386926033483264": {
@@ -18204,7 +18204,7 @@
   "spectral_type": "K0.5IIIb:",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "788862832304862720": {
@@ -18269,7 +18269,7 @@
   "spectral_type": "A0V",
   "object_type": "Emission-line Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "792994797003014528": {
@@ -18494,7 +18494,7 @@
   "spectral_type": "M0III",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "805194664490571392": {
@@ -18533,7 +18533,7 @@
   "spectral_type": "A1IV",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "806628225792165888": {
@@ -18708,7 +18708,7 @@
     "HD 81688 b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "818789855186183680": {
@@ -19196,7 +19196,7 @@
   "spectral_type": "A1IVps",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "859036069571586816": {
@@ -19300,7 +19300,7 @@
   "spectral_type": "F2VkF0mF0",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "868219293766831232": {
@@ -20072,7 +20072,7 @@
     "omi UMa b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "1043382731705599360": {
@@ -20242,7 +20242,7 @@
   "spectral_type": "M0III-IIIaCa1",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1063803411412606976": {
@@ -21486,7 +21486,7 @@
   "spectral_type": "F5-6IV",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "895232026718165888": {
@@ -21784,7 +21784,7 @@
   "spectral_type": "K4+III",
   "object_type": "Long-Period Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "917553620294336128": {
@@ -25686,7 +25686,7 @@
   "spectral_type": "M0.5IIIab",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1198813956016764288": {
@@ -25712,7 +25712,7 @@
   "spectral_type": "G7III",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1198898034296727680": {
@@ -26017,7 +26017,7 @@
   "spectral_type": "A1IV",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1222932018450870144": {
@@ -26751,7 +26751,7 @@
   "spectral_type": "A0V",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1279798794197267072": {
@@ -26764,7 +26764,7 @@
   "spectral_type": "K0-II-III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1284257623084916480": {
@@ -26933,7 +26933,7 @@
   "spectral_type": "G8IIIaFe-0.5",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1297158777130486144": {
@@ -27078,7 +27078,7 @@
     "HD 145457 b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "1317801352027771136": {
@@ -27400,7 +27400,7 @@
   "spectral_type": "G0IV",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1249955471638243456": {
@@ -27542,7 +27542,7 @@
   "spectral_type": "F2VpSrCrEuSi",
   "object_type": "alpha2 CVn Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1274317007178434560": {
@@ -27738,7 +27738,7 @@
   "spectral_type": "G7IIIaFe-0.5",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1300043071008233216": {
@@ -29347,7 +29347,7 @@
   "spectral_type": "F0IV",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1388536233576681728": {
@@ -29825,7 +29825,7 @@
   "spectral_type": "A2V",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1418797130034946048": {
@@ -29877,7 +29877,7 @@
   "spectral_type": "K2III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1422359410270340352": {
@@ -30594,7 +30594,7 @@
   "spectral_type": "A7IV+(n)",
   "object_type": "delta Sct Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1487656794503669888": {
@@ -30776,7 +30776,7 @@
   "spectral_type": "B3V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1511173389717021312": {
@@ -31093,7 +31093,7 @@
   "spectral_type": "A5V+M3-4V",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1572155809287171456": {
@@ -31249,7 +31249,7 @@
   "spectral_type": "F6V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1425769751741972352": {
@@ -31604,7 +31604,7 @@
   "spectral_type": "A0Va_lB",
   "object_type": "delta Sct Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1505343882144388864": {
@@ -31682,7 +31682,7 @@
   "spectral_type": "A0VpSiEu",
   "object_type": "alpha2 CVn Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1517746270227193856": {
@@ -31891,7 +31891,7 @@
   "spectral_type": "G0V",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1534118032724512128": {
@@ -31970,7 +31970,7 @@
   "spectral_type": "C-N5",
   "object_type": "Carbon Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1543587954575027200": {
@@ -32294,7 +32294,7 @@
   "spectral_type": "A1.5Vas",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1567285659971101440": {
@@ -32436,7 +32436,7 @@
   "spectral_type": "A2Vn",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1576683529448755328": {
@@ -32449,7 +32449,7 @@
   "spectral_type": "A1III-IVpkB9",
   "object_type": "alpha2 CVn Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1576850723937017216": {
@@ -32656,7 +32656,7 @@
   "spectral_type": "F6IVs",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1589954703517602560": {
@@ -33049,7 +33049,7 @@
     "iot Dra c"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "1615529687576202880": {
@@ -33244,7 +33244,7 @@
   "spectral_type": "G8-IIIab",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1625248992408317952": {
@@ -33387,7 +33387,7 @@
   "spectral_type": "B8III",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1634325460896887808": {
@@ -33725,7 +33725,7 @@
   "spectral_type": "F5IV-V",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1651268763282397312": {
@@ -34126,7 +34126,7 @@
   "spectral_type": "F3IV",
   "object_type": "gamma Dor Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1678844308746410880": {
@@ -34165,7 +34165,7 @@
   "spectral_type": "K5III",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1679187115856566528": {
@@ -34357,7 +34357,7 @@
     "HD 104985 b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "1693272581363394304": {
@@ -34414,7 +34414,7 @@
   "spectral_type": "A2III",
   "object_type": "delta Sct Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1700635838936248064": {
@@ -35185,7 +35185,7 @@
   "spectral_type": "A0III",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1671148277108755200": {
@@ -35385,7 +35385,7 @@
   "spectral_type": "A1Van",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1726095477354219648": {
@@ -35483,7 +35483,7 @@
   "spectral_type": "G6IV+B9.5V",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1733281541754737024": {
@@ -35773,7 +35773,7 @@
   "spectral_type": "B6IV",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1756079606122005248": {
@@ -35817,7 +35817,7 @@
     "18 Del b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "1760176180287452800": {
@@ -37057,7 +37057,7 @@
   "spectral_type": "F5IV",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1810687847547417856": {
@@ -37083,7 +37083,7 @@
   "spectral_type": "B9IV",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1811510179166912128": {
@@ -37550,7 +37550,7 @@
   "spectral_type": "G1II",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1824534959611831680": {
@@ -38653,7 +38653,7 @@
   "spectral_type": "G8+III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1880065175833407872": {
@@ -39288,7 +39288,7 @@
   "spectral_type": "K0III",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1869552092345518592": {
@@ -39470,7 +39470,7 @@
   "spectral_type": "G8II+F0V",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1889993009917834368": {
@@ -40008,7 +40008,7 @@
     "14 And b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "1920585924529574144": {
@@ -41716,7 +41716,7 @@
   "spectral_type": "B3III",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "1981019893969624064": {
@@ -42871,7 +42871,7 @@
   "spectral_type": "K3II+B9.5V",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2028058994291893888": {
@@ -43235,7 +43235,7 @@
   "spectral_type": "M0.5IIIb",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2022884142834942464": {
@@ -43890,7 +43890,7 @@
   "spectral_type": "B9.5II-III",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2043885295914531072": {
@@ -44927,7 +44927,7 @@
   "spectral_type": "F8Ib",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2067536581298109568": {
@@ -45330,7 +45330,7 @@
   "spectral_type": "B9.5IV",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2079990268472754048": {
@@ -45985,7 +45985,7 @@
     "HD 173416 b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "2096869455581362560": {
@@ -46897,7 +46897,7 @@
   "spectral_type": "B8.5Ib-II",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2093667849521567104": {
@@ -46960,7 +46960,7 @@
   "spectral_type": "B6",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2100382189073830528": {
@@ -49135,7 +49135,7 @@
   "spectral_type": "A8Vn",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2193401525619301632": {
@@ -49834,7 +49834,7 @@
   "spectral_type": "kA2.5hF2mF2(IV)",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2218144866573662848": {
@@ -50442,7 +50442,7 @@
   "spectral_type": "G9III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2256800156349110528": {
@@ -50455,7 +50455,7 @@
   "spectral_type": "K1.5IIIFe-1",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2259778527188126464": {
@@ -50481,7 +50481,7 @@
   "spectral_type": "K0V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2261630791965200896": {
@@ -50608,7 +50608,7 @@
     "gam Cep b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "2285469063046254080": {
@@ -51438,7 +51438,7 @@
   "spectral_type": "B0.5IIIs",
   "object_type": "beta Cep Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2272649822619848064": {
@@ -54963,7 +54963,7 @@
   "spectral_type": "A3Vp",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2410222091875449216": {
@@ -55294,7 +55294,7 @@
   "spectral_type": "K0.5III",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2461686829557803520": {
@@ -56439,7 +56439,7 @@
   "spectral_type": "G8III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2574158313504213504": {
@@ -56504,7 +56504,7 @@
   "spectral_type": "A7IV",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2577273298665142528": {
@@ -56621,7 +56621,7 @@
   "spectral_type": "G7IIIa",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2592042866562488064": {
@@ -57036,7 +57036,7 @@
   "spectral_type": "G9II",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2618221581289625984": {
@@ -57106,7 +57106,7 @@
   "spectral_type": "K1.5IIIbCN0.5",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2626301656019381632": {
@@ -57669,7 +57669,7 @@
   "spectral_type": "K0III",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2669361142702790272": {
@@ -57747,7 +57747,7 @@
   "spectral_type": "G0Ib",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2671705610731103616": {
@@ -57838,7 +57838,7 @@
   "spectral_type": "A0V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2677942384281073408": {
@@ -58165,7 +58165,7 @@
   "spectral_type": "A1Va",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2724862565528022016": {
@@ -58581,7 +58581,7 @@
   "spectral_type": "M5/6IIIe",
   "object_type": "Mira Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2498460442625153536": {
@@ -59137,7 +59137,7 @@
   "spectral_type": "B6Ve",
   "object_type": "Be Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2662771735157880704": {
@@ -59236,7 +59236,7 @@
   "spectral_type": "G2Ib",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2684391775892287616": {
@@ -59550,7 +59550,7 @@
   "spectral_type": "B8.5IV",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2717930312217660928": {
@@ -60148,7 +60148,7 @@
   "spectral_type": "B2IV",
   "object_type": "beta Cep Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2773043336855924224": {
@@ -60800,7 +60800,7 @@
   "spectral_type": "A0IV",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2816930274759413760": {
@@ -61126,7 +61126,7 @@
     "51 Peg b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "2835686534380105216": {
@@ -61191,7 +61191,7 @@
   "spectral_type": "F8III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2840252153335838208": {
@@ -61230,7 +61230,7 @@
   "spectral_type": "A5Vp_lB",
   "object_type": "delta Sct Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2841029336257880192": {
@@ -61893,7 +61893,7 @@
   "spectral_type": "K1III_CN+1",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2888135575488124800": {
@@ -62829,7 +62829,7 @@
   "spectral_type": "B7III",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2885572407726698880": {
@@ -63076,7 +63076,7 @@
   "spectral_type": "B2.5V",
   "object_type": "Cepheid Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2897372641393464064": {
@@ -63185,7 +63185,7 @@
   "spectral_type": "B9Ve",
   "object_type": "Be Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2900979348769551744": {
@@ -64038,7 +64038,7 @@
   "spectral_type": "B8II",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2936640943266685568": {
@@ -64764,7 +64764,7 @@
   "spectral_type": "G5II-IIIa:",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "2968427785767149952": {
@@ -65690,7 +65690,7 @@
   "spectral_type": "B0.5Ia",
   "object_type": "Blue Supergiant",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3012143238511733760": {
@@ -65834,7 +65834,7 @@
   "spectral_type": "O9IIIvar",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3017271326397223424": {
@@ -68049,7 +68049,7 @@
   "spectral_type": "K1III",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3081017127914705792": {
@@ -68326,7 +68326,7 @@
     "bet Cnc b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "3098523380258573952": {
@@ -68422,7 +68422,7 @@
     "HD 52265 b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "3101768554465447936": {
@@ -69469,7 +69469,7 @@
   "spectral_type": "B8Ve",
   "object_type": "Be Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3143460557918325248": {
@@ -69890,7 +69890,7 @@
   "spectral_type": "K2-IIIb",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3177730441273211008": {
@@ -71063,7 +71063,7 @@
   "spectral_type": "K0V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3196262301738787968": {
@@ -71089,7 +71089,7 @@
   "spectral_type": "F0III",
   "object_type": "delta Sct Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3197763169471183488": {
@@ -71414,7 +71414,7 @@
   "spectral_type": "A3IV",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3212075924646082176": {
@@ -71792,7 +71792,7 @@
   "spectral_type": "O9.5IINwk",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3220859442003299072": {
@@ -73007,7 +73007,7 @@
   "spectral_type": "F6V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3289363964217584768": {
@@ -73487,7 +73487,7 @@
   "spectral_type": "G9.5IIIabCN0.5",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3312453429225734272": {
@@ -73613,7 +73613,7 @@
   "spectral_type": "G9.5IIICN0.5",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3314063977537054208": {
@@ -73936,7 +73936,7 @@
   "spectral_type": "O8III((f))",
   "object_type": "Emission-line Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3339514785504333440": {
@@ -74624,7 +74624,7 @@
   "spectral_type": "A7III",
   "object_type": "delta Sct Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3312783561888068352": {
@@ -75483,7 +75483,7 @@
   "spectral_type": "F5IV-V",
   "object_type": "Red Giant Branch star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3352697277091090688": {
@@ -75744,7 +75744,7 @@
   "spectral_type": "G1Ib",
   "object_type": "Classical Cepheid Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3367225845778533120": {
@@ -76018,7 +76018,7 @@
   "spectral_type": "M2IIIa",
   "object_type": "Red Giant Branch star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3377166289889430656": {
@@ -76031,7 +76031,7 @@
   "spectral_type": "M3IIIab",
   "object_type": "Long-Period Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3377336026995981312": {
@@ -76278,7 +76278,7 @@
   "spectral_type": "G8Ib",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3386123083403623168": {
@@ -76742,7 +76742,7 @@
   "spectral_type": "B1IVe_shell",
   "object_type": "Be Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3403339270833361280": {
@@ -79257,7 +79257,7 @@
   "spectral_type": "F1V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3491065249163241984": {
@@ -79413,7 +79413,7 @@
   "spectral_type": "G5IIBa0.3",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3501286618492133632": {
@@ -79647,7 +79647,7 @@
   "spectral_type": "A0IV(n)kB9",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3521118887679637632": {
@@ -80010,7 +80010,7 @@
   "spectral_type": "K0IIIb",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3556620984269124480": {
@@ -80803,7 +80803,7 @@
   "spectral_type": "F7III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3641376735017647872": {
@@ -80985,7 +80985,7 @@
   "spectral_type": "A2Van",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3667302325846472320": {
@@ -81159,7 +81159,7 @@
     "HD 112300 b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "3709988940650856064": {
@@ -81801,7 +81801,7 @@
   "spectral_type": "F5V+F6V",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3942757338955937408": {
@@ -82591,7 +82591,7 @@
   "spectral_type": "G2IV",
   "object_type": "Red Giant Branch star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3654258613247786368": {
@@ -82913,7 +82913,7 @@
   "spectral_type": "F1-F2V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3684575344281793920": {
@@ -82991,7 +82991,7 @@
   "spectral_type": "A2IV",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3699664732623236992": {
@@ -83400,7 +83400,7 @@
   "spectral_type": "G8III-IIIb",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3739563222165922048": {
@@ -83878,7 +83878,7 @@
   "spectral_type": "F9V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3797911662842760064": {
@@ -84125,7 +84125,7 @@
   "spectral_type": "K2.5III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3830286576563947136": {
@@ -85377,7 +85377,7 @@
   "spectral_type": "A2IV",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3973470065974214784": {
@@ -87048,7 +87048,7 @@
     "HD 100655 b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "3984984838934859904": {
@@ -87113,7 +87113,7 @@
   "spectral_type": "A5IV(n)",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "3992011061833780096": {
@@ -87582,7 +87582,7 @@
   "spectral_type": "K2III",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4040346452052736640": {
@@ -87898,7 +87898,7 @@
   "spectral_type": "K2.5IIIaCN0.5",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4049647731947901312": {
@@ -87924,7 +87924,7 @@
   "spectral_type": "K0+III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4050309195613114624": {
@@ -88583,7 +88583,7 @@
   "spectral_type": "K1II",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4077480533158341248": {
@@ -89037,7 +89037,7 @@
   "spectral_type": "B8Iab(e)",
   "object_type": "Blue Supergiant",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4093968702062993664": {
@@ -89804,7 +89804,7 @@
   "spectral_type": "K1IIIb",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4077462730427146112": {
@@ -90271,7 +90271,7 @@
   "spectral_type": "K2V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4110602530665608064": {
@@ -92420,7 +92420,7 @@
     "HD 192699 b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "4246237185473865216": {
@@ -93397,7 +93397,7 @@
     "xi Aql b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "4302054339959905920": {
@@ -93410,7 +93410,7 @@
   "spectral_type": "K3II",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4304699318269816704": {
@@ -93912,7 +93912,7 @@
   "spectral_type": "A5V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4281199318773462016": {
@@ -94119,7 +94119,7 @@
   "spectral_type": "G8IV",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4297359494014043264": {
@@ -94520,7 +94520,7 @@
   "spectral_type": "A0IV-Vnn",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4315051937466612608": {
@@ -95213,7 +95213,7 @@
   "spectral_type": "G9.5IIIbFe-0.5",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4356563556595153664": {
@@ -95252,7 +95252,7 @@
   "spectral_type": "M0.5III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4358031335898505472": {
@@ -96357,7 +96357,7 @@
   "spectral_type": "K2IIIbCN1",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4431639310048958208": {
@@ -97255,7 +97255,7 @@
   "spectral_type": "A5IVnn",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4493790166883346432": {
@@ -97705,7 +97705,7 @@
   "spectral_type": "A2VpCrSr",
   "object_type": "alpha2 CVn Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4468233187335913472": {
@@ -97744,7 +97744,7 @@
   "spectral_type": "K2IIICN0.5",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4473968166959087104": {
@@ -99450,7 +99450,7 @@
   "spectral_type": "A1IVn",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4573599043018457728": {
@@ -101468,7 +101468,7 @@
   "spectral_type": "K3.5III",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4572946311068223616": {
@@ -103931,7 +103931,7 @@
   "spectral_type": "K3.5III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4873256196840062720": {
@@ -105104,7 +105104,7 @@
   "spectral_type": "M0III-IIIb",
   "object_type": "Long-Period Variable Candidate",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5118682791479493248": {
@@ -106137,7 +106137,7 @@
   "spectral_type": "G8+III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4880808810930787200": {
@@ -106317,7 +106317,7 @@
   "spectral_type": "B6V+B9V",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4916085851233904512": {
@@ -106891,7 +106891,7 @@
   "spectral_type": "K0.5IIIb",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "4993858466193693824": {
@@ -107292,7 +107292,7 @@
   "spectral_type": "A3IV-V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5045432364765457792": {
@@ -107398,7 +107398,7 @@
   "spectral_type": "F6V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5061574844732308992": {
@@ -107990,7 +107990,7 @@
   "spectral_type": "K0III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5129338021224785408": {
@@ -108320,7 +108320,7 @@
     "eps Eri b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "5166718118034769664": {
@@ -108392,7 +108392,7 @@
   "spectral_type": "K1+IIIb",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5173862607153332224": {
@@ -110364,7 +110364,7 @@
   "spectral_type": "K0+IV",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5166645550267371776": {
@@ -110390,7 +110390,7 @@
   "spectral_type": "kA4hA9mA9V",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5168901782487608704": {
@@ -112686,7 +112686,7 @@
   "spectral_type": "A7Ib",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5300733840839734912": {
@@ -113964,7 +113964,7 @@
   "spectral_type": "B2IV",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5310667898369745408": {
@@ -120469,7 +120469,7 @@
   "spectral_type": "O4I(n)fp",
   "object_type": "BY Dra Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5536058023863555840": {
@@ -123847,7 +123847,7 @@
   "spectral_type": "B5Ia",
   "object_type": "Blue Supergiant",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5605903228710920192": {
@@ -125176,7 +125176,7 @@
   "spectral_type": "K5Ib",
   "object_type": "Red Supergiant",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5611112165048662656": {
@@ -125215,7 +125215,7 @@
   "spectral_type": "G6Ib",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5615175066674756608": {
@@ -126250,7 +126250,7 @@
   "spectral_type": "K5III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5672652758559220224": {
@@ -126515,7 +126515,7 @@
   "spectral_type": "G7III",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5688438928035529984": {
@@ -126702,7 +126702,7 @@
   "spectral_type": "F5IIkF2IImF5II",
   "object_type": "delta Sct Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5699895873562610176": {
@@ -134389,7 +134389,7 @@
     "HD 160691 e"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "5946743174685212672": {
@@ -135190,7 +135190,7 @@
     "mu2 Sco b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "5971289565647972608": {
@@ -135203,7 +135203,7 @@
   "spectral_type": "B1V+B",
   "object_type": "Be Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "5971324097179289216": {
@@ -137134,7 +137134,7 @@
   "spectral_type": "K1III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6026472336300108928": {
@@ -137459,7 +137459,7 @@
   "spectral_type": "B2IV-V",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6042159790157494912": {
@@ -137536,7 +137536,7 @@
   "spectral_type": "B0V",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6045581642143801600": {
@@ -137601,7 +137601,7 @@
   "spectral_type": "B1III+B1:V",
   "object_type": "beta Cep Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6049497999479270272": {
@@ -137964,7 +137964,7 @@
   "spectral_type": "K3III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6058439910929477120": {
@@ -138366,7 +138366,7 @@
   "spectral_type": "B2IV",
   "object_type": "Pulsating Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6071169133172136192": {
@@ -142133,7 +142133,7 @@
   "spectral_type": "M2.5III",
   "object_type": "Mira Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6228559481012187392": {
@@ -142319,7 +142319,7 @@
   "spectral_type": "B1V+B2:V:",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6235654766990811008": {
@@ -142658,7 +142658,7 @@
   "spectral_type": "B1V",
   "object_type": "beta Cep Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6248270593466356096": {
@@ -142950,7 +142950,7 @@
     "gam Lib c"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "6265744173989472256": {
@@ -143248,7 +143248,7 @@
   "spectral_type": "A1V",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6304886616138630912": {
@@ -143417,7 +143417,7 @@
   "spectral_type": "B8Vn",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6322837620931216896": {
@@ -147289,7 +147289,7 @@
   "spectral_type": "B6V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6561950098251419776": {
@@ -148169,7 +148169,7 @@
   "spectral_type": "K2.5IIIFe-0.5",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6306315500219036160": {
@@ -150645,7 +150645,7 @@
   "spectral_type": "F2/3V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6664464851576141824": {
@@ -150658,7 +150658,7 @@
   "spectral_type": "B9V",
   "object_type": "Pulsating Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6665061817668962816": {
@@ -151705,7 +151705,7 @@
   "spectral_type": "kA2hA5mA4IV-V",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6323935758169407744": {
@@ -151731,7 +151731,7 @@
   "spectral_type": "F0IV",
   "object_type": "delta Sct Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6356375508718385024": {
@@ -152357,7 +152357,7 @@
   "spectral_type": "B8IV-Vs",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6591959756301956352": {
@@ -152942,7 +152942,7 @@
   "spectral_type": "B8V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6715175908398323072": {
@@ -153084,7 +153084,7 @@
   "spectral_type": "A2Va",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6719152945029845376": {
@@ -153873,7 +153873,7 @@
     "HD 179949 b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "6770407435482749056": {
@@ -154859,7 +154859,7 @@
   "spectral_type": "kA5hF0mF2III",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6840420728156732544": {
@@ -155196,7 +155196,7 @@
   "spectral_type": "G9II:+B8p:Si:",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6878130330567510144": {
@@ -155992,7 +155992,7 @@
   "spectral_type": "G5IV",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6757495939165742208": {
@@ -156031,7 +156031,7 @@
   "spectral_type": "A2.5Va",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6766104084405895040": {
@@ -156402,7 +156402,7 @@
   "spectral_type": "kF0hF1VmF2",
   "object_type": "alpha2 CVn Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6838704699744176768": {
@@ -156668,7 +156668,7 @@
   "spectral_type": "B9IV",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6880093650314169984": {
@@ -156681,7 +156681,7 @@
   "spectral_type": "G9III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6880523250121028480": {
@@ -156992,7 +156992,7 @@
   "spectral_type": "B9.5V",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "6904703228801028864": {
@@ -157134,7 +157134,7 @@
   "spectral_type": "B2IV",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:102098": {
@@ -157147,7 +157147,7 @@
   "spectral_type": "A2Ia",
   "object_type": "Evolved Supergiant",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:107315": {
@@ -157160,7 +157160,7 @@
   "spectral_type": "K2Ib-II",
   "object_type": "Long-Period Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:112122": {
@@ -157173,7 +157173,7 @@
   "spectral_type": "M4.5III",
   "object_type": "Long-Period Variable Candidate",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:113368": {
@@ -157186,7 +157186,7 @@
   "spectral_type": "A4V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:113881": {
@@ -157199,7 +157199,7 @@
   "spectral_type": "M2.5II-III",
   "object_type": "Long-Period Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:11767": {
@@ -157212,7 +157212,7 @@
   "spectral_type": "F8Ib",
   "object_type": "Classical Cepheid Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:14135": {
@@ -157225,7 +157225,7 @@
   "spectral_type": "M1.5IIIa",
   "object_type": "Long-Period Variable Candidate",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:14576": {
@@ -157238,7 +157238,7 @@
   "spectral_type": "B8V",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:15863": {
@@ -157251,7 +157251,7 @@
   "spectral_type": "F5Ib",
   "object_type": "Variable Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:21421": {
@@ -157269,7 +157269,7 @@
     "alf Tau b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "hip:24436": {
@@ -157282,7 +157282,7 @@
   "spectral_type": "B8Ia",
   "object_type": "Blue Supergiant",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:24608": {
@@ -157295,7 +157295,7 @@
   "spectral_type": "G3III:",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:25336": {
@@ -157308,7 +157308,7 @@
   "spectral_type": "B2III",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:25428": {
@@ -157321,7 +157321,7 @@
   "spectral_type": "B7III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:26311": {
@@ -157334,7 +157334,7 @@
   "spectral_type": "B0Ia",
   "object_type": "Blue Supergiant",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:26727": {
@@ -157346,7 +157346,7 @@
   "spectral_type": "O9.7Ib+B0III",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:27989": {
@@ -157359,7 +157359,7 @@
   "spectral_type": "M1-M2Ia-Iab",
   "object_type": "Red Supergiant",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:28360": {
@@ -157372,7 +157372,7 @@
   "spectral_type": "A1IV-Vp",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:28380": {
@@ -157385,7 +157385,7 @@
   "spectral_type": "A0VpSi",
   "object_type": "alpha2 CVn Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:30324": {
@@ -157398,7 +157398,7 @@
   "spectral_type": "B1II-III",
   "object_type": "beta Cep Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:30438": {
@@ -157411,7 +157411,7 @@
   "spectral_type": "A9II",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:31681": {
@@ -157424,7 +157424,7 @@
   "spectral_type": "A1.5IV+",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:32349": {
@@ -157438,7 +157438,7 @@
   "spectral_type": "A0mA1Va",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:33579": {
@@ -157451,7 +157451,7 @@
   "spectral_type": "B1.5II",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:3419": {
@@ -157464,7 +157464,7 @@
   "spectral_type": "G9.5IIICH-1",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:34444": {
@@ -157477,7 +157477,7 @@
   "spectral_type": "F8Ia",
   "object_type": "Yellow Supergiant",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:36850": {
@@ -157489,7 +157489,7 @@
   "spectral_type": "A1V+A2Vm",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:37279": {
@@ -157502,7 +157502,7 @@
   "spectral_type": "F5IV-V+DQZ",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:37826": {
@@ -157520,7 +157520,7 @@
     "HD 62509 b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "hip:39953": {
@@ -157545,7 +157545,7 @@
   "spectral_type": "K3:III+B2:V",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:42913": {
@@ -157559,7 +157559,7 @@
   "spectral_type": "A2IV+A4V",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:44816": {
@@ -157572,7 +157572,7 @@
   "spectral_type": "K4Ib",
   "object_type": "Red Supergiant",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:45238": {
@@ -157585,7 +157585,7 @@
   "spectral_type": "A1III-",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:46390": {
@@ -157598,7 +157598,7 @@
   "spectral_type": "K3IIIa",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:49669": {
@@ -157611,7 +157611,7 @@
   "spectral_type": "B8IVn",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:50583": {
@@ -157623,7 +157623,7 @@
   "spectral_type": "K1-III+G7IIIb",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:54061": {
@@ -157636,7 +157636,7 @@
   "spectral_type": "G9III+A7.5",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:5447": {
@@ -157654,7 +157654,7 @@
     "HD 6860 b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "hip:57632": {
@@ -157667,7 +157667,7 @@
   "spectral_type": "A3Va",
   "object_type": "delta Sct Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:59803": {
@@ -157680,7 +157680,7 @@
   "spectral_type": "B8III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:60718": {
@@ -157692,7 +157692,7 @@
   "spectral_type": "B0.5IV+B1V",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:61084": {
@@ -157705,7 +157705,7 @@
   "spectral_type": "M3.5III",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:62434": {
@@ -157718,7 +157718,7 @@
   "spectral_type": "B1IV",
   "object_type": "beta Cep Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:65474": {
@@ -157731,7 +157731,7 @@
   "spectral_type": "B1V",
   "object_type": "beta Cep Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:66657": {
@@ -157757,7 +157757,7 @@
   "spectral_type": "B8IV-VHgMn",
   "object_type": "alpha2 CVn Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:68002": {
@@ -157783,7 +157783,7 @@
   "spectral_type": "B1III",
   "object_type": "beta Cep Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:68933": {
@@ -157796,7 +157796,7 @@
   "spectral_type": "K0-IIIb",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:69673": {
@@ -157809,7 +157809,7 @@
   "spectral_type": "K1.5IIIFe-0.5",
   "object_type": "Red Giant Branch star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:71352": {
@@ -157836,7 +157836,7 @@
   "spectral_type": "K1V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:71683": {
@@ -157849,7 +157849,7 @@
   "spectral_type": "G2V",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:72607": {
@@ -157867,7 +157867,7 @@
     "bet UMi b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "hip:7588": {
@@ -157880,7 +157880,7 @@
   "spectral_type": "B6Vpe",
   "object_type": "Be Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:78401": {
@@ -157893,7 +157893,7 @@
   "spectral_type": "B0.3IV",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:80763": {
@@ -157906,7 +157906,7 @@
   "spectral_type": "M1.5Iab+B2Vn",
   "object_type": "Red Supergiant",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:82273": {
@@ -157919,7 +157919,7 @@
   "spectral_type": "K2III_Ba1",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:84345": {
@@ -157931,7 +157931,7 @@
   "spectral_type": "M5Ib-II+G5III+F2V:",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:85696": {
@@ -157944,7 +157944,7 @@
   "spectral_type": "B2IV",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:85927": {
@@ -157957,7 +157957,7 @@
   "spectral_type": "B2IV+DA7.9",
   "object_type": "beta Cep Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:86228": {
@@ -157971,7 +157971,7 @@
   "spectral_type": "F1III",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:87833": {
@@ -157984,7 +157984,7 @@
   "spectral_type": "K5III",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:8903": {
@@ -157997,7 +157997,7 @@
   "spectral_type": "kA4hA5mA5Va",
   "object_type": "Spectroscopic Binary",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:90185": {
@@ -158010,7 +158010,7 @@
   "spectral_type": "B9IVp_lB?",
   "object_type": "High Proper Motion Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:91262": {
@@ -158023,7 +158023,7 @@
   "spectral_type": "A0V",
   "object_type": "delta Sct Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:92855": {
@@ -158036,7 +158036,7 @@
   "spectral_type": "B2.5V",
   "object_type": "Double or Multiple Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:9640": {
@@ -158049,7 +158049,7 @@
   "spectral_type": "K2+IIb",
   "object_type": "Star",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:97649": {
@@ -158062,7 +158062,7 @@
   "spectral_type": "A7Vn",
   "object_type": "delta Sct Variable",
   "planets": null,
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": null
  },
  "hip:9884": {
@@ -158080,7 +158080,7 @@
     "alf Ari b"
    ]
   },
-  "name_source": "SIMBAD/CDS",
+  "name_source": "IAU WGSN · SIMBAD/CDS",
   "planet_source": "NASA Exoplanet Archive"
  },
  "__source__": {
