@@ -1179,6 +1179,11 @@ Expected: the entry count rises by roughly the number of bright stars added in T
 
 Expected: Vega, Sirius and Betelgeuse all appear with `hip:`-prefixed keys.
 
+> **Amendment (2026-09-28).** Built with three additions (Andrew-approved where they added a source):
+> 1. `fetch_simbad_by_hip` shares a private `_fetch_by_ident` with `fetch_simbad` instead of duplicating it, so the TAP-cap guard lives in one place.
+> 2. **Exoplanet hosts are also matched by `hip_name`.** Five supplement stars are confirmed hosts with no Gaia DR3 id in the archive (Pollux, Aldebaran, Hamal, Mirach, Kochab). Without this they would have read "No known planets".
+> 3. **Name selection fixed, and IAU names adopted.** `build_name_fields` took the *first* SIMBAD `NAME`/`*` identifier, and SIMBAD's order is arbitrary: Polaris showed "Lodestar · 1 Ursae Minoris", Sirius "Sirius A · α A". Now designations rank Greek Bayer > Latin Bayer > Flamsteed, whole system > component. `format_bayer` handles component suffixes, numbered letters (α¹) and SIMBAD's `tet`/`ksi` spellings. Proper names come from the vendored **IAU WGSN Catalog of Star Names** (`server/data/sources/iau_csn.txt`, CC BY, keyed by HIP/HD) when listed, else the best-ranked SIMBAD name. Result: 363 named stars (was 226), 803 designations corrected, 72/72 supplement stars resolved, 191 exoplanet hosts.
+
 - [ ] **Step 6: Commit**
 
 ```bash
