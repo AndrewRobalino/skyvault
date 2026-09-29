@@ -236,7 +236,7 @@ This project lives or dies on accuracy. Non-negotiable:
 - [x] **Phase 3b** — Enrichment: click-to-lookup SIMBAD names/spectral type + NASA Exoplanet Archive host data, **fully baked** (zero runtime external calls), shown by expanding the star tooltip. Backend: `ObjectEnrichment`/`ExoplanetInfo`/`ObjectResponse` schemas, `star_enrichment.py` service (lru_cache loader + `enrichment_for`), real `GET /api/v1/objects/{source_id}` replacing the stub, `scripts/ingest_star_enrichment.py` + baked `star_enrichment.json` (12,037 stars / 99.3% SIMBAD resolution / 185 exoplanet hosts). Frontend: `api.object`, gated `useObject` hook, SkyChart wiring, `StarBody` rewrite (name header → designation · catalog id → spectral type row → `✦ N confirmed planets` → source line) + loading shimmer. Guardrail #25. **Merged to main 2026-09-28 (PR #5, commit `026e35f`).**
 - [x] **Bright-star supplement** — ESA Hipparcos fills in the 72 naked-eye stars Gaia DR3 saturates on (G < ≈2.7), deduped against Gaia by identifier + position; per-star reference epochs in `coordinates.py`; enrichment for `hip:` stars incl. exoplanet hosts by `hip_name`; IAU WGSN star names; name/designation selection fixed; derived photometry labelled in the UI. `scripts/verify_bright_stars.py` acceptance gate. Guardrails #26–27. **Built 2026-09-28 on `feat/bright-stars`, awaiting QA + merge.**
 - [ ] **Phase 4** — Explore Mode: Three.js 3D flyable celestial sphere (behind the "Explore in 3D" button)
-- [ ] **Phase 5** — Polish + Deploy: landing, about, docker-compose, live URL
+- [ ] **Phase 5** — Public launch: Cloud Run backend + Cloudflare Pages frontend, 4-layer cost protection ($5 spend cap), CI + keyless auto-deploy, /about page, OSM attribution, GPS fixes. **Spec written 2026-09-28** (`docs/superpowers/specs/2026-09-28-phase-5-deploy-design.md`), awaiting Andrew review → plan → build.
 
 **Rendering pivot:** Three.js is no longer the Phase 2 engine. Canvas 2D ships first in Phase 2b. Three.js is deferred to Phase 4 as a differentiated 3D flythrough. See `SKYVAULT_ROADMAP.md` for the rationale (will be rewritten in Task H2 of the Phase 2a plan).
 
@@ -246,7 +246,14 @@ See `SKYVAULT_ROADMAP.md` for full phase breakdowns and task lists.
 
 ## Resume Here — Next Session
 
-**Paused:** 2026-09-28. Phase 3b merged (PR #5, `026e35f`). The **bright-star supplement** is built on `feat/bright-stars` (plan `docs/superpowers/plans/2026-08-17-bright-star-supplement.md`, all 10 tasks), awaiting Andrew's live QA → push → PR → merge. Then Phase 5 (deploy).
+**Paused:** 2026-09-28 (end of session). State of every branch:
+- `main` — Phase 3b merged (PR #5, `026e35f`).
+- `feat/bright-stars` — bright-star supplement, all 10 plan tasks done, **live-QA passed by Andrew 2026-09-28**, pushed, **PR #6 open** (https://github.com/AndrewRobalino/skyvault/pull/6). **Merge not yet approved — ask Andrew first.**
+- `feat/phase-5-deploy` — stacked on `feat/bright-stars`. Contains only the Phase 5 design spec (`docs/superpowers/specs/2026-09-28-phase-5-deploy-design.md`, commit `2918cbd`) + this status note.
+
+**Resume at:** (1) Andrew reviews the Phase 5 spec, (2) ask to merge PR #6, (3) invoke `superpowers:writing-plans` on the spec. The spec is the source of truth for every Phase 5 decision (hosting, $5 cap, IERS build-time bake, direct API calls, etc.) — read it before touching deploy work.
+
+**Post-launch backlog (Andrew, 2026-09-28):** his HCI issues list (not yet written down — ask him), frontend redesign, and a full codebase review pass for bugs. Date picker friction (defaults to today; editing is clunky) is on that list.
 
 ### Bright-star supplement — BUILT 2026-09-28 on `feat/bright-stars`
 
