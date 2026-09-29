@@ -59,23 +59,21 @@ def _parallax_to_distance_pc(parallax_mas: np.ndarray) -> np.ndarray:
     return np.where(np.isnan(distance), FALLBACK_DISTANCE_PC, distance)
 
 
-def _reference_epochs(stars: pd.DataFrame) -> Time:
-    """Per-star catalog reference epoch.
+def _epoch_groups(stars: pd.DataFrame) -> list[tuple[Time, np.ndarray]]:
+    """Split rows by catalog reference epoch: [(epoch, row mask), ...].
 
     Gaia DR3 is J2016.0; the Hipparcos bright-star supplement is J1991.25.
-    Frames that are all-Gaia (no ``epoch`` column, or every row J2016.0 / NaN)
-    get the scalar Gaia epoch, so that path is exactly what it was before
-    mixed catalogs existed.
+    Rows without an ``epoch`` (no column, or NaN after a concat) are Gaia.
+
+    Each group is transformed with a *scalar* obstime. A per-row Time array
+    gives the same answer but doubled the /sky transform (85 -> 169 ms for
+    ~6k stars), because Astropy converts every element's time scale
+    individually. An all-Gaia frame is a single group — the original path.
     """
     if "epoch" not in stars.columns:
-        return GAIA_REFERENCE_EPOCH
-    epochs = stars["epoch"].fillna(GAIA_REFERENCE_EPOCH.jyear_str)
-    unique = epochs.unique()
-    if len(unique) == 1 and Time(unique[0]) == GAIA_REFERENCE_EPOCH:
-        return GAIA_REFERENCE_EPOCH
-    # Parse each distinct label once; the column holds only a handful.
-    jyear = {label: Time(label).jyear for label in unique}
-    return Time(epochs.map(jyear).to_numpy(dtype=float), format="jyear")
+        return [(GAIA_REFERENCE_EPOCH, np.ones(len(stars), dtype=bool))]
+    labels = stars["epoch"].fillna(GAIA_REFERENCE_EPOCH.jyear_str).to_numpy()
+    return [(Time(label), labels == label) for label in pd.unique(labels)]
 
 
 def compute_altaz(
@@ -123,7 +121,7 @@ def compute_altaz(
     # Rows without a valid parallax get their proper motion zeroed out. The
     # alternative — propagating motion with a huge fallback distance — makes
     # pmsafe diverge (implied transverse velocity > c) and silently NaNs the
-    # resulting alt/az. Zeroing the pm pins the star at its J2016.0 position,
+    # resulting alt/az. Zeroing the pm pins the star at its catalog-epoch position,
     # which is honest: we don't know the 3D motion, so we don't pretend to.
     bad_astrometry = ~np.isfinite(parallax_raw) | (parallax_raw <= 0)
     pmra = np.where(bad_astrometry, 0.0, stars["pmra"].to_numpy(dtype=float))
@@ -133,24 +131,32 @@ def compute_altaz(
     pmra = np.where(np.isfinite(pmra), pmra, 0.0)
     pmdec = np.where(np.isfinite(pmdec), pmdec, 0.0)
 
-    # Build the SkyCoord at each star's catalog reference epoch with full 6D
-    # state so apply_space_motion can propagate it to the observation epoch.
-    catalog = SkyCoord(
-        ra=stars["ra"].to_numpy() * u.deg,
-        dec=stars["dec"].to_numpy() * u.deg,
-        pm_ra_cosdec=pmra * (u.mas / u.yr),
-        pm_dec=pmdec * (u.mas / u.yr),
-        distance=distance_pc * u.pc,
-        obstime=_reference_epochs(stars),
-        frame="icrs",
-    )
+    ra = stars["ra"].to_numpy(dtype=float)
+    dec = stars["dec"].to_numpy(dtype=float)
+    frame = AltAz(obstime=obs_time, location=location)
+    alt = np.empty(len(stars))
+    az = np.empty(len(stars))
 
-    current = catalog.apply_space_motion(new_obstime=obs_time)
-    altaz = current.transform_to(AltAz(obstime=obs_time, location=location))
+    # Build each group's SkyCoord at its catalog reference epoch with full 6D
+    # state so apply_space_motion can propagate it to the observation epoch.
+    for epoch, mask in _epoch_groups(stars):
+        catalog = SkyCoord(
+            ra=ra[mask] * u.deg,
+            dec=dec[mask] * u.deg,
+            pm_ra_cosdec=pmra[mask] * (u.mas / u.yr),
+            pm_dec=pmdec[mask] * (u.mas / u.yr),
+            distance=distance_pc[mask] * u.pc,
+            obstime=epoch,
+            frame="icrs",
+        )
+        current = catalog.apply_space_motion(new_obstime=obs_time)
+        altaz = current.transform_to(frame)
+        alt[mask] = altaz.alt.to(u.deg).value
+        az[mask] = altaz.az.to(u.deg).value
 
     out = stars.copy()
-    out["alt"] = altaz.alt.to(u.deg).value
-    out["az"] = altaz.az.to(u.deg).value
+    out["alt"] = alt
+    out["az"] = az
 
     if horizon_only:
         out = out.loc[out["alt"] >= 0.0].reset_index(drop=True)
