@@ -259,4 +259,66 @@ describe("SkyTooltip star enrichment", () => {
     );
     expect(screen.getByTestId("enrichment-loading")).toBeInTheDocument();
   });
+
+  it("credits the position catalog ahead of the enrichment sources", () => {
+    const enrichment = {
+      source_id: baseStar.source_id,
+      proper_name: "Vega",
+      sources: ["IAU WGSN · SIMBAD/CDS"],
+    };
+    render(
+      <SkyTooltip object={baseStar} enrichment={enrichment} container={container} />
+    );
+    expect(
+      screen.getByText("Source: Gaia DR3 · IAU WGSN · SIMBAD/CDS")
+    ).toBeInTheDocument();
+  });
+});
+
+const hipStar = {
+  ...baseStar,
+  source_id: "hip:32349",
+  magnitude: -1.49,
+  bp_rp: -0.06,
+  source: "ESA Hipparcos",
+  magnitude_source: "Derived from Hipparcos V and B-V via the Gaia EDR3 G-V relation (Riello et al. 2021, Table 5.7)",
+  color_source: "Derived from Hipparcos V-I via the Gaia EDR3 BP-RP relation (Riello et al. 2021, Table 5.7)",
+};
+
+describe("SkyTooltip Hipparcos-supplement star", () => {
+  it("labels an unenriched hip: star as Hipparcos with its HIP number", () => {
+    render(<SkyTooltip object={hipStar} container={container} />);
+    expect(screen.getByText("ESA Hipparcos · HIP 32349")).toBeInTheDocument();
+    expect(screen.queryByText(/Gaia DR3/)).not.toBeInTheDocument();
+  });
+
+  it("marks transformed photometry as derived, never as measured", () => {
+    render(<SkyTooltip object={hipStar} container={container} />);
+    expect(screen.getByText("-1.49 (derived)")).toBeInTheDocument();
+    expect(screen.getByText("-0.06 (derived)")).toBeInTheDocument();
+  });
+
+  it("does not mark Gaia photometry as derived", () => {
+    render(<SkyTooltip object={baseStar} container={container} />);
+    expect(screen.queryByText(/derived/)).not.toBeInTheDocument();
+  });
+
+  it("renders an enriched hip: star with Hipparcos credited", () => {
+    const enrichment = {
+      source_id: "hip:32349",
+      proper_name: "Sirius",
+      designation: "α Canis Majoris",
+      catalog_ids: ["HD 48915"],
+      spectral_type: "A0mA1Va",
+      planets: null,
+      sources: ["IAU WGSN · SIMBAD/CDS"],
+    };
+    render(
+      <SkyTooltip object={hipStar} enrichment={enrichment} container={container} />
+    );
+    expect(screen.getByText("Sirius")).toBeInTheDocument();
+    expect(
+      screen.getByText("Source: ESA Hipparcos · IAU WGSN · SIMBAD/CDS")
+    ).toBeInTheDocument();
+  });
 });

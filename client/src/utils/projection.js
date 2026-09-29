@@ -60,6 +60,9 @@ export function projectStars(stars, width, height) {
       parallax_mas: s.parallax_mas,
       teff_k: s.teff_k,
       source: s.source ?? "Gaia DR3",
+      // Set only on Hipparcos-supplement stars, whose photometry is transformed.
+      magnitude_source: s.magnitude_source ?? null,
+      color_source: s.color_source ?? null,
     };
   });
 }
