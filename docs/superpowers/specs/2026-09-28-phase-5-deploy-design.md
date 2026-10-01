@@ -1,7 +1,7 @@
 # Phase 5 — Public Launch (Deploy) Design
 
 **Date:** 2026-09-28
-**Status:** Approved in conversation; awaiting written-spec review
+**Status:** Approved 2026-10-01. Implementation plan: `docs/superpowers/plans/2026-10-01-phase-5-launch.md` (see its "Spec amendments")
 **Branch:** `feat/phase-5-deploy` (stacked on `feat/bright-stars`, PR #6)
 
 ---
@@ -108,6 +108,8 @@ Tested on 2026-09-28 with astropy 7.2.0 and the bundled `astropy-iers-data` 0.20
 - **Verified:** with the age check off, 1900, today, 2027, 2035 and 2100 all transform. The worst position difference against fresh data is ~2″, even using six-month-old bundled data.
 - **Freshness:** a monthly scheduled rebuild (§7.3) keeps the baked predictions under ~1 month old.
 - Configure this in one place at app startup (`app/main.py` lifespan or a small `app/services/iers_config.py`), with a test that transforms a far-future date with downloads off.
+
+> Amended 2026-10-01: with `auto_download` off, Astropy reads only the bundled `astropy-iers-data` table (the download cache is ignored), so freshness comes from that package's version. See the plan's amendment 1.
 
 ### 4.5 Container
 - `server/Dockerfile`: slim base with the **same Python minor version as local and CI (3.14)**, and a non-root user.
