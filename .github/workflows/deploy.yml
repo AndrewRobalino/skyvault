@@ -43,14 +43,25 @@ jobs:
           docker build -t "$IMAGE:$TAG" server
           docker push "$IMAGE:$TAG"
           echo "TAG=$TAG" >> "$GITHUB_ENV"
-      - name: Deploy
+      # Gate: the new revision gets NO traffic until it passes the smoke test
+      # on its own tagged URL; only then is it promoted. A failure leaves the
+      # previous revision serving everyone.
+      - name: Deploy (no traffic, tagged "candidate")
         run: |
           gcloud run deploy "$SERVICE" --image="$IMAGE:$TAG" --region="$REGION" \
             --service-account="${{ vars.GCP_RUNTIME_SA }}" \
             --env-vars-file=deploy/cloudrun.env.yaml \
-            --max-instances=1 --cpu=1 --memory=512Mi --concurrency=10 --timeout=30
-      - name: Smoke test
+            --max-instances=1 --cpu=1 --memory=512Mi --concurrency=10 --timeout=30 \
+            --no-traffic --tag=candidate
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Smoke test the candidate
         run: |
           URL=$(gcloud run services describe "$SERVICE" --region="$REGION" --format='value(status.url)')
-          pip install --quiet httpx
-          python server/scripts/smoke_test_live.py "$URL" --origin https://skyvault.pages.dev
+          # Tagged revisions are served at https://<tag>---<service host>
+          CANDIDATE="https://candidate---${URL#https://}"
+          python -m pip install --quiet httpx
+          python server/scripts/smoke_test_live.py "$CANDIDATE" --origin https://skyvault.pages.dev
+      - name: Promote to 100% of traffic
+        run: gcloud run services update-traffic "$SERVICE" --region="$REGION" --to-latest

@@ -9,11 +9,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY requirements.txt constraints.txt ./
 # astropy-iers-data is upgraded on purpose: it carries the Earth-orientation
 # predictions, and the monthly rebuild must pick up a fresh table (Phase 5
 # plan amendment 1). Everything else installs at its pinned version.
-RUN pip install --no-cache-dir -r requirements.txt \
+RUN pip install --no-cache-dir -r requirements.txt -c constraints.txt \
  && pip install --no-cache-dir --upgrade astropy-iers-data
 
 COPY app ./app

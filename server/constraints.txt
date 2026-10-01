@@ -1,0 +1,45 @@
+# Every package in the production image, pinned: `pip freeze` of the image
+# verified on 2026-10-01 (smoke 8/8). Used as `pip install -c constraints.txt`
+# so a rebuild cannot pick up a new transitive version unannounced.
+# astropy-iers-data is deliberately NOT here: the image upgrades it on every
+# build for fresh Earth-orientation data (Phase 5 plan amendment 1).
+# Regenerate after bumping requirements.txt:
+#   docker run --rm --entrypoint pip skyvault-api freeze | grep -v ^astropy-iers-data== > constraints.txt
+annotated-doc==0.0.5
+annotated-types==0.8.0
+anyio==4.15.1
+astropy==7.2.0
+certifi==2026.7.22
+cffi==2.1.1
+click==8.5.0
+fastapi==0.135.3
+flatbuffers==25.12.19
+h11==0.16.0
+h3==4.5.0
+httpcore==1.0.9
+httptools==0.8.0
+httpx==0.28.1
+idna==3.20
+jplephem==2.24
+numpy==2.4.4
+packaging==26.3
+pandas==3.0.2
+pyarrow==23.0.1
+pycparser==3.0
+pydantic==2.12.5
+pydantic-settings==2.13.1
+pydantic_core==2.41.5
+pyerfa==2.0.1.5
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.3
+PyYAML==6.0.3
+six==1.17.0
+starlette==1.0.0
+timezonefinder==9.0.0
+timezonefinder-data==3.2026.4
+typing-inspection==0.4.4
+typing_extensions==4.16.0
+uvicorn==0.44.0
+uvloop==0.23.0
+watchfiles==1.3.0
+websockets==17.1

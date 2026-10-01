@@ -1,7 +1,9 @@
 # Runtime dependencies for the API server (what the Docker image installs).
-# Pinned exactly: the image is rebuilt on a schedule, and an unpinned rebuild
-# could silently pick up a new Astropy/NumPy major. Bump deliberately, run the
-# full suite (incl. `pytest -m network` and verify_backdrop_projection.py).
+# Direct dependencies are pinned here; every transitive one is pinned in
+# constraints.txt. The image is rebuilt on a schedule, so nothing may float
+# except astropy-iers-data (see constraints.txt). Bump deliberately, run the
+# full suite (incl. `pytest -m network` and verify_backdrop_projection.py),
+# then regenerate constraints.txt.
 fastapi==0.135.3
 starlette==1.0.0
 uvicorn[standard]==0.44.0
