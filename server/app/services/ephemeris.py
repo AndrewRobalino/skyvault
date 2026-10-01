@@ -23,13 +23,15 @@ Physics notes:
 from __future__ import annotations
 
 import math
+from functools import lru_cache
 
 from astropy import units as u
 from astropy.coordinates import AltAz, EarthLocation, get_body, solar_system_ephemeris
 from astropy.time import Time
+from jplephem.spk import SPK
 
 from app.config import settings
-from app.services.time_utils import parse_utc_time
+from app.services.time_utils import InvalidObservationTimeError, parse_utc_time
 
 
 # Order matters for deterministic output — Sun first, then Moon, then planets
@@ -48,9 +50,21 @@ BODIES: tuple[str, ...] = (
 
 SOURCE_LABEL = "JPL DE421 via Astropy"
 
+# The Moon's waxing/waning test samples this far past the observation, so the
+# look-ahead instant has to be inside the kernel's coverage too.
+PHASE_LOOKAHEAD = 6 * u.hour
+
 
 class EphemerisNotDownloadedError(RuntimeError):
     """Raised when the DE421 SPK kernel is missing from disk."""
+
+
+class ObservationOutOfRangeError(InvalidObservationTimeError):
+    """Raised for a time outside the ephemeris kernel's coverage.
+
+    Subclasses InvalidObservationTimeError so routers answer 422: the request
+    is valid ISO 8601 but asks for something DE421 cannot compute.
+    """
 
 
 def _resolve_kernel() -> str:
@@ -68,6 +82,34 @@ def _resolve_kernel() -> str:
             f"Run `python scripts/download_ephemeris.py` to fetch it from NAIF."
         )
     return str(kernel_path)
+
+
+@lru_cache(maxsize=4)
+def _kernel_span_jd(kernel: str) -> tuple[float, float]:
+    """Coverage of an SPK kernel as (start, end) Julian dates, TDB.
+
+    Read from the file rather than hardcoded so a kernel swap (e.g. DE440)
+    moves the limit with it. DE421: 1899-07-29 to 2053-10-09.
+    """
+    spk = SPK.open(kernel)
+    try:
+        return (
+            min(seg.start_jd for seg in spk.segments),
+            max(seg.end_jd for seg in spk.segments),
+        )
+    finally:
+        spk.close()
+
+
+def _check_in_coverage(kernel: str, obs_time: Time, requested: str) -> None:
+    start_jd, end_jd = _kernel_span_jd(kernel)
+    if obs_time.tdb.jd < start_jd or (obs_time + PHASE_LOOKAHEAD).tdb.jd > end_jd:
+        start = Time(start_jd, format="jd", scale="tdb").iso[:10]
+        end = Time(end_jd, format="jd", scale="tdb").iso[:10]
+        raise ObservationOutOfRangeError(
+            f"Planet positions are only available from {start} to {end} "
+            f"(JPL DE421 coverage); requested {requested}."
+        )
 
 
 def _phase_name_from_angle_and_trend(phase_angle_deg: float, waxing: bool) -> str:
@@ -135,7 +177,7 @@ def _compute_moon_phase(
     illumination = (1.0 + math.cos(phase_angle_rad)) / 2.0
 
     # Determine waxing vs waning by sampling 6 hours later
-    future_time = obs_time + 6 * u.hour
+    future_time = obs_time + PHASE_LOOKAHEAD
     future_moon = get_body("moon", future_time)
     future_sun = get_body("sun", future_time)
     fm_xyz = future_moon.cartesian.xyz.to(u.au).value
@@ -181,6 +223,7 @@ def compute_planet_positions(
     altaz_frame = AltAz(obstime=obs_time, location=location)
 
     kernel = _resolve_kernel()
+    _check_in_coverage(kernel, obs_time, observer_time)
 
     results: list[dict] = []
     # Context manager scopes the DE421 selection to this call — avoids

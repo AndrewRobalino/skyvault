@@ -15,6 +15,7 @@ proper-motion correction live in ``coordinates.py`` and compose on top of this.
 from __future__ import annotations
 
 import logging
+import threading
 import time
 from pathlib import Path
 
@@ -26,6 +27,9 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 _catalog: pd.DataFrame | None = None
+# Routes run in FastAPI's threadpool; the lock keeps two cold requests from
+# each reading the parquet.
+_catalog_lock = threading.Lock()
 
 # Catalog reference epochs. Gaia rows carry no epoch column of their own.
 GAIA_EPOCH = "J2016.0"
@@ -91,10 +95,12 @@ def get_catalog() -> pd.DataFrame:
     """Return the in-memory star catalog, loading and merging on first call."""
     global _catalog
     if _catalog is None:
-        gaia = _load_catalog(settings.gaia_parquet_path)
-        bright = _load_bright_stars(settings.bright_stars_parquet_path)
-        _catalog = _merge_catalogs(gaia, bright)
-        logger.info("Merged star catalog: %s rows", f"{len(_catalog):,}")
+        with _catalog_lock:
+            if _catalog is None:
+                gaia = _load_catalog(settings.gaia_parquet_path)
+                bright = _load_bright_stars(settings.bright_stars_parquet_path)
+                _catalog = _merge_catalogs(gaia, bright)
+                logger.info("Merged star catalog: %s rows", f"{len(_catalog):,}")
     return _catalog
 
 

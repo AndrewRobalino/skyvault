@@ -13,7 +13,7 @@ router = APIRouter(prefix="/planets", tags=["planets"])
 
 
 @router.get("", response_model=PlanetsResponse)
-async def get_planets(
+def get_planets(
     lat: float = Query(..., ge=-90.0, le=90.0, description="Observer latitude (deg)"),
     lon: float = Query(..., ge=-180.0, le=180.0, description="Observer longitude (deg)"),
     datetime: str = Query(..., description="Observation time, ISO 8601 UTC"),

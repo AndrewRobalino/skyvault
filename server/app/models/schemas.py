@@ -24,8 +24,9 @@ class Star(BaseModel):
     """A single star in the rendered sky.
 
     Alt/Az are in the observer's local horizontal frame. RA/Dec are the
-    original ICRS positions from Gaia (epoch J2016.0); proper-motion-corrected
-    positions live implicitly in alt/az.
+    catalog ICRS positions at the catalog's own epoch (Gaia DR3: J2016.0,
+    Hipparcos supplement: J1991.25); proper-motion-corrected positions live
+    implicitly in alt/az.
     """
 
     # Gaia DR3 source_ids are 64-bit integers up to ~10^18, which exceed

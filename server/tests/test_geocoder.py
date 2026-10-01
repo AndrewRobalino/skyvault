@@ -236,3 +236,61 @@ async def test_geocode_display_name_without_state():
     with patch.object(httpx.AsyncClient, "get", AsyncMock(return_value=mock_response)):
         result = await geocoder.geocode("Paris", limit=5, lang="en")
     assert result.candidates[0].display_name == "Paris, France"
+
+
+@pytest.mark.asyncio
+async def test_photon_rate_limit_falls_back_to_nominatim():
+    # A 429 means Photon is throttling *our* shared IP, not that the place
+    # doesn't exist. It used to come back as "no matches" (and get cached).
+    photon_429 = httpx.Response(429, text="Too Many Requests")
+    nominatim_ok = httpx.Response(200, json=SAMPLE_NOMINATIM_RESPONSE)
+    mock_get = AsyncMock(side_effect=[photon_429, nominatim_ok])
+
+    with patch.object(httpx.AsyncClient, "get", mock_get):
+        result = await geocoder.geocode("Charlotte", limit=5, lang="en")
+
+    assert mock_get.call_count == 2
+    assert "Nominatim" in result.source
+    assert result.count == 1
+
+
+@pytest.mark.asyncio
+async def test_both_providers_rate_limited_raises_and_caches_nothing():
+    mock_get = AsyncMock(
+        side_effect=[httpx.Response(429, text="slow down"), httpx.Response(429, text="slow down")]
+    )
+    with patch.object(httpx.AsyncClient, "get", mock_get):
+        with pytest.raises(geocoder.GeocoderUpstreamError):
+            await geocoder.geocode("Paris", limit=5, lang="en")
+    assert geocoder._CACHE == {}
+
+
+@pytest.mark.asyncio
+async def test_photon_non_json_body_falls_back_to_nominatim():
+    # e.g. an HTML maintenance page served with 200. Used to raise a 500.
+    photon_html = httpx.Response(200, text="<html>maintenance</html>")
+    nominatim_ok = httpx.Response(200, json=SAMPLE_NOMINATIM_RESPONSE)
+    mock_get = AsyncMock(side_effect=[photon_html, nominatim_ok])
+
+    with patch.object(httpx.AsyncClient, "get", mock_get):
+        result = await geocoder.geocode("Charlotte", limit=5, lang="en")
+
+    assert "Nominatim" in result.source
+
+
+@pytest.mark.asyncio
+async def test_photon_candidates_carry_their_iana_timezone():
+    mock_response = httpx.Response(200, json=SAMPLE_PHOTON_RESPONSE)
+    with patch.object(httpx.AsyncClient, "get", AsyncMock(return_value=mock_response)):
+        result = await geocoder.geocode("Portoviejo", limit=5, lang="en")
+    assert result.candidates[0].timezone == "America/Guayaquil"
+
+
+@pytest.mark.asyncio
+async def test_nominatim_candidates_carry_their_iana_timezone():
+    mock_get = AsyncMock(
+        side_effect=[httpx.Response(503), httpx.Response(200, json=SAMPLE_NOMINATIM_RESPONSE)]
+    )
+    with patch.object(httpx.AsyncClient, "get", mock_get):
+        result = await geocoder.geocode("Charlotte", limit=5, lang="en")
+    assert result.candidates[0].timezone == "America/New_York"

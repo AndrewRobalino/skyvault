@@ -3,7 +3,7 @@
 Why two providers:
     Photon is designed for autocomplete — fast, generous rate limits, fuzzy
     matching, GeoJSON output. It's our primary. When Photon is unreachable
-    or returns 5xx (e.g. their service is down), we transparently fall back
+    returns 5xx, or rate-limits us (429), we transparently fall back
     to Nominatim — the older OSM geocoder. Both are backed by the same
     OpenStreetMap data, so result quality is comparable; the response
     shapes differ and each has its own parser.
@@ -27,6 +27,7 @@ import time
 import httpx
 
 from app.schemas.geocode import GeocodeCandidate, GeocodeResponse
+from app.services.timezones import timezone_for
 
 
 PHOTON_BASE_URL = "https://photon.komoot.io/api"
@@ -68,7 +69,29 @@ class GeocoderUnavailableError(RuntimeError):
 
 
 class GeocoderUpstreamError(RuntimeError):
-    """Raised when Photon returns a non-2xx status code."""
+    """Raised when a provider refuses or garbles the request (5xx, 429, bad body)."""
+
+
+# 4xx codes that mean "your query is malformed" -> an honest empty result.
+# Any other 4xx (429 rate limit, 403 blocked, ...) is about *us*, not the
+# place, so it must fall back / surface as an error, never as "no matches".
+_QUERY_REJECTED_STATUSES = frozenset({400, 404, 422})
+
+
+def _check_status(resp: httpx.Response, provider: str) -> bool:
+    """Return True if the response is a valid "no results"; raise if upstream failed."""
+    if resp.status_code >= 500 or (
+        resp.status_code >= 400 and resp.status_code not in _QUERY_REJECTED_STATUSES
+    ):
+        raise GeocoderUpstreamError(f"{provider} returned HTTP {resp.status_code}")
+    return resp.status_code >= 400
+
+
+def _json_body(resp: httpx.Response, provider: str):
+    try:
+        return resp.json()
+    except ValueError as exc:
+        raise GeocoderUpstreamError(f"{provider} returned a non-JSON body") from exc
 
 
 def _make_cache_key(query: str, limit: int, lang: str) -> tuple[str, int, str]:
@@ -149,6 +172,7 @@ def _parse_feature(feature: dict) -> GeocodeCandidate | None:
         osm_type=osm_type,
         osm_id=osm_id,
         place_type=place_type,
+        timezone=timezone_for(lat, lon),
     )
 
 
@@ -194,6 +218,7 @@ def _parse_nominatim_result(result: dict) -> GeocodeCandidate | None:
         osm_type=osm_type,
         osm_id=osm_id,
         place_type=place_type,
+        timezone=timezone_for(lat, lon),
     )
 
 
@@ -209,13 +234,10 @@ async def _call_photon(query: str, limit: int, lang: str) -> GeocodeResponse:
     except httpx.RequestError as exc:
         raise GeocoderUnavailableError(f"Photon request failed: {exc}") from exc
 
-    if resp.status_code >= 500:
-        raise GeocoderUpstreamError(f"Photon returned HTTP {resp.status_code}")
-    if resp.status_code >= 400:
-        # 4xx from Photon usually means a malformed query — treat as empty.
+    if _check_status(resp, "Photon"):
         return GeocodeResponse(query=query, candidates=[], count=0, source=PHOTON_SOURCE)
 
-    features = (resp.json() or {}).get("features") or []
+    features = (_json_body(resp, "Photon") or {}).get("features") or []
     candidates = [c for c in (_parse_feature(f) for f in features) if c is not None]
     return GeocodeResponse(
         query=query,
@@ -243,12 +265,10 @@ async def _call_nominatim(query: str, limit: int, lang: str) -> GeocodeResponse:
     except httpx.RequestError as exc:
         raise GeocoderUnavailableError(f"Nominatim request failed: {exc}") from exc
 
-    if resp.status_code >= 500:
-        raise GeocoderUpstreamError(f"Nominatim returned HTTP {resp.status_code}")
-    if resp.status_code >= 400:
+    if _check_status(resp, "Nominatim"):
         return GeocodeResponse(query=query, candidates=[], count=0, source=NOMINATIM_SOURCE)
 
-    rows = resp.json() or []
+    rows = _json_body(resp, "Nominatim") or []
     candidates = [c for c in (_parse_nominatim_result(r) for r in rows) if c is not None]
     return GeocodeResponse(
         query=query,
@@ -263,7 +283,10 @@ async def geocode(query: str, *, limit: int = 5, lang: str = "en") -> GeocodeRes
 
     Raises:
         GeocoderUnavailableError: both providers had network/timeout failures.
-        GeocoderUpstreamError: both providers returned 5xx (or one had each).
+        GeocoderUpstreamError: both providers returned 5xx/429/garbage (or one had each).
+
+    Only successful answers are cached: a failure never becomes an hour of
+    "no matches".
     """
     cache_key = _make_cache_key(query, limit, lang)
     cached = _cache_get(cache_key)

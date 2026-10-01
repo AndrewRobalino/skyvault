@@ -40,20 +40,22 @@ def test_sky_returns_stars_above_horizon_only_by_default():
         assert star["source"] in {"Gaia DR3", "ESA Hipparcos"}
 
 
-def test_sky_include_below_horizon_returns_more_stars():
-    above = client.get(
-        "/api/v1/sky", params={**MIAMI, "mag_limit": 6.5}
-    ).json()["count"]
-    full = client.get(
+def test_sky_never_returns_below_horizon_stars():
+    # The chart only draws the visible hemisphere. A full-sphere response is
+    # ~2x the payload for nothing, so the option is not offered.
+    body = client.get(
         "/api/v1/sky",
         params={**MIAMI, "mag_limit": 6.5, "include_below_horizon": True},
-    ).json()["count"]
+    ).json()
+    assert body["count"] > 0
+    assert all(star["alt"] >= 0.0 for star in body["stars"])
 
-    # Roughly half the sky is always below horizon, so the full-sky count
-    # should be strictly larger.
-    assert full > above
-    # And the ratio should be reasonable — not 10x, not 1.01x.
-    assert 1.5 < full / above < 3.0
+
+def test_sky_rejects_mag_limit_fainter_than_naked_eye():
+    # mag 9 + full sky was a 58 MB, ~770 MiB-peak request: enough to OOM a
+    # 512 MiB container with one unauthenticated GET.
+    response = client.get("/api/v1/sky", params={**MIAMI, "mag_limit": 9.0})
+    assert response.status_code == 422
 
 
 def test_sky_mag_limit_reduces_star_count():

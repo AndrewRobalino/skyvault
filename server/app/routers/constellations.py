@@ -16,7 +16,7 @@ router = APIRouter(prefix="/constellations", tags=["constellations"])
 
 
 @router.get("", response_model=ConstellationsResponse)
-async def get_constellations(
+def get_constellations(
     lat: float = Query(..., ge=-90.0, le=90.0, description="Observer latitude (deg)"),
     lon: float = Query(..., ge=-180.0, le=180.0, description="Observer longitude (deg)"),
     datetime: str = Query(..., description="Observation time, ISO 8601 UTC"),
