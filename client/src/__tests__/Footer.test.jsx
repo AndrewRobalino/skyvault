@@ -34,6 +34,11 @@ describe("<Footer> data credits", () => {
     expect(within(credits).getByText("ODbL")).toBeInTheDocument(); // OSM
   });
 
+  it("discloses that the ESO panorama was re-encoded (CC BY 4.0 indicate changes)", () => {
+    const { container } = render(<Footer />);
+    expect(container.querySelector("#credits").textContent).toMatch(/re-encoded/i);
+  });
+
   it("links the ESO source image", () => {
     render(<Footer />);
     expect(screen.getByRole("link", { name: /ESO\/S\. Brunier/ })).toHaveAttribute(

@@ -28,7 +28,7 @@ export default function Footer() {
         id="credits"
         className="mx-auto mt-4 grid max-w-3xl gap-x-8 gap-y-1 text-left text-[10px] tracking-wide text-ink-dim/80 sm:grid-cols-2"
       >
-        {CREDITS.map(({ what, who, href, license, licenseHref }) => (
+        {CREDITS.map(({ what, who, href, license, licenseHref, note }) => (
           <li key={what}>
             <span className="text-ink-dim/60">{what}: </span>
             <Maybe href={href}>{who}</Maybe>
@@ -38,6 +38,7 @@ export default function Footer() {
                 <Maybe href={licenseHref}>{license}</Maybe>
               </>
             )}
+            {note && <span className="text-ink-dim/60"> ({note})</span>}
           </li>
         ))}
       </ul>

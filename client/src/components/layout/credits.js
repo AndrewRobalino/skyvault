@@ -12,6 +12,8 @@ export const CREDITS = [
     href: "https://www.eso.org/public/images/eso0932a/",
     license: "CC BY 4.0",
     licenseHref: CC_BY_4,
+    // CC BY 4.0: changes must be indicated (scripts/reencode_milky_way.py).
+    note: "re-encoded to a smaller JPEG",
   },
   {
     what: "Stars",
