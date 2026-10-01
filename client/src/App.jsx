@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { api } from "./api/client.js";
 import AppBackground from "./components/layout/AppBackground.jsx";
 import IntroSequence from "./components/layout/IntroSequence.jsx";
 import FrameContainer from "./components/layout/FrameContainer.jsx";
@@ -8,6 +10,10 @@ import ControlsStrip from "./components/controls/ControlsStrip.jsx";
 import InfoPanelsGrid from "./components/info/InfoPanelsGrid.jsx";
 
 export default function App() {
+  useEffect(() => {
+    api.health();
+  }, []);
+
   return (
     <>
       <AppBackground />

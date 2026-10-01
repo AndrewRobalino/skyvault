@@ -14,7 +14,10 @@ export class ApiError extends Error {
   }
 }
 
-const API_BASE = "/api/v1";
+// Production: the Cloud Run URL (set at build time on Cloudflare Pages).
+// Dev: relative, proxied to localhost:8000 by Vite.
+const API_BASE = import.meta.env.VITE_API_BASE ?? "/api/v1";
+const HEALTH_URL = API_BASE.replace(/\/api\/v1\/?$/, "") + "/health";
 
 async function request(path, params) {
   const url = new URL(`${API_BASE}${path}`, window.location.origin);
@@ -63,4 +66,13 @@ export const api = {
   constellations: (lat, lon, datetime) =>
     request("/constellations", { lat, lon, datetime }),
   object: (sourceId) => request(`/objects/${sourceId}`),
+  // Fire-and-forget on page load: wakes a scaled-to-zero backend while the
+  // visitor is still typing a place name. Never throws.
+  health: async () => {
+    try {
+      await fetch(new URL(HEALTH_URL, window.location.origin).toString());
+    } catch {
+      // the real requests will surface any problem
+    }
+  },
 };

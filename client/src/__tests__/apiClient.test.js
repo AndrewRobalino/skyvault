@@ -27,3 +27,31 @@ describe("api.planets", () => {
     expect(url.searchParams.get("include_below_horizon")).toBe("true");
   });
 });
+
+describe("API base URL", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it("calls an absolute API origin when VITE_API_BASE is set (production)", async () => {
+    vi.stubEnv("VITE_API_BASE", "https://skyvault-api-abc.a.run.app/api/v1");
+    vi.resetModules();
+    const { api: prodApi } = await import("../api/client.js");
+    const fetchMock = stubFetch();
+    await prodApi.dso(1, 2, "2026-01-15T02:00:00.000Z");
+    expect(fetchMock.mock.calls[0][0]).toMatch(/^https:\/\/skyvault-api-abc\.a\.run\.app\/api\/v1\/dso\?/);
+  });
+
+  it("health pings the API origin's /health and swallows failures", async () => {
+    vi.stubEnv("VITE_API_BASE", "https://skyvault-api-abc.a.run.app/api/v1");
+    vi.resetModules();
+    const { api: prodApi } = await import("../api/client.js");
+    const fetchMock = vi.fn(async () => {
+      throw new TypeError("offline");
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(prodApi.health()).resolves.toBeUndefined();
+    expect(fetchMock.mock.calls[0][0]).toBe("https://skyvault-api-abc.a.run.app/health");
+  });
+});
