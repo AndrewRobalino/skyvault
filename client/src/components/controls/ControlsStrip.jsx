@@ -49,9 +49,11 @@ export default function ControlsStrip() {
           <ErrorCard
             title="Geocoder unavailable"
             message={
-              geocode.error?.status === 503
-                ? "Couldn't reach the place lookup service. Try again, or use your current location."
-                : geocode.error?.message || "Unknown error"
+              geocode.error?.status === 429
+                ? "Too many lookups — give it a minute."
+                : geocode.error?.status === 503 || geocode.error?.status === 0
+                  ? "Couldn't reach the place lookup service. Try again, or use your current location."
+                  : geocode.error?.message || "Unknown error"
             }
             onRetry={() => geocode.refetch()}
           />

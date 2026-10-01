@@ -9,6 +9,7 @@ import { useObject } from "../../hooks/useObject.js";
 import { useCanvasSize } from "../../hooks/useCanvasSize.js";
 import { projectStars, projectPlanets, projectDsos, projectConstellations } from "../../utils/projection.js";
 import { findNearestWithinRadius } from "../../utils/hitTest.js";
+import { useDelayedFlag } from "../../hooks/useDelayedFlag.js";
 import SkyCanvas from "./SkyCanvas.jsx";
 import CardinalLabels from "./CardinalLabels.jsx";
 import SelectionRing from "./SelectionRing.jsx";
@@ -100,6 +101,8 @@ export default function SkyChart() {
   const enrichment = objectQuery.data?.found ? objectQuery.data.enrichment : null;
 
   const status = statusFor({ selected, skyQuery, planetsQuery, dsoQuery });
+  // A cold Cloud Run start takes a few seconds; say so instead of looking stuck.
+  const slow = useDelayedFlag(status === "loading", 3000);
   const notices = status === "ready" ? layerNotices({ planetsQuery, dsoQuery }) : [];
 
   const getMouseCoords = (e) => {
@@ -208,6 +211,7 @@ export default function SkyChart() {
         state={status}
         placeName={selected?.displayName}
         error={skyQuery.error}
+        slow={slow}
         onRetry={() => {
           skyQuery.refetch();
           planetsQuery.refetch();

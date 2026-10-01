@@ -1,20 +1,28 @@
 import ErrorCard from "../ui/ErrorCard.jsx";
 
-function errorMessage(error) {
-  if (!error) return "Something went wrong.";
-  if (error.status === 404 || error.status === 422) {
-    return "Location could not be computed.";
+function errorContent(error) {
+  const status = error?.status;
+  if (status === 429) {
+    return { title: "Too many requests", message: "Too many requests — give it a minute." };
   }
-  if (error.status >= 500) {
-    return "Sky computation failed. Please try again.";
+  // 503 = backend paused (spend cap / emergency stop); 0 = network or CORS
+  // failure, which is also what a paused Cloud Run looks like from a browser.
+  if (status === 0 || status === 503) {
+    return {
+      title: "SkyVault's backend is temporarily offline",
+      message: "The sky will be back shortly. Try again in a few minutes.",
+    };
   }
-  if (error.status === 0) {
-    return "Can't reach the server. Check your connection.";
+  if (status === 404 || status === 422) {
+    return { title: "Something went wrong", message: "Location could not be computed." };
   }
-  return error.message || "Something went wrong.";
+  if (status >= 500) {
+    return { title: "Something went wrong", message: "Sky computation failed. Please try again." };
+  }
+  return { title: "Something went wrong", message: error?.message || "Something went wrong." };
 }
 
-export default function SkyStatusOverlay({ state, placeName, error, onRetry }) {
+export default function SkyStatusOverlay({ state, placeName, error, onRetry, slow = false }) {
   if (state === "ready") return null;
 
   const base =
@@ -42,6 +50,11 @@ export default function SkyStatusOverlay({ state, placeName, error, onRetry }) {
         <p className="font-serif italic text-ink text-lg md:text-xl">
           for {placeName || "your location"}
         </p>
+        {slow && (
+          <p className="max-w-xs font-mono text-[10px] uppercase tracking-[0.2em] text-ink-dim">
+            Waking up the observatory — the first load after a quiet period takes a few seconds.
+          </p>
+        )}
       </div>
     );
   }
@@ -49,7 +62,7 @@ export default function SkyStatusOverlay({ state, placeName, error, onRetry }) {
   if (state === "error") {
     return (
       <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto">
-        <ErrorCard message={errorMessage(error)} onRetry={onRetry} />
+        <ErrorCard {...errorContent(error)} onRetry={onRetry} />
       </div>
     );
   }
