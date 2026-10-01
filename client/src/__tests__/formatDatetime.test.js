@@ -58,6 +58,17 @@ describe("toIsoUtc", () => {
     expect(iso).toBe("2026-11-01T05:30:00.000Z");
   });
 
+  // East of UTC the DST transitions run the other way round in UTC terms;
+  // the first implementation only got negative-offset zones right.
+  it.each([
+    ["Europe/Berlin gap (02:30 doesn't exist, reads as 03:30 CEST)", "2026-03-29", "Europe/Berlin", "2026-03-29T01:30:00.000Z"],
+    ["Europe/Berlin overlap (first 02:30 is CEST)", "2026-10-25", "Europe/Berlin", "2026-10-25T00:30:00.000Z"],
+    ["Australia/Sydney gap (reads as 03:30 AEDT)", "2026-10-04", "Australia/Sydney", "2026-10-03T16:30:00.000Z"],
+    ["Australia/Sydney overlap (first 02:30 is AEDT)", "2026-04-05", "Australia/Sydney", "2026-04-04T15:30:00.000Z"],
+  ])("DST east of UTC: %s", (_label, date, zone, expected) => {
+    expect(toIsoUtc({ date, time: "02:30", timezone: "Local", zone })).toBe(expected);
+  });
+
   it("Local mode with no time uses the current clock in the place's zone", () => {
     const iso = toIsoUtc({
       date: "2026-09-30", time: "", timezone: "Local", zone: "Asia/Tokyo", now: NOW,

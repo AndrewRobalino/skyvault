@@ -81,16 +81,23 @@ function offsetMs(zone, epochMs) {
 // Instant at which `zone`'s clock reads the given wall time. Gaps
 // (spring-forward) resolve one hour later; overlaps (fall-back) take the
 // first occurrence, matching Temporal's "compatible" disambiguation.
+//
+// Works the same on both sides of UTC: take the offsets in force a day
+// before and a day after, build both candidate instants, and keep the ones
+// whose wall clock actually reads the requested time.
+const DAY_MS = 86_400_000;
+
 function zonedWallTimeToUtcMs(zone, year, month, day, hours, minutes) {
   const wall = wallAsUtcMs(year, month, day, hours, minutes);
-  const firstGuess = offsetMs(zone, wall);
-  let utc = wall - firstGuess;
-  const corrected = offsetMs(zone, utc);
-  if (corrected !== firstGuess) {
-    const alternative = wall - corrected;
-    if (offsetMs(zone, alternative) === corrected) utc = alternative;
-  }
-  return utc;
+  const before = offsetMs(zone, wall - DAY_MS);
+  const after = offsetMs(zone, wall + DAY_MS);
+  const valid = [wall - before, wall - after].filter(
+    (utc) => offsetMs(zone, utc) === wall - utc
+  );
+  if (valid.length > 0) return Math.min(...valid); // overlap: earliest
+  // Gap: the wall time never happens. Using the pre-transition offset lands
+  // it after the jump (02:30 -> 03:30 in the new offset).
+  return wall - before;
 }
 
 function resolveZone(zone) {
