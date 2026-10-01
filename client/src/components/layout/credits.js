@@ -31,7 +31,14 @@ export const CREDITS = [
     license: "CC BY 4.0",
     licenseHref: CC_BY_4,
   },
-  { what: "Star names", who: "IAU WGSN", license: "CC BY" },
+  {
+    what: "Star names",
+    who: "IAU WGSN",
+    // The vendored list (server/data/sources/iau_csn.txt) states "Creative
+    // Commons Attribution" without a version and asks users to cite this page.
+    href: "https://www.iau.org/public/themes/naming_stars/",
+    license: "CC BY",
+  },
   {
     what: "Star & deep-sky data",
     who: "SIMBAD, CDS Strasbourg",
@@ -46,7 +53,8 @@ export const CREDITS = [
     what: "Constellation figures",
     who: "Stellarium",
     href: "https://stellarium.org/",
-    license: "CC BY-SA",
+    license: "CC BY-SA 4.0",
+    licenseHref: "https://creativecommons.org/licenses/by-sa/4.0/",
   },
   {
     what: "Place search & time zones",

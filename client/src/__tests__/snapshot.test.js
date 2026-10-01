@@ -196,7 +196,7 @@ describe("renderSnapshot", () => {
         },
       ],
     });
-    expect(drawn()).toContain("Figures: Stellarium · CC BY-SA");
+    expect(drawn()).toContain("Figures: Stellarium · CC BY-SA 4.0");
     expect(drawn()).toContain("ORION"); // uppercase, as the chart shows it
   });
 

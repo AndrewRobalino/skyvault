@@ -31,7 +31,7 @@ const MARGIN = 14;
 
 export const CREDIT_MILKY_WAY = "Milky Way: ESO/S. Brunier · CC BY 4.0";
 export const CREDIT_STARS = "Stars: ESA/Gaia/DPAC & ESA Hipparcos";
-export const CREDIT_FIGURES = "Figures: Stellarium · CC BY-SA";
+export const CREDIT_FIGURES = "Figures: Stellarium · CC BY-SA 4.0";
 
 /** Short place name for the caption; coordinates for a GPS fix. */
 export function placeLabel(selected) {

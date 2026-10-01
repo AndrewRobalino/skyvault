@@ -29,7 +29,7 @@ describe("<Footer> data credits", () => {
     const credits = container.querySelector("#credits");
     expect(within(credits).getAllByText("CC BY 4.0").length).toBe(2); // ESO + Solar System Scope
     expect(within(credits).getByText("CC BY-SA 3.0 IGO")).toBeInTheDocument(); // Gaia
-    expect(within(credits).getByText("CC BY-SA")).toBeInTheDocument(); // Stellarium
+    expect(within(credits).getByText("CC BY-SA 4.0")).toBeInTheDocument(); // Stellarium
     expect(within(credits).getByText("CC BY")).toBeInTheDocument(); // IAU WGSN
     expect(within(credits).getByText("ODbL")).toBeInTheDocument(); // OSM
   });

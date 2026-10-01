@@ -21,6 +21,16 @@ describe("<AboutPage>", () => {
     expect(links).toContain("https://www.openstreetmap.org/copyright");
   });
 
+  it("links every license that requires attribution, with versions where the source states one", () => {
+    render(<AboutPage />);
+    const links = screen.getAllByRole("link").map((a) => a.getAttribute("href"));
+    // Stellarium Western figures: CC BY-SA 4.0 (constellations.json source block)
+    expect(screen.getByText("CC BY-SA 4.0")).toBeInTheDocument();
+    expect(links).toContain("https://creativecommons.org/licenses/by-sa/4.0/");
+    // IAU WGSN: the vendored list asks to cite the official IAU page
+    expect(links).toContain("https://www.iau.org/public/themes/naming_stars/");
+  });
+
   it("lists the documented approximations honestly", () => {
     render(<AboutPage />);
     expect(screen.getByText(/atmospheric refraction/i)).toBeInTheDocument();
