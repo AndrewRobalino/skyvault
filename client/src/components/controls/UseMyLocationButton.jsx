@@ -3,8 +3,14 @@ import { useGeolocation } from "../../hooks/useGeolocation.js";
 import { useObserverStore } from "../../stores/observerStore.js";
 
 export default function UseMyLocationButton() {
-  const { position, error, isLoading, request } = useGeolocation();
+  const { position, error, isLoading, request, clearError } = useGeolocation();
   const setCurrentLocation = useObserverStore((s) => s.useCurrentLocation);
+  const selected = useObserverStore((s) => s.selected);
+
+  // Any successful location choice makes an old GPS error irrelevant.
+  useEffect(() => {
+    if (selected) clearError();
+  }, [selected, clearError]);
 
   useEffect(() => {
     if (position) {

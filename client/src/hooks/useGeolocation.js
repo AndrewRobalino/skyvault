@@ -36,5 +36,7 @@ export function useGeolocation() {
     );
   }, []);
 
-  return { position, error, isLoading, request };
+  const clearError = useCallback(() => setError(null), []);
+
+  return { position, error, isLoading, request, clearError };
 }

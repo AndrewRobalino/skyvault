@@ -78,13 +78,12 @@ export const useObserverStore = create((set, get) => ({
 
   submit: () => {
     const { rawQuery, date, time, timezone, selected } = get();
-    if (!rawQuery || rawQuery.length < 2 || !isSupportedDate(date)) return;
+    if (!isSupportedDate(date)) return;
 
-    // If the user already has a location selected, treat GO as
-    // "recompute with the current date/time" — don't re-geocode and
-    // don't drop the selection. Typing a new location clears
-    // `selected` (see setRawQuery), which sends us through the
-    // geocode path again on the next GO.
+    // A location is already chosen (search pick or GPS fix): GO means
+    // "recompute for the current date/time". The search box may be empty
+    // after GPS, so don't require it here. Typing a new location clears
+    // `selected` (see setRawQuery), which sends GO through the geocoder.
     if (selected) {
       set({
         datetimeUtc: toIsoUtc({ date, time, timezone, zone: selected.timezone }),
@@ -92,6 +91,7 @@ export const useObserverStore = create((set, get) => ({
       return;
     }
 
+    if (!rawQuery || rawQuery.length < 2) return;
     set({ geocodeRequested: true, submitted: false });
   },
 

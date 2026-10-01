@@ -157,6 +157,17 @@ describe("observerStore", () => {
     expect(useObserverStore.getState().datetimeUtc).toBe("2026-04-08T22:00:00.000Z");
   });
 
+  it("GO after a GPS fix recomputes the sky even with an empty search box", () => {
+    const store = useObserverStore.getState();
+    store.setDate("2026-04-08");
+    store.setTime("22:00");
+    store.setTimezone("UTC");
+    store.useCurrentLocation(25.76, -80.19);
+    store.setDate("2026-04-09");
+    store.submit();
+    expect(useObserverStore.getState().datetimeUtc).toBe("2026-04-09T22:00:00.000Z");
+  });
+
   it("selectCandidate with invalid index is a no-op", () => {
     const store = useObserverStore.getState();
     store.setDate("2026-04-08");
