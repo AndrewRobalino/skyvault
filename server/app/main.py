@@ -95,6 +95,9 @@ async def rate_limit(request: Request, call_next):
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
+    # Cloudflare Pages preview deploys. Starlette full-matches this regex, so
+    # look-alikes such as skyvault.pages.dev.evil.example are rejected.
+    allow_origin_regex=settings.cors_origin_regex,
     # Read-only public API: no cookies or auth headers cross origins.
     allow_methods=["GET"],
     allow_headers=["*"],
