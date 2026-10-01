@@ -1,0 +1,56 @@
+name: Deploy backend
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  schedule:
+    - cron: "17 6 1 * *" # monthly rebuild: fresh astropy-iers-data (Phase 5 plan amendment 1)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: false
+
+env:
+  REGION: us-east1
+  SERVICE: skyvault-api
+  IMAGE: us-east1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/skyvault/api
+
+jobs:
+  deploy:
+    # Only after a green CI run on a push to main (not PR runs), or on schedule/manual.
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: gcloud auth configure-docker us-east1-docker.pkg.dev --quiet
+      - name: Build and push
+        run: |
+          TAG="${{ github.event.workflow_run.head_sha || github.sha }}"
+          docker build -t "$IMAGE:$TAG" server
+          docker push "$IMAGE:$TAG"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+      - name: Deploy
+        run: |
+          gcloud run deploy "$SERVICE" --image="$IMAGE:$TAG" --region="$REGION" \
+            --service-account="${{ vars.GCP_RUNTIME_SA }}" \
+            --env-vars-file=deploy/cloudrun.env.yaml \
+            --max-instances=1 --cpu=1 --memory=512Mi --concurrency=10 --timeout=30
+      - name: Smoke test
+        run: |
+          URL=$(gcloud run services describe "$SERVICE" --region="$REGION" --format='value(status.url)')
+          pip install --quiet httpx
+          python server/scripts/smoke_test_live.py "$URL" --origin https://skyvault.pages.dev
