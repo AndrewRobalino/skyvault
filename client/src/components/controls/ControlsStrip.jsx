@@ -11,6 +11,28 @@ import TimezoneToggle from "./TimezoneToggle.jsx";
 import SubmitButton from "./SubmitButton.jsx";
 import ErrorCard from "../ui/ErrorCard.jsx";
 
+function geocodeErrorContent(error) {
+  const status = error?.status;
+  if (status === 0) {
+    // Network failure: the place search is a visitor's first API call, so a
+    // paused/offline backend shows up here first. Don't blame the geocoder.
+    return {
+      title: "SkyVault's backend is temporarily offline",
+      message: "The sky will be back shortly. Try again in a few minutes.",
+    };
+  }
+  if (status === 429) {
+    return { title: "Too many lookups", message: "Too many lookups — give it a minute." };
+  }
+  if (status === 502 || status === 503) {
+    return {
+      title: "Geocoder unavailable",
+      message: "Couldn't reach the place lookup service. Try again, or use your current location.",
+    };
+  }
+  return { title: "Geocoder unavailable", message: error?.message || "Unknown error" };
+}
+
 export default function ControlsStrip() {
   const { rawQuery, selected, datetimeUtc, geocodeRequested, setCandidates } =
     useObserverStore();
@@ -47,14 +69,7 @@ export default function ControlsStrip() {
       {geocode.isError && (
         <div className="mt-4">
           <ErrorCard
-            title="Geocoder unavailable"
-            message={
-              geocode.error?.status === 429
-                ? "Too many lookups — give it a minute."
-                : geocode.error?.status === 503 || geocode.error?.status === 0
-                  ? "Couldn't reach the place lookup service. Try again, or use your current location."
-                  : geocode.error?.message || "Unknown error"
-            }
+            {...geocodeErrorContent(geocode.error)}
             onRetry={() => geocode.refetch()}
           />
         </div>
