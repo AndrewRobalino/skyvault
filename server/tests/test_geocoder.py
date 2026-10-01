@@ -294,3 +294,24 @@ async def test_nominatim_candidates_carry_their_iana_timezone():
     with patch.object(httpx.AsyncClient, "get", mock_get):
         result = await geocoder.geocode("Charlotte", limit=5, lang="en")
     assert result.candidates[0].timezone == "America/New_York"
+
+
+@pytest.fixture(autouse=True)
+def reset_nominatim_throttle():
+    geocoder._last_nominatim_call = float("-inf")
+    yield
+    geocoder._last_nominatim_call = float("-inf")
+
+
+@pytest.mark.asyncio
+async def test_nominatim_fallback_is_throttled_to_one_per_second():
+    # Nominatim's usage policy is ~1 req/s; abuse through us would get OUR
+    # server banned. A second fallback inside the second fails fast instead.
+    photon_down = httpx.Response(503)
+    nominatim_ok = httpx.Response(200, json=SAMPLE_NOMINATIM_RESPONSE)
+    mock_get = AsyncMock(side_effect=[photon_down, nominatim_ok, photon_down])
+    with patch.object(httpx.AsyncClient, "get", mock_get):
+        await geocoder.geocode("Charlotte", limit=5, lang="en")
+        with pytest.raises(geocoder.GeocoderUnavailableError):
+            await geocoder.geocode("Raleigh", limit=5, lang="en")
+    assert mock_get.call_count == 3  # the throttled call never reached Nominatim

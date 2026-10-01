@@ -23,6 +23,19 @@ class Settings(BaseSettings):
     # API
     api_v1_prefix: str = "/api/v1"
     cors_origins: list[str] = ["http://localhost:5173"]
+    # Preview deploys: https://<hash>.skyvault.pages.dev
+    cors_origin_regex: str | None = None
+
+    # Rate limits (spec §4.2), per client IP per minute
+    rate_limit_data_per_min: int = 120
+    rate_limit_geocode_per_min: int = 20
+
+    # Behind Cloud Run the TCP peer is Google's front end; the client IP is in
+    # X-Forwarded-For. Off locally. forwarded_for_index counts from the right
+    # (-1 = rightmost) and is verified against the live service (plan Task 15).
+    trust_forwarded_for: bool = False
+    forwarded_for_index: int = -1
+    log_forwarded_for: bool = False
 
     # Gaia catalog ingest
     gaia_mag_cutoff: float = 9.0

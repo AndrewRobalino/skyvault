@@ -40,6 +40,11 @@ CACHE_TTL_SECONDS = 3600
 CACHE_MAX_ENTRIES = 256
 CACHE_EVICT_BATCH = 32
 
+# Nominatim's usage policy: at most ~1 request/second. Abuse routed through
+# our fallback would get OUR server banned, so excess fallbacks fail fast.
+NOMINATIM_MIN_INTERVAL_S = 1.0
+_last_nominatim_call: float = float("-inf")
+
 # Module-level cache: {cache_key: (cached_at_epoch, GeocodeResponse)}
 _CACHE: dict[tuple[str, int, str], tuple[float, GeocodeResponse]] = {}
 
@@ -249,6 +254,12 @@ async def _call_photon(query: str, limit: int, lang: str) -> GeocodeResponse:
 
 async def _call_nominatim(query: str, limit: int, lang: str) -> GeocodeResponse:
     """Query Nominatim and return a parsed response. Raises on failure."""
+    global _last_nominatim_call
+    now = time.monotonic()
+    if now - _last_nominatim_call < NOMINATIM_MIN_INTERVAL_S:
+        raise GeocoderUnavailableError("Nominatim fallback throttled (1 req/s usage policy)")
+    _last_nominatim_call = now
+
     params = {
         "q": query,
         "limit": limit,
