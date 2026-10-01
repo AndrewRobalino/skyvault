@@ -48,6 +48,18 @@ describe("<App> smoke test", () => {
     expect(screen.getByText(/pick a date and location/i)).toBeInTheDocument();
   });
 
+  it("serves /about from the same bundle without a router", () => {
+    window.history.pushState({}, "", "/about");
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    );
+    expect(screen.getByRole("heading", { name: /about skyvault/i })).toBeInTheDocument();
+    window.history.pushState({}, "", "/");
+  });
+
   it("renders the EXPLORE IN 3D stub button", () => {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } },
