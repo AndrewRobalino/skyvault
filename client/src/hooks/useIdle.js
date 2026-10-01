@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { useUiStateStore } from "../stores/uiStateStore.js";
 
 const ACTIVE_TO_GLASS_MS = 15_000;
-const GLASS_TO_HIDDEN_MS = 5_000;
 
 const ACTIVITY_EVENTS = [
   "mousedown",
@@ -18,9 +17,11 @@ const ACTIVITY_EVENTS = [
  *
  *   (initial after intro) GLASS
  *      | any activity -> NORMAL
- *      | 15s no activity -> GLASS
- *      | 5s more no activity -> HIDDEN
+ *      | 15s no activity -> GLASS (dimmed, still readable)
  *      | any activity -> NORMAL
+ *
+ * There is deliberately no "hidden" stage: reading a panel looks exactly
+ * like being idle, and fading the UI out made it vanish mid-read.
  *
  * Visibility handling:
  *   - Hide tab: pause the timer, record `hiddenAt`
@@ -36,7 +37,8 @@ const ACTIVITY_EVENTS = [
  *   the global @media rule in global.css. We don't special-case here.
  */
 export function useIdle({ enabled }) {
-  const { markActive, markGlass, markHidden } = useUiStateStore();
+  const markActive = useUiStateStore((s) => s.markActive);
+  const markGlass = useUiStateStore((s) => s.markGlass);
   const timerRef = useRef(null);
   const hiddenAtRef = useRef(null);
 
@@ -52,12 +54,7 @@ export function useIdle({ enabled }) {
 
     const scheduleGlass = () => {
       clearTimer();
-      timerRef.current = setTimeout(() => {
-        markGlass();
-        timerRef.current = setTimeout(() => {
-          markHidden();
-        }, GLASS_TO_HIDDEN_MS);
-      }, ACTIVE_TO_GLASS_MS);
+      timerRef.current = setTimeout(markGlass, ACTIVE_TO_GLASS_MS);
     };
 
     const isFormFocused = () => {
@@ -112,5 +109,5 @@ export function useIdle({ enabled }) {
       clearInterval(focusTicker);
       clearTimer();
     };
-  }, [enabled, markActive, markGlass, markHidden]);
+  }, [enabled, markActive, markGlass]);
 }

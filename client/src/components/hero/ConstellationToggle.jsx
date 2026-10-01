@@ -11,11 +11,15 @@ export default function ConstellationToggle() {
   return (
     <button
       type="button"
-      onClick={toggle}
+      onClick={(e) => {
+        // The chart underneath treats every click as a hit-test.
+        e.stopPropagation();
+        toggle();
+      }}
       aria-pressed={showConstellations}
       aria-label="Toggle constellations"
       className={[
-        "absolute top-3 right-3 z-10 rounded-md border px-2.5 py-1",
+        "rounded-md border px-2.5 py-1",
         "font-mono text-[10px] uppercase tracking-[0.18em] select-none",
         "backdrop-blur-sm transition-colors",
         showConstellations

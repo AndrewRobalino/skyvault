@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { toIsoUtc } from "../utils/formatDatetime.js";
+import { toIsoUtc, isSupportedDate } from "../utils/formatDatetime.js";
 
 /**
  * Semantic observer state: what the user wants to see.
@@ -8,7 +8,8 @@ import { toIsoUtc } from "../utils/formatDatetime.js";
  *   candidates  — geocode results after the user has submitted
  *   selected    — the chosen candidate (or current location)
  *   date/time   — user-chosen date and optional time
- *   timezone    — "Local" | "UTC"
+ *   timezone    — "Local" | "UTC". "Local" is the SELECTED PLACE's zone
+ *                 (selected.timezone, IANA), not the browser's.
  *   datetimeUtc — derived ISO 8601 UTC string (set on submit)
  *   submitted   — true once the user has clicked Submit and a candidate is picked
  *
@@ -39,13 +40,15 @@ export const useObserverStore = create((set, get) => ({
     const { candidates, date, time, timezone } = get();
     const picked = candidates[idx];
     if (!picked) return;
-    const datetimeUtc = toIsoUtc({ date, time, timezone });
+    const zone = picked.timezone ?? null;
+    const datetimeUtc = toIsoUtc({ date, time, timezone, zone });
     set({
       selected: {
         lat: picked.lat,
         lon: picked.lon,
         displayName: picked.display_name,
         country: picked.country ?? null,
+        timezone: zone,
       },
       candidates: [],
       datetimeUtc,
@@ -56,9 +59,12 @@ export const useObserverStore = create((set, get) => ({
 
   useCurrentLocation: (lat, lon, displayName = "Current location") => {
     const { date, time, timezone } = get();
-    const datetimeUtc = toIsoUtc({ date, time, timezone });
+    // A GPS fix is where the user is standing, so the browser's zone is the
+    // place's zone.
+    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const datetimeUtc = toIsoUtc({ date, time, timezone, zone });
     set({
-      selected: { lat, lon, displayName, country: null },
+      selected: { lat, lon, displayName, country: null, timezone: zone },
       candidates: [],
       datetimeUtc,
       submitted: true,
@@ -72,7 +78,7 @@ export const useObserverStore = create((set, get) => ({
 
   submit: () => {
     const { rawQuery, date, time, timezone, selected } = get();
-    if (!rawQuery || rawQuery.length < 2 || !date) return;
+    if (!rawQuery || rawQuery.length < 2 || !isSupportedDate(date)) return;
 
     // If the user already has a location selected, treat GO as
     // "recompute with the current date/time" — don't re-geocode and
@@ -80,7 +86,9 @@ export const useObserverStore = create((set, get) => ({
     // `selected` (see setRawQuery), which sends us through the
     // geocode path again on the next GO.
     if (selected) {
-      set({ datetimeUtc: toIsoUtc({ date, time, timezone }) });
+      set({
+        datetimeUtc: toIsoUtc({ date, time, timezone, zone: selected.timezone }),
+      });
       return;
     }
 

@@ -19,13 +19,31 @@ import PlanetLabels from "./PlanetLabels.jsx";
 import ConstellationLabels from "./ConstellationLabels.jsx";
 import AttributionFooter from "./AttributionFooter.jsx";
 import ConstellationToggle from "./ConstellationToggle.jsx";
+import SaveImageButton from "./SaveImageButton.jsx";
+import { saveSnapshot } from "../../utils/snapshot.js";
 
+// Stars are the chart: only a sky failure blocks it. Planets and DSOs degrade
+// to a notice (e.g. a date outside JPL DE421 coverage still has a starry sky).
 function statusFor({ selected, skyQuery, planetsQuery, dsoQuery }) {
   if (!selected) return "idle";
-  if (skyQuery.isError || planetsQuery.isError || dsoQuery.isError) return "error";
-  if (skyQuery.isLoading || planetsQuery.isLoading || dsoQuery.isLoading) return "loading";
-  if (skyQuery.data && planetsQuery.data && dsoQuery.data) return "ready";
+  if (skyQuery.isError) return "error";
+  const settled = (q) => Boolean(q.data) || q.isError;
+  if (skyQuery.data && settled(planetsQuery) && settled(dsoQuery)) return "ready";
   return "loading";
+}
+
+function layerNotices({ planetsQuery, dsoQuery }) {
+  const notices = [];
+  if (planetsQuery.isError) {
+    // A 422 carries the backend's explanation (the DE421 date window).
+    notices.push(
+      planetsQuery.error?.status === 422 && planetsQuery.error?.message
+        ? planetsQuery.error.message
+        : "Planet positions are unavailable right now."
+    );
+  }
+  if (dsoQuery.isError) notices.push("Deep-sky objects are unavailable right now.");
+  return notices;
 }
 
 export default function SkyChart() {
@@ -44,7 +62,10 @@ export default function SkyChart() {
 
   const projected = useMemo(() => {
     const stars = projectStars(skyQuery.data?.stars ?? [], width, height);
-    const planets = projectPlanets(planetsQuery.data?.planets ?? [], width, height);
+    // The API includes below-horizon bodies for the info panels; the chart
+    // draws (and hit-tests) only what is up.
+    const upPlanets = (planetsQuery.data?.planets ?? []).filter((p) => p.alt >= 0);
+    const planets = projectPlanets(upPlanets, width, height);
     const dsos = projectDsos(dsoQuery.data?.dsos ?? [], width, height);
     return { stars, planets, dsos, all: [...stars, ...planets, ...dsos] };
   }, [skyQuery.data, planetsQuery.data, dsoQuery.data, width, height]);
@@ -79,6 +100,7 @@ export default function SkyChart() {
   const enrichment = objectQuery.data?.found ? objectQuery.data.enrichment : null;
 
   const status = statusFor({ selected, skyQuery, planetsQuery, dsoQuery });
+  const notices = status === "ready" ? layerNotices({ planetsQuery, dsoQuery }) : [];
 
   const getMouseCoords = (e) => {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -111,6 +133,19 @@ export default function SkyChart() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  // Export exactly the layers on screen: constellations only when toggled on.
+  const handleSave = () =>
+    saveSnapshot({
+      selected,
+      datetimeUtc,
+      stars: skyQuery.data?.stars ?? [],
+      planets: planetsQuery.data?.planets ?? [],
+      dsos: dsoQuery.data?.dsos ?? [],
+      constellations: showConstellations
+        ? (constellationsQuery.data?.constellations ?? [])
+        : [],
+    });
 
   const ariaLabel = selected
     ? `Night sky for ${selected.displayName} on ${datetimeUtc ?? ""}`
@@ -172,7 +207,7 @@ export default function SkyChart() {
       <SkyStatusOverlay
         state={status}
         placeName={selected?.displayName}
-        error={skyQuery.error || planetsQuery.error}
+        error={skyQuery.error}
         onRetry={() => {
           skyQuery.refetch();
           planetsQuery.refetch();
@@ -180,7 +215,21 @@ export default function SkyChart() {
         }}
       />
 
-      <ConstellationToggle />
+      {notices.length > 0 && (
+        <div
+          role="status"
+          className="pointer-events-none absolute left-3 top-3 z-10 max-w-[70%] space-y-1 border border-white/10 bg-black/40 px-2.5 py-1.5 font-mono text-[10px] tracking-wide text-ink-dim backdrop-blur-sm"
+        >
+          {notices.map((n) => (
+            <p key={n}>{n}</p>
+          ))}
+        </div>
+      )}
+
+      <div className="absolute right-3 top-3 z-10 flex gap-2">
+        {status === "ready" && <SaveImageButton onSave={handleSave} />}
+        <ConstellationToggle />
+      </div>
 
       <AttributionFooter />
     </div>

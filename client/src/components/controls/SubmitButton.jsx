@@ -1,9 +1,12 @@
 import { useObserverStore } from "../../stores/observerStore.js";
 import Button from "../ui/Button.jsx";
+import { isSupportedDate } from "../../utils/formatDatetime.js";
 
 export default function SubmitButton({ isGeocoding, isComputing }) {
-  const { rawQuery, date, submit } = useObserverStore();
-  const disabled = !rawQuery || rawQuery.length < 2 || !date;
+  const rawQuery = useObserverStore((s) => s.rawQuery);
+  const date = useObserverStore((s) => s.date);
+  const submit = useObserverStore((s) => s.submit);
+  const disabled = !rawQuery || rawQuery.length < 2 || !isSupportedDate(date);
 
   let label = "GO";
   if (isGeocoding) label = "LOOKING UP...";

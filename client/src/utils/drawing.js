@@ -346,6 +346,24 @@ function drawMoon(ctx, planet) {
   ctx.restore();
 }
 
+/**
+ * Constellation stick figures, drawn first (behind DSOs/stars/planets).
+ * Line width is in CSS px; thicker on high-DPR output so it doesn't vanish.
+ */
+export function drawConstellationLines(ctx, lines, dpr) {
+  if (!lines.length) return;
+  ctx.save();
+  ctx.strokeStyle = "rgba(160, 190, 230, 0.44)";
+  ctx.lineWidth = dpr > 1 ? 1.5 : 1;
+  for (const ln of lines) {
+    ctx.beginPath();
+    ctx.moveTo(ln.x1, ln.y1);
+    ctx.lineTo(ln.x2, ln.y2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 // Small utility: hex "#rrggbb" + alpha → "rgba(r,g,b,a)"
 function hexToRgba(hex, alpha) {
   const m = /^#?([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})$/.exec(hex);

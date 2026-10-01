@@ -38,6 +38,32 @@ describe("MilkyWayBackdrop", () => {
     expect(container.querySelector("[data-backdrop-fallback]")).toBeNull();
   });
 
+  it("redraws once the panorama finishes loading", () => {
+    // The draw effect only reruns on size/observer changes. On a real network
+    // the 4000x2000 panorama arrives after the first sky is drawn, which left
+    // the 1x1 placeholder on screen until the next resize or GO.
+    const images = [];
+    vi.stubGlobal(
+      "Image",
+      class {
+        constructor() {
+          images.push(this);
+        }
+      }
+    );
+    const glStub = makeGlStub();
+    HTMLCanvasElement.prototype.getContext = vi.fn(() => glStub);
+    render(
+      <MilkyWayBackdrop width={1000} height={600} dpr={1} lat={25} lon={-80} datetime="2026-04-15T03:30:00Z" />
+    );
+    const drawsBeforeLoad = glStub.drawArrays.mock.calls.length;
+    expect(drawsBeforeLoad).toBeGreaterThan(0);
+
+    images[0].onload();
+    expect(glStub.drawArrays.mock.calls.length).toBe(drawsBeforeLoad + 1);
+    vi.unstubAllGlobals();
+  });
+
   it("does not draw if shader compile throws (canvas stays transparent over parent's dark fill)", () => {
     const glStub = makeGlStub({ shaderCompileFails: true });
     HTMLCanvasElement.prototype.getContext = vi.fn(() => glStub);

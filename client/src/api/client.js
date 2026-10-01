@@ -55,8 +55,9 @@ export const api = {
     request("/geocode", { q, limit, lang }),
   sky: (lat, lon, datetime, { mag_limit = 6.5 } = {}) =>
     request("/sky", { lat, lon, datetime, mag_limit }),
+  // Below-horizon bodies too: the panels list all of them; the chart filters.
   planets: (lat, lon, datetime) =>
-    request("/planets", { lat, lon, datetime }),
+    request("/planets", { lat, lon, datetime, include_below_horizon: true }),
   dso: (lat, lon, datetime, { include_below_horizon = false } = {}) =>
     request("/dso", { lat, lon, datetime, include_below_horizon }),
   constellations: (lat, lon, datetime) =>

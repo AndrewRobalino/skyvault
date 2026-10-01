@@ -17,6 +17,7 @@ const SAMPLE_CANDIDATES = [
     state: null,
     lat: 48.85,
     lon: 2.35,
+    timezone: "Europe/Paris",
   },
 ];
 
@@ -73,6 +74,7 @@ describe("observerStore", () => {
       lon: -80.4544,
       displayName: "Portoviejo, Manabí, Ecuador",
       country: "Ecuador",
+      timezone: null,
     });
     expect(s.submitted).toBe(true);
     expect(s.geocodeRequested).toBe(false);
@@ -104,6 +106,57 @@ describe("observerStore", () => {
     expect(after.datetimeUtc).toBe("2026-04-09T22:00:00.000Z");
   });
 
+  it("Local time means the picked place's zone, not the browser's", () => {
+    const store = useObserverStore.getState();
+    store.setRawQuery("Paris");
+    store.setDate("2026-04-08");
+    store.setTime("22:00");
+    store.setTimezone("Local");
+    store.setCandidates(SAMPLE_CANDIDATES);
+    store.selectCandidate(1);
+
+    const s = useObserverStore.getState();
+    expect(s.selected.timezone).toBe("Europe/Paris");
+    // 22:00 CEST (UTC+2), not 22:00 in the test runner's New York.
+    expect(s.datetimeUtc).toBe("2026-04-08T20:00:00.000Z");
+  });
+
+  it("GO after a selection keeps using the place's zone", () => {
+    const store = useObserverStore.getState();
+    store.setRawQuery("Paris");
+    store.setDate("2026-04-08");
+    store.setTime("22:00");
+    store.setTimezone("Local");
+    store.setCandidates(SAMPLE_CANDIDATES);
+    store.selectCandidate(1);
+
+    store.setDate("2026-01-15");
+    store.submit();
+    expect(useObserverStore.getState().datetimeUtc).toBe("2026-01-15T21:00:00.000Z"); // CET
+  });
+
+  it("submit ignores a date outside the supported ephemeris window", () => {
+    const store = useObserverStore.getState();
+    store.setRawQuery("Portoviejo");
+    store.setDate("2060-01-01");
+    store.submit();
+    expect(useObserverStore.getState().geocodeRequested).toBe(false);
+  });
+
+  it("submit with a selection does not recompute for an unsupported date", () => {
+    const store = useObserverStore.getState();
+    store.setRawQuery("Portoviejo");
+    store.setDate("2026-04-08");
+    store.setTime("22:00");
+    store.setTimezone("UTC");
+    store.setCandidates(SAMPLE_CANDIDATES);
+    store.selectCandidate(0);
+
+    store.setDate("2060-01-01");
+    store.submit();
+    expect(useObserverStore.getState().datetimeUtc).toBe("2026-04-08T22:00:00.000Z");
+  });
+
   it("selectCandidate with invalid index is a no-op", () => {
     const store = useObserverStore.getState();
     store.setDate("2026-04-08");
@@ -124,6 +177,17 @@ describe("observerStore", () => {
     expect(s.selected?.displayName).toBe("Current location");
     expect(s.submitted).toBe(true);
     expect(s.datetimeUtc).toBe("2026-04-08T12:00:00.000Z");
+  });
+
+  it("useCurrentLocation uses the browser's zone: the user is standing there", () => {
+    const store = useObserverStore.getState();
+    store.setDate("2026-01-15");
+    store.setTime("21:00");
+    store.setTimezone("Local");
+    store.useCurrentLocation(25.76, -80.19);
+    const s = useObserverStore.getState();
+    expect(s.selected.timezone).toBe("America/New_York");
+    expect(s.datetimeUtc).toBe("2026-01-16T02:00:00.000Z");
   });
 
   it("reset clears all state", () => {

@@ -16,12 +16,16 @@ vi.mock("../hooks/useDso.js", () => ({
 vi.mock("../hooks/useConstellations.js", () => ({
   useConstellations: vi.fn(),
 }));
+vi.mock("../utils/snapshot.js", () => ({
+  saveSnapshot: vi.fn(async () => {}),
+}));
 
 import { useSky } from "../hooks/useSky.js";
 import { usePlanets } from "../hooks/usePlanets.js";
 import { useDso } from "../hooks/useDso.js";
 import { useConstellations } from "../hooks/useConstellations.js";
 import { useUiStateStore } from "../stores/uiStateStore.js";
+import { saveSnapshot } from "../utils/snapshot.js";
 
 HTMLCanvasElement.prototype.getContext = () => ({
   setTransform: vi.fn(),
@@ -37,6 +41,11 @@ HTMLCanvasElement.prototype.getContext = () => ({
   fillRect: vi.fn(),
   moveTo: vi.fn(),
   lineTo: vi.fn(),
+  clip: vi.fn(),
+  closePath: vi.fn(),
+  translate: vi.fn(),
+  rotate: vi.fn(),
+  scale: vi.fn(),
   set fillStyle(_) {},
   set strokeStyle(_) {},
   set lineWidth(_) {},
@@ -143,7 +152,7 @@ describe("<SkyChart>", () => {
   it("mounts the AttributionFooter (Phase 2c license-critical attribution)", () => {
     renderWithProviders(<SkyChart />);
     expect(screen.getByText(/Brunier/i)).toBeInTheDocument();
-    expect(screen.getByText(/Gaia DR3/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /data credits/i })).toBeInTheDocument();
   });
 
   it("click on an object shows the tooltip; click empty area dismisses it", () => {
@@ -239,6 +248,155 @@ describe("<SkyChart>", () => {
     renderWithProviders(<SkyChart />);
     act(() => { vi.advanceTimersByTime(200); });
     expect(screen.queryByText("Orion")).not.toBeInTheDocument();
+  });
+
+  it("a planets failure still renders the star chart, with a notice", () => {
+    // e.g. a date past JPL DE421 coverage: stars are fine, planets are not.
+    useObserverStore.getState().useCurrentLocation(25.76, -80.19, "Miami, FL");
+    useSky.mockReturnValue(mockQuery({ data: { observer: {}, stars: [], count: 0 } }));
+    usePlanets.mockReturnValue(
+      mockQuery({
+        isError: true,
+        error: { status: 422, message: "Planet positions are only available from 1899-07-29 to 2053-10-09" },
+      })
+    );
+    useDso.mockReturnValue(mockQuery({ data: { observer: {}, dsos: [], count: 0 } }));
+    renderWithProviders(<SkyChart />);
+    act(() => { vi.advanceTimersByTime(200); });
+    expect(screen.getByText("N")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent(/only available from 1899/);
+    expect(screen.queryByRole("button", { name: /retry/i })).not.toBeInTheDocument();
+  });
+
+  it("below-horizon planets are never hit-testable", () => {
+    useObserverStore.getState().useCurrentLocation(25.76, -80.19, "Miami, FL");
+    useSky.mockReturnValue(mockQuery({ data: { observer: {}, stars: [], count: 0 } }));
+    usePlanets.mockReturnValue(
+      mockQuery({
+        data: {
+          observer: {},
+          count: 1,
+          planets: [{ name: "jupiter", alt: -5, az: 90, distance_au: 5, source: "JPL DE421 via Astropy" }],
+        },
+      })
+    );
+    useDso.mockReturnValue(mockQuery({ data: { observer: {}, dsos: [], count: 0 } }));
+    const { container } = renderWithProviders(<SkyChart />);
+    act(() => { vi.advanceTimersByTime(200); });
+    const root = container.querySelector("[role='img']");
+    root.getBoundingClientRect = () => ({
+      left: 0, top: 0, right: 800, bottom: 450, width: 800, height: 450,
+    });
+    // alt -5, az 90 projects to (154.5, 225), just outside the horizon circle.
+    fireEvent.click(root, { clientX: 155, clientY: 225 });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("clicks inside the tooltip or on the toggle keep the selection", () => {
+    useObserverStore.getState().useCurrentLocation(25.76, -80.19, "Miami, FL");
+    useSky.mockReturnValue(
+      mockQuery({
+        data: {
+          observer: {},
+          count: 1,
+          stars: [{ source_id: "7", ra: 0, dec: 0, alt: 90, az: 0, magnitude: 1, bp_rp: 0 }],
+        },
+      })
+    );
+    usePlanets.mockReturnValue(mockQuery({ data: { observer: {}, planets: [], count: 0 } }));
+    useDso.mockReturnValue(mockQuery({ data: { observer: {}, dsos: [], count: 0 } }));
+    const { container } = renderWithProviders(<SkyChart />);
+    act(() => { vi.advanceTimersByTime(200); });
+    const root = container.querySelector("[role='img']");
+    root.getBoundingClientRect = () => ({
+      left: 0, top: 0, right: 800, bottom: 450, width: 800, height: 450,
+    });
+    fireEvent.click(root, { clientX: 400, clientY: 225 });
+    fireEvent.click(screen.getByRole("dialog"), { clientX: 10, clientY: 10 });
+    expect(screen.getByText(/Gaia DR3 · 7/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /constellations/i }), {
+      clientX: 10,
+      clientY: 10,
+    });
+    expect(screen.getByText(/Gaia DR3 · 7/)).toBeInTheDocument();
+  });
+
+  it("offers Save image only once the sky is ready", () => {
+    renderWithProviders(<SkyChart />);
+    expect(screen.queryByRole("button", { name: /save image/i })).not.toBeInTheDocument();
+  });
+
+  it("Save image exports what is on screen, without touching the selection", async () => {
+    saveSnapshot.mockClear();
+    useObserverStore.getState().useCurrentLocation(25.76, -80.19, "Miami, FL");
+    const stars = [{ source_id: "7", ra: 0, dec: 0, alt: 90, az: 0, magnitude: 1, bp_rp: 0 }];
+    const planets = [{ name: "mars", alt: 20, az: 100, distance_au: 1 }];
+    useSky.mockReturnValue(mockQuery({ data: { observer: {}, stars, count: 1 } }));
+    usePlanets.mockReturnValue(mockQuery({ data: { observer: {}, planets, count: 1 } }));
+    useDso.mockReturnValue(mockQuery({ data: { observer: {}, dsos: [], count: 0 } }));
+    useConstellations.mockReturnValue(
+      mockQuery({ data: { constellations: [{ id: "Ori", name: "Orion", segments: [] }] } })
+    );
+    const { container } = renderWithProviders(<SkyChart />);
+    act(() => { vi.advanceTimersByTime(200); });
+    container.querySelector("[role='img']").getBoundingClientRect = () => ({
+      left: 0, top: 0, right: 800, bottom: 450, width: 800, height: 450,
+    });
+
+    // Constellations are off, so none are exported even though data exists.
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /save image/i }), {
+        clientX: 400,
+        clientY: 225,
+      });
+    });
+    expect(saveSnapshot).toHaveBeenCalledTimes(1);
+    const args = saveSnapshot.mock.calls[0][0];
+    expect(args.selected.displayName).toBe("Miami, FL");
+    expect(args.datetimeUtc).toBe(useObserverStore.getState().datetimeUtc);
+    expect(args.stars).toBe(stars);
+    expect(args.planets).toBe(planets);
+    expect(args.constellations).toEqual([]);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("Save image includes constellations when the overlay is on", async () => {
+    saveSnapshot.mockClear();
+    useObserverStore.getState().useCurrentLocation(25.76, -80.19, "Miami, FL");
+    useUiStateStore.setState({ showConstellations: true });
+    const figures = [{ id: "Ori", name: "Orion", segments: [] }];
+    useSky.mockReturnValue(mockQuery({ data: { observer: {}, stars: [], count: 0 } }));
+    usePlanets.mockReturnValue(mockQuery({ data: { observer: {}, planets: [], count: 0 } }));
+    useDso.mockReturnValue(mockQuery({ data: { observer: {}, dsos: [], count: 0 } }));
+    useConstellations.mockReturnValue(mockQuery({ data: { constellations: figures } }));
+    renderWithProviders(<SkyChart />);
+    act(() => { vi.advanceTimersByTime(200); });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /save image/i }));
+    });
+    expect(saveSnapshot.mock.calls[0][0].constellations).toBe(figures);
+  });
+
+  it("Save image shows progress and recovers if the export fails", async () => {
+    let fail;
+    saveSnapshot.mockImplementationOnce(() => new Promise((_, reject) => { fail = reject; }));
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    useObserverStore.getState().useCurrentLocation(25.76, -80.19, "Miami, FL");
+    useSky.mockReturnValue(mockQuery({ data: { observer: {}, stars: [], count: 0 } }));
+    usePlanets.mockReturnValue(mockQuery({ data: { observer: {}, planets: [], count: 0 } }));
+    useDso.mockReturnValue(mockQuery({ data: { observer: {}, dsos: [], count: 0 } }));
+    renderWithProviders(<SkyChart />);
+    act(() => { vi.advanceTimersByTime(200); });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /save image/i }));
+    });
+    expect(screen.getByRole("button", { name: /saving/i })).toBeDisabled();
+
+    await act(async () => {
+      fail(new Error("boom"));
+    });
+    expect(screen.getByRole("button", { name: /save image/i })).toBeEnabled();
   });
 
   it("Escape keypress clears an active selection", () => {

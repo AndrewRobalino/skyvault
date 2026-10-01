@@ -6,7 +6,6 @@ describe("uiStateStore", () => {
     useUiStateStore.setState({
       introState: "pending",
       activityState: "normal",
-      lastActivityAt: Date.now(),
       prefersReducedMotion: false,
     });
   });
@@ -26,21 +25,28 @@ describe("uiStateStore", () => {
     expect(useUiStateStore.getState().introState).toBe("done");
   });
 
-  it("markActive sets activityState to normal and updates lastActivityAt", () => {
-    const before = useUiStateStore.getState().lastActivityAt;
-    useUiStateStore.setState({ activityState: "glass", lastActivityAt: 0 });
+  it("markActive sets activityState back to normal", () => {
+    useUiStateStore.setState({ activityState: "glass" });
     useUiStateStore.getState().markActive();
-    const after = useUiStateStore.getState();
-    expect(after.activityState).toBe("normal");
-    expect(after.lastActivityAt).toBeGreaterThan(before - 1);
+    expect(useUiStateStore.getState().activityState).toBe("normal");
   });
 
-  it("markGlass and markHidden set activityState directly", () => {
-    const store = useUiStateStore.getState();
-    store.markGlass();
+  it("markActive while already normal notifies nobody", () => {
+    // It runs on every mousemove; a fresh state object each time re-rendered
+    // every whole-store subscriber on every pointer movement.
+    let notifications = 0;
+    const unsubscribe = useUiStateStore.subscribe(() => {
+      notifications += 1;
+    });
+    useUiStateStore.getState().markActive();
+    useUiStateStore.getState().markActive();
+    unsubscribe();
+    expect(notifications).toBe(0);
+  });
+
+  it("markGlass sets activityState directly", () => {
+    useUiStateStore.getState().markGlass();
     expect(useUiStateStore.getState().activityState).toBe("glass");
-    store.markHidden();
-    expect(useUiStateStore.getState().activityState).toBe("hidden");
   });
 
   it("setReducedMotion updates the flag", () => {
