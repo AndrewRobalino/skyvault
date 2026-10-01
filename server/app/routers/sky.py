@@ -48,6 +48,10 @@ def _safe_str(value) -> str | None:
     return value if isinstance(value, str) else None
 
 
+def _round(value: float | None, digits: int) -> float | None:
+    return None if value is None else round(value, digits)
+
+
 def _distance_ly(parallax_mas: float | None) -> float | None:
     """Convert Gaia parallax (mas) to distance in light-years."""
     if parallax_mas is None or parallax_mas <= 0:
@@ -99,15 +103,17 @@ def get_sky(
         Star(
             # Gaia ids arrive as int64 or str, Hipparcos ids as "hip:<n>".
             source_id=str(rec["source_id"]),
-            ra=float(rec["ra"]),
-            dec=float(rec["dec"]),
-            alt=float(rec["alt"]),
-            az=float(rec["az"]),
-            magnitude=float(rec["phot_g_mean_mag"]),
-            bp_rp=_safe(rec.get("bp_rp")),
-            parallax_mas=_safe(rec.get("parallax")),
-            distance_ly=_safe(distance_ly[i]),
-            teff_k=_safe(rec.get("teff_gspphot")),
+            # Rounded for transport: 1e-5 deg = 0.04", far below the pipeline's
+            # error budget (no refraction alone is ~0.5 deg).
+            ra=round(float(rec["ra"]), 5),
+            dec=round(float(rec["dec"]), 5),
+            alt=round(float(rec["alt"]), 5),
+            az=round(float(rec["az"]), 5),
+            magnitude=round(float(rec["phot_g_mean_mag"]), 3),
+            bp_rp=_round(_safe(rec.get("bp_rp")), 3),
+            parallax_mas=_round(_safe(rec.get("parallax")), 3),
+            distance_ly=_round(_safe(distance_ly[i]), 2),
+            teff_k=_round(_safe(rec.get("teff_gspphot")), 0),
             source=_safe_str(rec.get("source")) or "Gaia DR3",
             magnitude_source=_safe_str(rec.get("magnitude_source")),
             color_source=_safe_str(rec.get("color_source")),

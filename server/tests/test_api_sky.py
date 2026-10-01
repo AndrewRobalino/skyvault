@@ -113,3 +113,27 @@ def test_sky_includes_the_bright_stars_gaia_saturates_on():
         assert by_id[hip]["source"] == "ESA Hipparcos"
         assert "Riello" in by_id[hip]["magnitude_source"]
     assert by_id["hip:32349"]["magnitude"] == min(s["magnitude"] for s in body["stars"])
+
+
+def _decimals(x: float) -> int:
+    s = repr(float(x))
+    return len(s.split(".")[1]) if "." in s and "e" not in s else 0
+
+
+def test_sky_numbers_are_rounded_for_transport():
+    # 0.00001 deg = 0.04": far below the pipeline's real error budget (no
+    # refraction alone is ~0.5 deg). Cuts the payload with no visible change.
+    body = client.get("/api/v1/sky", params={**MIAMI, "mag_limit": 6.5}).json()
+    for star in body["stars"][:200]:
+        for key in ("ra", "dec", "alt", "az"):
+            assert _decimals(star[key]) <= 5, (key, star[key])
+        assert _decimals(star["magnitude"]) <= 3
+        if star["distance_ly"] is not None:
+            assert _decimals(star["distance_ly"]) <= 2
+
+
+def test_sky_response_is_gzipped():
+    response = client.get(
+        "/api/v1/sky", params={**MIAMI, "mag_limit": 6.5}, headers={"Accept-Encoding": "gzip"}
+    )
+    assert response.headers.get("content-encoding") == "gzip"
