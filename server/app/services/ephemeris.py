@@ -23,6 +23,7 @@ Physics notes:
 from __future__ import annotations
 
 import math
+import threading
 from functools import lru_cache
 
 from astropy import units as u
@@ -49,6 +50,13 @@ BODIES: tuple[str, ...] = (
 )
 
 SOURCE_LABEL = "JPL DE421 via Astropy"
+
+# Astropy's solar_system_ephemeris is PROCESS-GLOBAL state, and routes run in
+# FastAPI's threadpool. Interleaved `with solar_system_ephemeris.set(...)`
+# blocks restore each other's values: a request can silently compute with the
+# built-in (non-DE421) ephemeris, hit a closed SPK file, or leave the global
+# stuck. Planet requests are ~100-200 ms, so serializing them is cheap.
+_EPHEMERIS_LOCK = threading.Lock()
 
 # The Moon's waxing/waning test samples this far past the observation, so the
 # look-ahead instant has to be inside the kernel's coverage too.
@@ -226,9 +234,10 @@ def compute_planet_positions(
     _check_in_coverage(kernel, obs_time, observer_time)
 
     results: list[dict] = []
-    # Context manager scopes the DE421 selection to this call — avoids
-    # globally mutating Astropy state for anyone else using it.
-    with solar_system_ephemeris.set(kernel):
+    # The context manager restores the previous ephemeris on exit, but the
+    # setting itself is process-global, so the lock makes the whole block
+    # exclusive across threads (see _EPHEMERIS_LOCK).
+    with _EPHEMERIS_LOCK, solar_system_ephemeris.set(kernel):
         # Precompute the Sun's geocentric position once for the moon phase
         # calculation. We still re-query it inside the loop so the returned
         # Sun entry uses the same call path as every other body — but we
