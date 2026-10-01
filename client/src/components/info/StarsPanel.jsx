@@ -6,6 +6,13 @@ import { bvToHex } from "../../utils/bvToColor.js";
 
 const TOP_N = 30;
 
+// Row label: Gaia ids are 19 digits, so show the tail; Hipparcos-supplement
+// stars ("hip:32349") show their HIP number.
+function catalogLabel(s) {
+  const id = String(s.source_id);
+  return id.startsWith("hip:") ? ["HIP", id.slice(4)] : ["Gaia", id.slice(-9)];
+}
+
 export default function StarsPanel({ query }) {
   if (query.isLoading) {
     return (
@@ -41,6 +48,7 @@ export default function StarsPanel({ query }) {
   const top = [...stars]
     .sort((a, b) => a.magnitude - b.magnitude)
     .slice(0, TOP_N);
+  const sources = [...new Set(top.map((s) => s.source ?? "Gaia DR3"))].join(" · ");
 
   return (
     <Panel title="Brightest Stars">
@@ -65,8 +73,8 @@ export default function StarsPanel({ query }) {
                       style={{ backgroundColor: bvToHex(s.bp_rp) }}
                       aria-hidden="true"
                     />
-                    <span className="text-ink-dim">Gaia</span>
-                    <span>{String(s.source_id).slice(-9)}</span>
+                    <span className="text-ink-dim">{catalogLabel(s)[0]}</span>
+                    <span>{catalogLabel(s)[1]}</span>
                   </span>
                 </td>
                 <td className="py-1.5 text-right font-mono text-xs text-ink">
@@ -87,7 +95,7 @@ export default function StarsPanel({ query }) {
         </table>
       </div>
       <div className="mt-4">
-        <SourceBadge source="Gaia DR3" />
+        <SourceBadge source={sources} />
       </div>
     </Panel>
   );

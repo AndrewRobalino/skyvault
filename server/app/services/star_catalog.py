@@ -1,10 +1,12 @@
-"""Gaia DR3 star catalog — loading and querying.
+"""Star catalog — Gaia DR3 plus the Hipparcos bright-star supplement.
 
 The catalog parquet is loaded **once** into a module-level DataFrame on first
 access, then reused for every subsequent query. This keeps the render hot path
 fast: all queries are in-memory pandas filters, no disk I/O.
 
-Data source: ESA Gaia DR3, ingested via ``scripts/ingest_gaia.py``.
+Data sources: ESA Gaia DR3, ingested via ``scripts/ingest_gaia.py``, and the
+stars Gaia saturates on (G < ~2.7) from ESA Hipparcos, baked by
+``scripts/ingest_bright_stars.py``. The two are concatenated once at load.
 
 Phase 1 scope: magnitude filtering only. The ICRS -> AltAz transform and
 proper-motion correction live in ``coordinates.py`` and compose on top of this.
@@ -25,9 +27,13 @@ logger = logging.getLogger(__name__)
 
 _catalog: pd.DataFrame | None = None
 
+# Catalog reference epochs. Gaia rows carry no epoch column of their own.
+GAIA_EPOCH = "J2016.0"
+GAIA_SOURCE = "Gaia DR3"
+
 
 class CatalogNotIngestedError(RuntimeError):
-    """Raised when the Gaia parquet is missing at load time."""
+    """Raised when a catalog parquet is missing at load time."""
 
 
 def _load_catalog(path: Path) -> pd.DataFrame:
@@ -49,11 +55,46 @@ def _load_catalog(path: Path) -> pd.DataFrame:
     return df
 
 
+def _load_bright_stars(path: Path) -> pd.DataFrame:
+    if not path.exists():
+        raise CatalogNotIngestedError(
+            f"Bright-star supplement not found at {path}. "
+            f"Run `python -m scripts.ingest_bright_stars` to generate it."
+        )
+    df = pd.read_parquet(path, engine="pyarrow")
+    logger.info("Loaded bright-star supplement: %s rows", f"{len(df):,}")
+    return df
+
+
+def _merge_catalogs(gaia: pd.DataFrame, bright: pd.DataFrame) -> pd.DataFrame:
+    """Concatenate the Gaia catalog with the bright-star supplement.
+
+    Gaia source_ids are int64 on disk and exceed JS MAX_SAFE_INTEGER, so both
+    frames are cast to string before concatenation — otherwise the mixed column
+    lands as object dtype with ints still inside it.
+
+    The supplement is already deduped against Gaia at ingest time
+    (scripts/ingest_bright_stars.py), so no dedupe happens here.
+    """
+    gaia = gaia.copy()
+    gaia["source_id"] = gaia["source_id"].astype(str)
+    gaia["epoch"] = GAIA_EPOCH
+    gaia["source"] = GAIA_SOURCE
+
+    bright = bright.copy()
+    bright["source_id"] = bright["source_id"].astype(str)
+
+    return pd.concat([gaia, bright], ignore_index=True, sort=False)
+
+
 def get_catalog() -> pd.DataFrame:
-    """Return the in-memory Gaia catalog, loading it on first call."""
+    """Return the in-memory star catalog, loading and merging on first call."""
     global _catalog
     if _catalog is None:
-        _catalog = _load_catalog(settings.gaia_parquet_path)
+        gaia = _load_catalog(settings.gaia_parquet_path)
+        bright = _load_bright_stars(settings.bright_stars_parquet_path)
+        _catalog = _merge_catalogs(gaia, bright)
+        logger.info("Merged star catalog: %s rows", f"{len(_catalog):,}")
     return _catalog
 
 

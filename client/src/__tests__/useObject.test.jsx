@@ -33,4 +33,11 @@ describe("useObject", () => {
     expect(api.object).toHaveBeenCalledWith("123");
     expect(result.current.data.enrichment.proper_name).toBe("Vega");
   });
+
+  it("passes a hip: prefixed source_id through unchanged", async () => {
+    api.object.mockResolvedValue({ found: true, enrichment: { proper_name: "Sirius" } });
+    const { result } = renderHook(() => useObject("hip:32349", true), { wrapper });
+    await waitFor(() => expect(result.current.data).toBeTruthy());
+    expect(api.object).toHaveBeenCalledWith("hip:32349");
+  });
 });

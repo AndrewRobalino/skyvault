@@ -37,7 +37,7 @@ def test_sky_returns_stars_above_horizon_only_by_default():
     for star in body["stars"]:
         assert star["alt"] >= 0.0, f"star {star['source_id']} below horizon"
         assert 0.0 <= star["az"] <= 360.0
-        assert star["source"] == "Gaia DR3"
+        assert star["source"] in {"Gaia DR3", "ESA Hipparcos"}
 
 
 def test_sky_include_below_horizon_returns_more_stars():
@@ -93,4 +93,21 @@ def test_sky_source_id_serialized_as_string():
     assert body["count"] > 0
     for star in body["stars"]:
         assert isinstance(star["source_id"], str)
-        assert star["source_id"].isdigit()
+        # Gaia ids are all digits; Hipparcos supplement ids are "hip:<n>".
+        if star["source"] == "Gaia DR3":
+            assert star["source_id"].isdigit()
+        else:
+            assert star["source_id"].startswith("hip:")
+
+
+def test_sky_includes_the_bright_stars_gaia_saturates_on():
+    # Gaia DR3 has no stars brighter than G = 1.73. Sirius (HIP 32349) and
+    # Rigel (HIP 24436) are both up over Miami at this time and must come from
+    # the Hipparcos supplement, labelled as such.
+    body = client.get("/api/v1/sky", params={**MIAMI, "mag_limit": 6.5}).json()
+    by_id = {s["source_id"]: s for s in body["stars"]}
+    for hip in ("hip:32349", "hip:24436"):
+        assert hip in by_id, f"{hip} missing from /sky"
+        assert by_id[hip]["source"] == "ESA Hipparcos"
+        assert "Riello" in by_id[hip]["magnitude_source"]
+    assert by_id["hip:32349"]["magnitude"] == min(s["magnitude"] for s in body["stars"])

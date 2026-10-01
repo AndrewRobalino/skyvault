@@ -2,7 +2,7 @@
 
 > Explore the night sky from any place, any moment in time.
 
-**SkyVault** is an interactive web app that renders an accurate night sky for any date, time, and location on Earth. Star positions come from **ESA Gaia DR3**, planet positions from **NASA JPL DE421**, constellation names from the **IAU** (public domain) with stick-figure line topology from the **Stellarium Western sky culture** (CC BY-SA), enrichment data from **NASA Exoplanet Archive** and **CDS SIMBAD**, and the photo-realistic Milky Way backdrop is the **ESO/S. Brunier GigaGalaxy Zoom panorama** (eso0932a). Every data point is attributed — no faked values, no approximations.
+**SkyVault** is an interactive web app that renders an accurate night sky for any date, time, and location on Earth. Star positions come from **ESA Gaia DR3**, with **ESA Hipparcos** filling in the brightest stars Gaia saturates on, planet positions from **NASA JPL DE421**, constellation names from the **IAU** (public domain) with stick-figure line topology from the **Stellarium Western sky culture** (CC BY-SA), star names from the **IAU Working Group on Star Names**, enrichment data from **NASA Exoplanet Archive** and **CDS SIMBAD**, and the photo-realistic Milky Way backdrop is the **ESO/S. Brunier GigaGalaxy Zoom panorama** (eso0932a). Every data point is attributed — no faked values, and every approximation is documented and labelled.
 
 Built with React, Vite, Canvas 2D + WebGL, FastAPI, and Astropy.
 
@@ -25,9 +25,11 @@ SkyVault uses real, attributed institutional data sources. No values are faked o
 | **JPL DE421 ephemeris** | Sun, Moon, Mercury–Neptune positions | NASA JPL | Public domain (US Gov) |
 | **IAU constellations** | Official 88 constellation names | IAU | Public domain |
 | **Stellarium Western sky culture** | Constellation stick-figure line topology | Stellarium | CC BY-SA (attribution + ShareAlike on the derived data file) |
-| **ESA Hipparcos** (VizieR I/239/hip_main) | J2000 ICRS coordinates for constellation stars | ESA | Public / scientific data |
+| **ESA Hipparcos** (VizieR I/239/hip_main) | ICRS positions (epoch J1991.25) for constellation stars, plus the 72 naked-eye stars Gaia DR3 saturates on (Sirius, Vega, Betelgeuse... everything brighter than G ≈ 2.7), deduped against Gaia by identifier and position | ESA | Public / scientific data |
+| **Gaia EDR3 photometric relations** (Riello et al. 2021, Table 5.7) | Johnson V, B−V, V−I → Gaia G and BP−RP for the Hipparcos stars; every transformed value is labelled "derived" in the UI | ESA / DPAC | Published, cited |
+| **IAU Catalog of Star Names** (WGSN) | Official proper names for 331 rendered stars, keyed by HIP/HD; vendored at `server/data/sources/iau_csn.txt` | IAU Working Group on Star Names | CC BY |
 | **NASA Exoplanet Archive** | Confirmed exoplanets and host stars, cross-matched to Gaia DR3 source ids and baked into the star enrichment catalog | NASA / IPAC | Public domain |
-| **CDS SIMBAD** | Canonical object metadata — proper names, Bayer/Flamsteed designations, HD/HIP ids, spectral and object types for naked-eye stars, plus DSO metadata | CDS Strasbourg | Free for academic / non-commercial use |
+| **CDS SIMBAD** | Canonical object metadata — Bayer/Flamsteed designations, proper names where the IAU list has none, HD/HIP ids, spectral and object types for naked-eye stars, plus DSO metadata | CDS Strasbourg | Free for academic / non-commercial use |
 | **ESO/S. Brunier panorama** (eso0932a) | All-sky Milky Way backdrop image (galactic equirectangular, 4000×2000) | ESO / Serge Brunier (GigaGalaxy Zoom Project) | CC BY 4.0 |
 
 The Milky Way panorama is © ESO/S. Brunier from the GigaGalaxy Zoom Project,

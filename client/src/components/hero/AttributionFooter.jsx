@@ -21,9 +21,10 @@ export default function AttributionFooter() {
       }}
     >
       <div>Milky Way: ESO/S. Brunier · CC BY 4.0</div>
-      <div>Stars: ESA Gaia DR3 · Planets: NASA JPL DE421</div>
+      <div>Stars: ESA Gaia DR3 + ESA Hipparcos · Planets: NASA JPL DE421</div>
       <div>Planet &amp; Moon textures: Solar System Scope · CC BY 4.0</div>
-      <div>DSO &amp; star names: SIMBAD/CDS</div>
+      <div>Star names: IAU WGSN · CC BY</div>
+      <div>DSO &amp; star data: SIMBAD/CDS</div>
       <div>Exoplanets: NASA Exoplanet Archive</div>
       <div>Constellation figures: Stellarium · CC BY-SA</div>
     </div>

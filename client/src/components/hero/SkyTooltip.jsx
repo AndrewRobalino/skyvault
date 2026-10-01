@@ -18,6 +18,19 @@ function formatAu(n) {
   return `${n.toFixed(2)} AU`;
 }
 
+// Photometry transformed from another system (the Hipparcos supplement) is
+// labelled as such — never presented as if Gaia measured it.
+function formatPhotometry(n, derivedFrom) {
+  const text = formatNumber(n, 2);
+  return derivedFrom && text !== "—" ? `${text} (derived)` : text;
+}
+
+// "hip:32349" is an internal key; show it the way astronomers write it.
+function catalogLabel(object) {
+  const id = String(object.source_id);
+  return `${object.source} · ${id.startsWith("hip:") ? `HIP ${id.slice(4)}` : id}`;
+}
+
 function formatDeg(n) {
   if (n == null || !Number.isFinite(n)) return "—";
   return `${n.toFixed(1)}°`;
@@ -41,9 +54,8 @@ function StarBody({ object, enrichment, loading }) {
   const subtitle = [enrichment?.designation, enrichment?.catalog_ids?.[0]]
     .filter(Boolean)
     .join(" · ");
-  const sourceLine = enrichment?.sources?.length
-    ? enrichment.sources.join(" · ")
-    : object.source;
+  // Position/photometry catalog first, then whoever supplied names and planets.
+  const sourceLine = [object.source, ...(enrichment?.sources ?? [])].join(" · ");
 
   return (
     <>
@@ -59,17 +71,23 @@ function StarBody({ object, enrichment, loading }) {
           <>
             <p className="text-ink-dim text-[11px] uppercase tracking-[0.18em]">Star</p>
             <p className="font-mono text-[11px] text-ink-dim mt-0.5 break-all">
-              Gaia DR3 · {object.source_id}
+              {catalogLabel(object)}
             </p>
           </>
         )}
       </div>
       <div className="border-t border-rule/60 pt-2 pb-2">
-        <Row label="Magnitude" value={formatNumber(object.magnitude, 2)} />
+        <Row
+          label="Magnitude"
+          value={formatPhotometry(object.magnitude, object.magnitude_source)}
+        />
         {enrichment?.spectral_type && (
           <Row label="Spectral type" value={enrichment.spectral_type} />
         )}
-        <Row label="Color index" value={formatNumber(object.bp_rp, 2)} />
+        <Row
+          label="Color index"
+          value={formatPhotometry(object.bp_rp, object.color_source)}
+        />
         <Row label="Distance" value={formatLy(object.distance_ly)} />
         <Row label="Altitude" value={formatDeg(object.alt)} />
         <Row label="Azimuth" value={formatDeg(object.az)} />

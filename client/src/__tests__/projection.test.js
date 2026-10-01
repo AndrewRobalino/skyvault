@@ -62,6 +62,17 @@ describe("projectAltAz", () => {
 });
 
 describe("projectStars", () => {
+  it("passes photometry provenance through for Hipparcos stars", () => {
+    const [star] = projectStars(
+      [{ source_id: "hip:32349", alt: 45, az: 90, magnitude: -1.49,
+         source: "ESA Hipparcos", magnitude_source: "derived-m", color_source: "derived-c" }],
+      800, 450,
+    );
+    expect(star.source).toBe("ESA Hipparcos");
+    expect(star.magnitude_source).toBe("derived-m");
+    expect(star.color_source).toBe("derived-c");
+  });
+
   it("returns empty array for empty input", () => {
     expect(projectStars([], 800, 450)).toEqual([]);
   });

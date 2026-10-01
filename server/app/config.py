@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     gaia_mag_cutoff: float = 9.0
     gaia_parquet_path: Path = DATA_DIR / "gaia_dr3_g9.parquet"
 
+    # Bright-star supplement — the stars Gaia DR3 saturates on
+    # (produced once via scripts/ingest_bright_stars.py)
+    bright_stars_parquet_path: Path = DATA_DIR / "bright_stars.parquet"
+
     # JPL DE421 planetary ephemeris (downloaded once via download_ephemeris.py)
     ephemeris_kernel_path: Path = DATA_DIR / "de421.bsp"
 
