@@ -1895,3 +1895,32 @@ No code. Claude walks Andrew through it live, one step at a time, and verifies e
   - §8.1 → T6/T13; §8.2-8.3 → T15; §9.1 is a runbook (no code); §9.2 → T14.5; §10 → T14; §11 → task order.
   - §12 open items → T5 (wheels, memory), T14.2 (spend cap), T15.2 (XFF), T11 (quality).
 - **Review Focus** items map to: #1 T3 + T15.2; #2 T1 (preload) + T8 (slow); #3 T1 test + T6; #4 T4 test; #5 T8 test.
+
+---
+
+## Render pivot (2026-10-02) — replaces Tasks 13–15's Google Cloud parts
+
+Spec: see "Amendment 2026-10-02" at the end of the spec. Tasks 1–12 and the final-review fixes stand.
+
+### Task R1: Cold-start copy + smoke-test timeout for Render
+- Modify `client/src/components/hero/SkyStatusOverlay.jsx`: waking-up line says the first load "can take up to a minute". Test: `SkyStatusOverlay.test.jsx` asserts `/up to a minute/i` (RED first).
+- Modify `server/scripts/smoke_test_live.py`: timeout 60 → 150 s so a cold Render start doesn't fail the smoke test.
+
+### Task R2: Render Blueprint, workflows, remove GCP files
+- Create `render.yaml` (service `skyvault-api`, web, docker, free, virginia, `dockerfilePath: ./server/Dockerfile`, `dockerContext: ./server`, `healthCheckPath: /health`, `autoDeployTrigger: checksPass`, `branch: main`, env vars from the old `deploy/cloudrun.env.yaml`).
+- Create `.github/workflows/rebuild.yml` (monthly + manual: POST to `secrets.RENDER_DEPLOY_HOOK`) and `.github/workflows/smoke.yml` (on `deployment_status` success + manual: run `smoke_test_live.py` against `vars.RENDER_API_URL --origin https://skyvault.pages.dev`).
+- Delete `deploy/` and `.github/workflows/deploy.yml`.
+- Verify: YAML parses; the Render spec fields match https://render.com/docs/blueprint-spec.
+
+### Task R3: Docs
+- CLAUDE.md: Phase 5 status and guardrail #29 (Render free, no card; checksPass; deploy hook; additive API changes; browser calls the API directly). README deployment section.
+
+### Task R4 (Andrew, ~15 min, no card anywhere)
+1. Merge PR #7 (CI green).
+2. render.com, sign in with GitHub, **New → Blueprint**, pick `AndrewRobalino/skyvault`, branch `main`, apply. Copy the service URL. In the service settings, copy the **Deploy Hook** URL.
+3. GitHub repo, Settings → Secrets and variables → Actions: secret `RENDER_DEPLOY_HOOK`, variable `RENDER_API_URL`.
+4. Cloudflare (sign up free), Workers & Pages → Pages → connect `AndrewRobalino/skyvault`. Project name `skyvault`, production branch `main`, root `client`, build `npm run build`, output `dist`, env `NODE_VERSION=22`, `VITE_API_BASE=<Render URL>/api/v1` (Production and Preview).
+5. Branch protection on `main`: require CI `backend` + `frontend`.
+
+### Task 15 (unchanged intent)
+Live smoke test, verify X-Forwarded-For position on Render, measurements, phone check, docs: README live link.

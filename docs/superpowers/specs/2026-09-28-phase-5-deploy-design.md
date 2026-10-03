@@ -303,3 +303,17 @@ Cost: key handling in the Worker, a second deploy target, and about a day of wor
 - Cloud Run 429 behaviour: <https://github.com/ahmetb/cloud-run-faq/issues/54>
 - Vercel limits and fair use: <https://vercel.com/docs/limits>, <https://vercel.com/docs/limits/fair-use-guidelines>
 - Cloudflare Pages limits and plans: <https://developers.cloudflare.com/pages/platform/limits/>, <https://www.cloudflare.com/plans/developer-platform/>
+
+---
+
+## Amendment 2026-10-02: backend on Render free, not Cloud Run (Andrew's decision)
+
+Andrew will not attach any payment method, so Google Cloud (which requires a billing account even inside the free tier) is out. Decided: **backend on Render's free web service**, frontend unchanged on Cloudflare Pages.
+
+- **No card ever.** Render's documented behavior with no payment method is to *suspend* free services for the rest of the month when a limit is hit, never to bill. This replaces the whole cost model of §5 (spend cap, kill switch, virtual card): with nothing linked, nothing can be charged.
+- **Limits (verified 2026-10-02):** 512 MB / 0.1 CPU; spins down after 15 min idle, ~1 min to wake; 750 instance-hours/month (one service always fits); **5 GB/month bandwidth** (~14k gzipped sky loads), then suspension until the next month.
+- **Speed traded away:** ~1.5–2 s per sky warm (vs ~0.2 s on Cloud Run) and a ~1 min cold start. The wake-up ping and "waking up" message now say "up to a minute".
+- **Deploy:** `render.yaml` Blueprint (Docker, `server/Dockerfile`, `healthCheckPath: /health`, `autoDeployTrigger: checksPass` so only green `main` commits ship). Render's health check keeps the previous version serving if a new one fails to boot. Monthly rebuild for fresh IERS data = a scheduled GitHub Action calling Render's deploy hook (stored as a GitHub secret). Post-deploy smoke test runs from Actions against the live URL.
+- **Removed:** `deploy/gcp_setup.sh`, `deploy/kill_switch/`, `deploy/ar-cleanup-policy.json`, `deploy/cloudrun.env.yaml`, `.github/workflows/deploy.yml` (recoverable from git history if SkyVault ever moves to Cloud Run).
+- **Unchanged:** rate limits (they now protect the 5 GB bandwidth), gzip/rounding, CORS, offline IERS, the container, every frontend change.
+- **To verify live:** the X-Forwarded-For position on Render (plan Task 15 step 2 still applies).
