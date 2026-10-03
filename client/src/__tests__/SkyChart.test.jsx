@@ -399,6 +399,41 @@ describe("<SkyChart>", () => {
     expect(screen.getByRole("button", { name: /save image/i })).toBeEnabled();
   });
 
+  it("a phone-sized chart draws only the stars that keep laptop density", () => {
+    // 340x340 chart: magnitude limit ~5.8, so a mag-6.3 star is not drawn or
+    // hit-testable while a mag-3 star still is.
+    class SmallRO {
+      constructor(cb) { this.cb = cb; }
+      observe(el) { this.cb([{ target: el, contentRect: { width: 340, height: 340 } }]); }
+      disconnect() {}
+    }
+    global.ResizeObserver = SmallRO;
+    useObserverStore.getState().useCurrentLocation(25.76, -80.19, "Miami, FL");
+    useSky.mockReturnValue(
+      mockQuery({
+        data: {
+          observer: {},
+          count: 2,
+          stars: [
+            { source_id: "faint", ra: 0, dec: 0, alt: 90, az: 0, magnitude: 6.3, bp_rp: 0 },
+            { source_id: "bright", ra: 0, dec: 0, alt: 45, az: 180, magnitude: 3.0, bp_rp: 0 },
+          ],
+        },
+      })
+    );
+    usePlanets.mockReturnValue(mockQuery({ data: { observer: {}, planets: [], count: 0 } }));
+    useDso.mockReturnValue(mockQuery({ data: { observer: {}, dsos: [], count: 0 } }));
+    const { container } = renderWithProviders(<SkyChart />);
+    act(() => { vi.advanceTimersByTime(200); });
+    const root = container.querySelector("[role='img']");
+    root.getBoundingClientRect = () => ({ left: 0, top: 0, right: 340, bottom: 340, width: 340, height: 340 });
+    fireEvent.click(root, { clientX: 170, clientY: 170 }); // zenith: the faint star
+    expect(screen.queryByText(/Gaia DR3 · faint/)).not.toBeInTheDocument();
+    // alt 45, az 180 projects to (170, 170 + tan(22.5deg) * 170) = (170, 240.4)
+    fireEvent.click(root, { clientX: 170, clientY: 240 });
+    expect(screen.getByText(/Gaia DR3 · bright/)).toBeInTheDocument();
+  });
+
   it("Escape keypress clears an active selection", () => {
     useObserverStore.getState().useCurrentLocation(25.76, -80.19, "Miami, FL");
     useSky.mockReturnValue(

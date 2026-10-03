@@ -6,13 +6,16 @@ export default function HeroRegion() {
     <section
       className="
         relative w-full overflow-hidden border border-rule
-        h-[min(56.25vw,calc(100vh-14rem))]
-        min-h-[260px]
+        aspect-square
+        md:aspect-auto md:h-[min(56.25vw,calc(100vh-14rem))] md:min-h-[260px]
       "
     >
+      {/* Phones: a full-width square, so the horizon circle fills the box and
+          the corners (below the horizon) hold the buttons and credits. */}
       <SkyChart />
 
-      <div className="absolute bottom-4 right-4 z-10 pointer-events-auto">
+      {/* A disabled placeholder; on phones it would cover a quarter of the sky. */}
+      <div className="absolute bottom-4 right-4 z-10 pointer-events-auto hidden md:block">
         <ExploreIn3DButton />
       </div>
     </section>

@@ -53,7 +53,7 @@ export default function ControlsStrip() {
   const isComputing = sky.isFetching || planets.isFetching;
 
   return (
-    <section className="controls-strip border border-rule bg-[color:var(--bg-panel)] backdrop-blur-sm p-6">
+    <section className="controls-strip border border-rule bg-[color:var(--bg-panel)] backdrop-blur-sm p-4 md:p-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:gap-4">
         <LocationInput />
         <UseMyLocationButton />

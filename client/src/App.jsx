@@ -37,7 +37,7 @@ export default function App() {
       <IntroSequence>
         <FrameContainer>
           <Header />
-          <main className="space-y-10">
+          <main className="space-y-6 md:space-y-10">
             <HeroRegion />
             <ControlsStrip />
             <InfoPanelsGrid />
