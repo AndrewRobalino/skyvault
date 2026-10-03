@@ -77,3 +77,26 @@ def test_missing_bright_parquet_raises_actionable_error(two_catalogs, monkeypatc
     with pytest.raises(star_catalog.CatalogNotIngestedError) as exc:
         star_catalog.get_catalog()
     assert "ingest_bright_stars" in str(exc.value)
+
+
+def test_concurrent_first_requests_load_the_catalog_once(two_catalogs, monkeypatch):
+    # Routes run in FastAPI's threadpool, so two cold requests can race into
+    # get_catalog(). Each load is a full parquet read; only one should happen.
+    import threading
+    import time
+
+    calls = []
+    real_load = star_catalog._load_catalog
+
+    def slow_load(path):
+        calls.append(path)
+        time.sleep(0.2)
+        return real_load(path)
+
+    monkeypatch.setattr(star_catalog, "_load_catalog", slow_load)
+    threads = [threading.Thread(target=star_catalog.get_catalog) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert len(calls) == 1

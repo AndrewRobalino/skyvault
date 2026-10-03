@@ -1,0 +1,7 @@
+# Tests + the offline ingest scripts (scripts/ingest_*.py). Not installed in
+# the production image.
+-r requirements.txt
+pytest==9.0.3
+pytest-asyncio==1.3.0
+# SIMBAD / VizieR / NASA Exoplanet Archive clients, used only at bake time.
+astroquery==0.4.11

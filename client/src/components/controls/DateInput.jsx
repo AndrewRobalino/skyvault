@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useObserverStore } from "../../stores/observerStore.js";
+import { DATE_MAX, DATE_MIN, isSupportedDate } from "../../utils/formatDatetime.js";
 
 function todayIso() {
   const d = new Date();
@@ -10,7 +11,9 @@ function todayIso() {
 }
 
 export default function DateInput() {
-  const { date, setDate } = useObserverStore();
+  const date = useObserverStore((s) => s.date);
+  const setDate = useObserverStore((s) => s.setDate);
+  const outOfRange = Boolean(date) && !isSupportedDate(date);
 
   useEffect(() => {
     if (!date) setDate(todayIso());
@@ -23,12 +26,18 @@ export default function DateInput() {
       </label>
       <input
         type="date"
-        min="1900-01-01"
-        max="2100-12-31"
+        min={DATE_MIN}
+        max={DATE_MAX}
+        aria-invalid={outOfRange}
         value={date}
         onChange={(e) => setDate(e.target.value)}
         className="border border-rule bg-bg/60 px-3 py-3 font-mono text-sm text-ink focus:border-accent focus:outline-none"
       />
+      {outOfRange && (
+        <p role="alert" className="mt-1 font-mono text-[10px] uppercase tracking-widest text-danger">
+          Dates {DATE_MIN} to {DATE_MAX} (JPL DE421)
+        </p>
+      )}
     </div>
   );
 }

@@ -6,18 +6,21 @@
 
 Built with React, Vite, Canvas 2D + WebGL, FastAPI, and Astropy.
 
+## Features
+
+- **Real sky, any place and moment (1900 to 2053).** Search a place or use GPS, pick a date and time (in the place's own local time, or UTC), and get the visible sky computed server-side by Astropy: ICRS to AltAz with proper motion propagated from each star's catalog epoch.
+- **Stars** from ESA Gaia DR3 down to naked-eye magnitude 6.5, with ESA Hipparcos for the brightest stars Gaia saturates on.
+- **Sun, Moon and planets** from NASA JPL DE421, with lunar phase and apparent-size scaling.
+- **Deep-sky objects, constellation figures, and star enrichment** (IAU names, spectral types, confirmed exoplanet hosts), all baked at ingest so the request path makes no external calls.
+- **Milky Way backdrop** projected through the same stereographic chart in a WebGL shader, numerically verified against Astropy (worst error 0.375°).
+
 ## Status
 
-✅ Phase 1 — Foundation
-✅ Phase 2a — Frontend Foundation
-✅ Phase 2b — 2D Sky Chart (Canvas 2D)
-🚧 Phase 2c — Visual Polish + Milky Way Backdrop (in progress)
-
-See [`SKYVAULT_ROADMAP.md`](./SKYVAULT_ROADMAP.md) for the full phase breakdown.
+Phases 1 to 3b plus the bright-star supplement are built and tested. Next is Phase 5, the public launch (Cloud Run + Cloudflare Pages). The Three.js "Explore in 3D" mode (Phase 4) comes after launch. See [`SKYVAULT_ROADMAP.md`](./SKYVAULT_ROADMAP.md) for the full phase breakdown.
 
 ## Data Sources
 
-SkyVault uses real, attributed institutional data sources. No values are faked or approximated.
+SkyVault uses real, attributed institutional data sources. No values are faked. The few modelling approximations (no atmospheric refraction, for example) are documented in [`CLAUDE.md`](./CLAUDE.md), and transformed photometry is labelled "derived" in the UI. The app's footer carries the full credits list.
 
 | Source | Provides | Institution | License |
 |---|---|---|---|
@@ -31,6 +34,9 @@ SkyVault uses real, attributed institutional data sources. No values are faked o
 | **NASA Exoplanet Archive** | Confirmed exoplanets and host stars, cross-matched to Gaia DR3 source ids and baked into the star enrichment catalog | NASA / IPAC | Public domain |
 | **CDS SIMBAD** | Canonical object metadata — Bayer/Flamsteed designations, proper names where the IAU list has none, HD/HIP ids, spectral and object types for naked-eye stars, plus DSO metadata | CDS Strasbourg | Free for academic / non-commercial use |
 | **ESO/S. Brunier panorama** (eso0932a) | All-sky Milky Way backdrop image (galactic equirectangular, 4000×2000) | ESO / Serge Brunier (GigaGalaxy Zoom Project) | CC BY 4.0 |
+| **Solar System Scope textures** | Planet and Moon images in the tooltips and lunar panel | INOVE / Solar System Scope | CC BY 4.0 |
+| **OpenStreetMap** via Photon and Nominatim | Place search | © OpenStreetMap contributors | ODbL |
+| **timezone-boundary-builder** via `timezonefinder` | The IANA time zone of the searched place, so "Local" time is that place's | © OpenStreetMap contributors | ODbL |
 
 The Milky Way panorama is © ESO/S. Brunier from the GigaGalaxy Zoom Project,
 licensed under [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/).
@@ -49,7 +55,37 @@ skyvault/
 
 ## Getting Started
 
-Phase 1 setup instructions will land here as the backend scaffold comes up. For now, see [`CLAUDE.md`](./CLAUDE.md) for the full project context and [`SKYVAULT_ROADMAP.md`](./SKYVAULT_ROADMAP.md) for the plan.
+**Backend** (Python 3.11+, developed on 3.14):
+
+```bash
+cd server
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv/Scripts/activate
+pip install -r requirements-dev.txt # runtime deps + pytest + astroquery for the ingest scripts
+python scripts/download_ephemeris.py   # JPL DE421 kernel from NASA NAIF (~17 MB)
+python scripts/ingest_gaia.py          # Gaia DR3 subset, G < 9 (one-time TAP query)
+uvicorn app.main:app --reload --port 8000
+pytest                                 # add -m network for the live-service tests
+```
+
+The other catalogs (bright-star supplement, star enrichment, DSOs, constellations) are committed under `server/data/`.
+
+**Frontend** (Node 20+):
+
+```bash
+cd client
+npm install
+npm run dev     # http://localhost:5173, proxies /api to :8000
+npm test
+```
+
+See [`CLAUDE.md`](./CLAUDE.md) for architecture, conventions, and the accuracy guardrails.
+
+## Deployment
+
+- **API:** Render free web service, defined in [`render.yaml`](./render.yaml) (Docker image from `server/Dockerfile`). It deploys only after CI passes on `main`. The account has no payment method, so hitting a free-tier limit suspends the service; it can never bill.
+- **Frontend:** Cloudflare Pages builds `client/` with `VITE_API_BASE` pointing at the API.
+- **Merging a PR ships it.** A monthly rebuild refreshes the Earth-orientation data, and a post-deploy smoke test checks the live API.
 
 ## Author
 

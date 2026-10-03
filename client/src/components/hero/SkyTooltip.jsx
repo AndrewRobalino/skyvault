@@ -1,7 +1,14 @@
+import { useLayoutEffect, useRef } from "react";
 import { PLANET_TEXTURE_URLS } from "../../utils/drawing.js";
 
 const TOOLTIP_W = 240;
 const ANCHOR_OFFSET = 12;
+const EDGE = 4; // keep this much gap from the chart edge (it clips overflow)
+
+// Lower bound wins when the range is empty (tooltip taller than the chart).
+function clamp(v, lo, hi) {
+  return Math.max(lo, Math.min(v, hi));
+}
 
 function formatNumber(n, decimals) {
   if (n == null || !Number.isFinite(n)) return "—";
@@ -201,29 +208,49 @@ export default function SkyTooltip({
   enrichmentLoading,
   container,
 }) {
+  const ref = useRef(null);
+  const desiredTop = object ? object.y - ANCHOR_OFFSET : 0;
+
+  // Height is only known after layout (and changes as enrichment loads), so
+  // the vertical clamp is applied to the DOM node directly after each render.
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.top = `${clamp(desiredTop, EDGE, container.height - el.offsetHeight - EDGE)}px`;
+  });
+
   if (!object) return null;
 
-  const anchorX = object.x;
-  const anchorY = object.y;
-
-  let left = anchorX + ANCHOR_OFFSET;
-  let top = anchorY - ANCHOR_OFFSET;
-
-  if (left + TOOLTIP_W > container.width) {
-    left = anchorX - ANCHOR_OFFSET - TOOLTIP_W;
-  }
-  if (top < 0) top = 0;
+  const width = Math.min(TOOLTIP_W, container.width - 2 * EDGE);
+  const rightSide = object.x + ANCHOR_OFFSET;
+  const leftSide = object.x - ANCHOR_OFFSET - width;
+  const left = clamp(
+    rightSide + width <= container.width - EDGE ? rightSide : leftSide,
+    EDGE,
+    container.width - width - EDGE
+  );
+  const top = clamp(desiredTop, EDGE, container.height - EDGE);
 
   return (
     <div
+      ref={ref}
       role="dialog"
+      // The chart underneath hit-tests every click; reading the tooltip must
+      // not deselect the star or select whatever is behind it.
+      onClick={(e) => e.stopPropagation()}
       className="
         pointer-events-auto absolute z-20
         rounded-md border border-rule/60 bg-bg/95 backdrop-blur-sm
         p-3 shadow-lg
         animate-[fadeIn_120ms_ease-out]
       "
-      style={{ left, top, width: TOOLTIP_W }}
+      style={{
+        left,
+        top,
+        width,
+        maxHeight: container.height - 2 * EDGE,
+        overflowY: "auto",
+      }}
     >
       {object.kind === "star" && (
         <StarBody object={object} enrichment={enrichment} loading={enrichmentLoading} />

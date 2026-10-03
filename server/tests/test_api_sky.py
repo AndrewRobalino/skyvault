@@ -40,20 +40,22 @@ def test_sky_returns_stars_above_horizon_only_by_default():
         assert star["source"] in {"Gaia DR3", "ESA Hipparcos"}
 
 
-def test_sky_include_below_horizon_returns_more_stars():
-    above = client.get(
-        "/api/v1/sky", params={**MIAMI, "mag_limit": 6.5}
-    ).json()["count"]
-    full = client.get(
+def test_sky_never_returns_below_horizon_stars():
+    # The chart only draws the visible hemisphere. A full-sphere response is
+    # ~2x the payload for nothing, so the option is not offered.
+    body = client.get(
         "/api/v1/sky",
         params={**MIAMI, "mag_limit": 6.5, "include_below_horizon": True},
-    ).json()["count"]
+    ).json()
+    assert body["count"] > 0
+    assert all(star["alt"] >= 0.0 for star in body["stars"])
 
-    # Roughly half the sky is always below horizon, so the full-sky count
-    # should be strictly larger.
-    assert full > above
-    # And the ratio should be reasonable — not 10x, not 1.01x.
-    assert 1.5 < full / above < 3.0
+
+def test_sky_rejects_mag_limit_fainter_than_naked_eye():
+    # mag 9 + full sky was a 58 MB, ~770 MiB-peak request: enough to OOM a
+    # 512 MiB container with one unauthenticated GET.
+    response = client.get("/api/v1/sky", params={**MIAMI, "mag_limit": 9.0})
+    assert response.status_code == 422
 
 
 def test_sky_mag_limit_reduces_star_count():
@@ -111,3 +113,27 @@ def test_sky_includes_the_bright_stars_gaia_saturates_on():
         assert by_id[hip]["source"] == "ESA Hipparcos"
         assert "Riello" in by_id[hip]["magnitude_source"]
     assert by_id["hip:32349"]["magnitude"] == min(s["magnitude"] for s in body["stars"])
+
+
+def _decimals(x: float) -> int:
+    s = repr(float(x))
+    return len(s.split(".")[1]) if "." in s and "e" not in s else 0
+
+
+def test_sky_numbers_are_rounded_for_transport():
+    # 0.00001 deg = 0.04": far below the pipeline's real error budget (no
+    # refraction alone is ~0.5 deg). Cuts the payload with no visible change.
+    body = client.get("/api/v1/sky", params={**MIAMI, "mag_limit": 6.5}).json()
+    for star in body["stars"][:200]:
+        for key in ("ra", "dec", "alt", "az"):
+            assert _decimals(star[key]) <= 5, (key, star[key])
+        assert _decimals(star["magnitude"]) <= 3
+        if star["distance_ly"] is not None:
+            assert _decimals(star["distance_ly"]) <= 2
+
+
+def test_sky_response_is_gzipped():
+    response = client.get(
+        "/api/v1/sky", params={**MIAMI, "mag_limit": 6.5}, headers={"Accept-Encoding": "gzip"}
+    )
+    assert response.headers.get("content-encoding") == "gzip"

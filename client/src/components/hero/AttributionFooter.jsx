@@ -1,32 +1,26 @@
 /**
- * Persistent attribution badge for the sky chart.
+ * On-chart attribution.
  *
  * LICENSE NOTICE: The Milky Way panorama (eso0932a, GigaGalaxy Zoom Project)
- * is © ESO/S. Brunier, licensed under CC BY 4.0. Attribution is required
- * wherever the image is displayed. The short on-chart credit lives here;
- * the long-form credit + license URL goes on /about.
- *
- * See: ~/.claude/projects/.../memory/skyvault_eso_license.md
+ * is © ESO/S. Brunier, licensed under CC BY 4.0, and is credited on the
+ * image itself. Everything else is credited in the page footer's full list
+ * (#credits, see layout/Footer.jsx); this badge links there. It used to list
+ * all seven sources here, which covered a large part of a phone-sized chart.
  */
 export default function AttributionFooter() {
   return (
     <div
-      className="absolute bottom-2 left-3 pointer-events-none select-none"
-      style={{
-        fontSize: "10px",
-        color: "rgba(255, 255, 255, 0.5)",
-        letterSpacing: "0.03em",
-        lineHeight: 1.4,
-        textAlign: "left",
-      }}
+      className="absolute bottom-2 left-3 select-none text-[10px] leading-snug tracking-[0.03em] text-white/50"
     >
       <div>Milky Way: ESO/S. Brunier · CC BY 4.0</div>
-      <div>Stars: ESA Gaia DR3 + ESA Hipparcos · Planets: NASA JPL DE421</div>
-      <div>Planet &amp; Moon textures: Solar System Scope · CC BY 4.0</div>
-      <div>Star names: IAU WGSN · CC BY</div>
-      <div>DSO &amp; star data: SIMBAD/CDS</div>
-      <div>Exoplanets: NASA Exoplanet Archive</div>
-      <div>Constellation figures: Stellarium · CC BY-SA</div>
+      <a
+        href="#credits"
+        // The chart underneath hit-tests every click.
+        onClick={(e) => e.stopPropagation()}
+        className="underline decoration-white/30 underline-offset-2 hover:text-white/80"
+      >
+        Data credits
+      </a>
     </div>
   );
 }

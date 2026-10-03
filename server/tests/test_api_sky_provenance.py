@@ -18,8 +18,7 @@ from app.services import star_catalog
 client = TestClient(app)
 
 # Near the zenith for this observer, so both survive the horizon cull.
-MIAMI = {"lat": 25.76, "lon": -80.19, "datetime": "2026-01-15T02:00:00Z",
-         "include_below_horizon": True}
+MIAMI = {"lat": 25.76, "lon": -80.19, "datetime": "2026-01-15T02:00:00Z"}
 
 
 @pytest.fixture

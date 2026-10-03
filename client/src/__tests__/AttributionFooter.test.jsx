@@ -1,54 +1,35 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { render, cleanup, screen } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { render, cleanup, screen, fireEvent } from "@testing-library/react";
 import AttributionFooter from "../components/hero/AttributionFooter.jsx";
 
-describe("AttributionFooter", () => {
+// The on-chart credit is deliberately short (7 lines covered a phone-sized
+// chart). The full list lives in the page footer (#credits), see Footer.test.
+describe("AttributionFooter (on-chart)", () => {
   beforeEach(() => cleanup());
 
-  it("includes Milky Way panorama attribution (CC BY 4.0 — license-critical)", () => {
+  it("keeps the Milky Way credit on the image itself (CC BY 4.0, license-critical)", () => {
     render(<AttributionFooter />);
-    expect(screen.getByText(/Brunier/i)).toBeTruthy();
-    expect(screen.getAllByText(/CC BY 4\.0/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Milky Way: ESO\/S\. Brunier · CC BY 4\.0/)).toBeInTheDocument();
   });
 
-  it("includes ESA Gaia DR3 attribution", () => {
+  it("links to the full data credits", () => {
     render(<AttributionFooter />);
-    expect(screen.getByText(/Gaia DR3/i)).toBeTruthy();
+    expect(screen.getByRole("link", { name: /data credits/i })).toHaveAttribute("href", "#credits");
   });
 
-  it("includes NASA JPL attribution", () => {
-    render(<AttributionFooter />);
-    expect(screen.getByText(/JPL/i)).toBeTruthy();
-  });
-
-  it("credits Solar System Scope for planet/moon textures", () => {
-    render(<AttributionFooter />);
-    expect(screen.getByText(/Solar System Scope/)).toBeInTheDocument();
-  });
-
-  it("credits SIMBAD/CDS for DSO data", () => {
-    render(<AttributionFooter />);
-    expect(screen.getByText(/SIMBAD\/CDS/)).toBeInTheDocument();
+  it("clicking the credits link does not reach the chart's hit-test", () => {
+    const onChartClick = vi.fn();
+    render(
+      <div onClick={onChartClick}>
+        <AttributionFooter />
+      </div>
+    );
+    fireEvent.click(screen.getByRole("link", { name: /data credits/i }));
+    expect(onChartClick).not.toHaveBeenCalled();
   });
 
   it("renders inside an absolute-positioned container", () => {
     const { container } = render(<AttributionFooter />);
-    const root = container.firstChild;
-    expect(root.className).toMatch(/absolute/);
-  });
-
-  it("credits ESA Hipparcos for the bright stars Gaia saturates on", () => {
-    render(<AttributionFooter />);
-    expect(screen.getByText(/Gaia DR3 \+ ESA Hipparcos/)).toBeInTheDocument();
-  });
-
-  it("credits the IAU WGSN for star names (CC BY — attribution required)", () => {
-    render(<AttributionFooter />);
-    expect(screen.getByText(/Star names: IAU WGSN · CC BY/)).toBeInTheDocument();
-  });
-
-  it("credits the constellation figure source", () => {
-    render(<AttributionFooter />);
-    expect(screen.getByText(/Constellation figures: Stellarium · CC BY-SA/)).toBeInTheDocument();
+    expect(container.firstChild.className).toMatch(/absolute/);
   });
 });

@@ -1,7 +1,7 @@
 """GET /api/v1/sky — visible stars for an observer, date, and location.
 
 Pipeline: Gaia catalog magnitude filter -> ICRS->AltAz transform (with J2016.0
-proper-motion correction) -> optional below-horizon cull -> Pydantic response.
+proper-motion correction) -> below-horizon cull -> Pydantic response.
 """
 
 from __future__ import annotations
@@ -18,6 +18,12 @@ from app.services.time_utils import InvalidObservationTimeError
 
 
 router = APIRouter(prefix="/sky", tags=["sky"])
+
+# Naked-eye limit. Fainter limits (the catalog goes to G 9) multiply the
+# payload and memory: mag 9 over the full sky was a 58 MB response peaking at
+# ~770 MiB, enough for one GET to OOM a 512 MiB container. The chart only ever
+# asks for 6.5 over the visible hemisphere, so that is all /sky serves.
+MAX_MAG_LIMIT = 6.5
 
 
 def _safe(value) -> float | None:
@@ -42,6 +48,10 @@ def _safe_str(value) -> str | None:
     return value if isinstance(value, str) else None
 
 
+def _round(value: float | None, digits: int) -> float | None:
+    return None if value is None else round(value, digits)
+
+
 def _distance_ly(parallax_mas: float | None) -> float | None:
     """Convert Gaia parallax (mas) to distance in light-years."""
     if parallax_mas is None or parallax_mas <= 0:
@@ -51,19 +61,15 @@ def _distance_ly(parallax_mas: float | None) -> float | None:
 
 
 @router.get("", response_model=SkyResponse)
-async def get_sky(
+def get_sky(
     lat: float = Query(..., ge=-90.0, le=90.0, description="Observer latitude (deg)"),
     lon: float = Query(..., ge=-180.0, le=180.0, description="Observer longitude (deg)"),
     datetime: str = Query(..., description="Observation time, ISO 8601 UTC"),
     mag_limit: float = Query(
         settings.default_mag_limit,
         ge=-2.0,
-        le=9.0,
-        description="Maximum apparent G magnitude to include",
-    ),
-    include_below_horizon: bool = Query(
-        False,
-        description="If true, include stars below the horizon in the response.",
+        le=MAX_MAG_LIMIT,
+        description="Maximum apparent G magnitude to include (naked-eye limit 6.5)",
     ),
 ) -> SkyResponse:
     # Magnitude filter first (pure in-memory pandas), then AltAz transform.
@@ -78,7 +84,7 @@ async def get_sky(
             observer_lat=lat,
             observer_lon=lon,
             observer_time=datetime,
-            horizon_only=not include_below_horizon,
+            horizon_only=True,
         )
     except InvalidObservationTimeError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -97,15 +103,17 @@ async def get_sky(
         Star(
             # Gaia ids arrive as int64 or str, Hipparcos ids as "hip:<n>".
             source_id=str(rec["source_id"]),
-            ra=float(rec["ra"]),
-            dec=float(rec["dec"]),
-            alt=float(rec["alt"]),
-            az=float(rec["az"]),
-            magnitude=float(rec["phot_g_mean_mag"]),
-            bp_rp=_safe(rec.get("bp_rp")),
-            parallax_mas=_safe(rec.get("parallax")),
-            distance_ly=_safe(distance_ly[i]),
-            teff_k=_safe(rec.get("teff_gspphot")),
+            # Rounded for transport: 1e-5 deg = 0.04", far below the pipeline's
+            # error budget (no refraction alone is ~0.5 deg).
+            ra=round(float(rec["ra"]), 5),
+            dec=round(float(rec["dec"]), 5),
+            alt=round(float(rec["alt"]), 5),
+            az=round(float(rec["az"]), 5),
+            magnitude=round(float(rec["phot_g_mean_mag"]), 3),
+            bp_rp=_round(_safe(rec.get("bp_rp")), 3),
+            parallax_mas=_round(_safe(rec.get("parallax")), 3),
+            distance_ly=_round(_safe(distance_ly[i]), 2),
+            teff_k=_round(_safe(rec.get("teff_gspphot")), 0),
             source=_safe_str(rec.get("source")) or "Gaia DR3",
             magnitude_source=_safe_str(rec.get("magnitude_source")),
             color_source=_safe_str(rec.get("color_source")),

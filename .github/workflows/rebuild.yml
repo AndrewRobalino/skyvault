@@ -1,0 +1,22 @@
+name: Monthly rebuild
+
+# Rebuilds the API image so it picks up a fresh astropy-iers-data
+# (Earth-orientation predictions; Phase 5 plan amendment 1).
+on:
+  schedule:
+    - cron: "17 6 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger the Render deploy hook
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          test -n "$HOOK" || { echo "RENDER_DEPLOY_HOOK secret is not set"; exit 1; }
+          curl -fsS -X POST "$HOOK" > /dev/null

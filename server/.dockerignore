@@ -1,0 +1,10 @@
+.venv
+.pytest_cache
+**/__pycache__
+tests
+data/sources
+data/de421.bsp
+scripts/*
+!scripts/__init__.py
+!scripts/download_ephemeris.py
+.env

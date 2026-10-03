@@ -34,7 +34,7 @@ export default function LunarPanel({ query }) {
   if (!moon) {
     return (
       <Panel title="Lunar Conditions">
-        <p className="font-serif italic text-ink-dim">Moon below horizon</p>
+        <p className="font-serif italic text-ink-dim">Lunar data unavailable</p>
       </Panel>
     );
   }
@@ -67,6 +67,11 @@ export default function LunarPanel({ query }) {
           <p className="font-mono text-sm text-ink-dim">
             Azimuth: <span className="text-ink">{moon.az.toFixed(1)}°</span>
           </p>
+          {moon.alt < 0 && (
+            <p className="font-serif italic text-sm text-ink-dim">
+              Currently below the horizon
+            </p>
+          )}
         </div>
       </div>
       <div className="mt-4">

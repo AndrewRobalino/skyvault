@@ -9,7 +9,6 @@ describe("useIdle", () => {
     useUiStateStore.setState({
       introState: "done",
       activityState: "normal",
-      lastActivityAt: Date.now(),
     });
   });
 
@@ -25,13 +24,15 @@ describe("useIdle", () => {
     expect(useUiStateStore.getState().activityState).toBe("glass");
   });
 
-  it("transitions glass -> hidden after 5 more seconds", () => {
+  it("never goes past glass, however long the user is idle", () => {
+    // Reading a panel IS idle. Fading the UI to nothing made the lunar panel
+    // vanish mid-read; idle now only dims.
     renderHook(() => useIdle({ enabled: true }));
     act(() => {
       vi.advanceTimersByTime(15_500);
-      vi.advanceTimersByTime(5_500);
+      vi.advanceTimersByTime(120_000);
     });
-    expect(useUiStateStore.getState().activityState).toBe("hidden");
+    expect(useUiStateStore.getState().activityState).toBe("glass");
   });
 
   it("mouse activity resets state to normal", () => {

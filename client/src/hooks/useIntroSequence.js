@@ -10,8 +10,10 @@ import { useUiStateStore } from "../stores/uiStateStore.js";
  * can read it from `useUiStateStore`.
  */
 export function useIntroSequence() {
-  const { introState, setIntroState, setReducedMotion, markGlass, markActive } =
-    useUiStateStore();
+  const introState = useUiStateStore((s) => s.introState);
+  const setIntroState = useUiStateStore((s) => s.setIntroState);
+  const setReducedMotion = useUiStateStore((s) => s.setReducedMotion);
+  const markGlass = useUiStateStore((s) => s.markGlass);
 
   // Effect 1: decide whether to play or skip (runs once when pending)
   useEffect(() => {
@@ -21,7 +23,7 @@ export function useIntroSequence() {
     setReducedMotion(mql.matches);
 
     setIntroState("playing");
-  }, [introState, setIntroState, setReducedMotion, markActive, markGlass]);
+  }, [introState, setIntroState, setReducedMotion]);
 
   // Effect 2: run the timer while playing (cleanup only fires when
   // introState leaves "playing", not when it enters it)

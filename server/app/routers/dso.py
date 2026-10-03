@@ -13,7 +13,7 @@ router = APIRouter(prefix="/dso", tags=["dso"])
 
 
 @router.get("", response_model=DsoResponse)
-async def get_dsos(
+def get_dsos(
     lat: float = Query(..., ge=-90.0, le=90.0, description="Observer latitude (deg)"),
     lon: float = Query(..., ge=-180.0, le=180.0, description="Observer longitude (deg)"),
     datetime: str = Query(..., description="Observation time, ISO 8601 UTC"),

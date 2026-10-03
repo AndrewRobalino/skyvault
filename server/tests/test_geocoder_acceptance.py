@@ -57,3 +57,10 @@ async def test_real_geocode_portoviejo_ecuador():
     assert result.count >= 1
     countries = {c.country for c in result.candidates if c.country}
     assert "Ecuador" in countries
+
+
+@pytest.fixture(autouse=True)
+def reset_nominatim_throttle():
+    geocoder._last_nominatim_call = float("-inf")
+    yield
+    geocoder._last_nominatim_call = float("-inf")

@@ -20,6 +20,9 @@ class GeocodeCandidate(BaseModel):
     osm_type: str | None = None
     osm_id: str | None = None
     place_type: str | None = None
+    timezone: str | None = Field(
+        None, description="IANA time zone at the point, e.g. 'America/Guayaquil'"
+    )
 
 
 class GeocodeResponse(BaseModel):

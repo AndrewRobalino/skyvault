@@ -65,3 +65,25 @@ def test_planets_every_body_has_required_fields():
     required = {"name", "alt", "az", "distance_au", "source"}
     for planet in body["planets"]:
         assert required <= set(planet.keys())
+
+
+# Astropy rightly warns that UTC before 1960 / after the IERS tables is
+# approximate; that is the point of these inputs.
+@pytest.mark.filterwarnings("ignore::erfa.ErfaWarning")
+@pytest.mark.filterwarnings("ignore::astropy.utils.exceptions.AstropyWarning")
+@pytest.mark.parametrize("when", ["2060-01-01T00:00:00Z", "1850-06-01T00:00:00Z"])
+def test_planets_outside_de421_coverage_is_a_clear_422(when):
+    # DE421 spans 1899-07-29 .. 2053-10-08. Outside it jplephem raises, which
+    # used to surface as a bare 500 the client could only "retry".
+    response = client.get("/api/v1/planets", params={**MIAMI, "datetime": when})
+    assert response.status_code == 422
+    assert "DE421" in response.json()["detail"]
+
+
+@pytest.mark.filterwarnings("ignore::erfa.ErfaWarning")
+@pytest.mark.filterwarnings("ignore::astropy.utils.exceptions.AstropyWarning")
+def test_planets_near_the_end_of_de421_coverage_still_work():
+    response = client.get(
+        "/api/v1/planets", params={**MIAMI, "datetime": "2053-10-01T00:00:00Z"}
+    )
+    assert response.status_code == 200

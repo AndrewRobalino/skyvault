@@ -13,12 +13,13 @@ import { useUiStateStore } from "../../stores/uiStateStore.js";
  *   .intro-pending    — black screen, content invisible
  *   .intro-playing    — galaxy + content fade-in animations running
  *   .intro-done       — final state
- *   .ui-normal/glass/hidden — driven by useIdle
+ *   .ui-normal/glass       — driven by useIdle
  */
 export default function IntroSequence({ children }) {
   useIntroSequence();
 
-  const { introState, activityState } = useUiStateStore();
+  const introState = useUiStateStore((s) => s.introState);
+  const activityState = useUiStateStore((s) => s.activityState);
 
   // Activate idle detection only after intro is done
   useIdle({ enabled: introState === "done" });
@@ -32,7 +33,7 @@ export default function IntroSequence({ children }) {
 
   useEffect(() => {
     const body = document.body;
-    body.classList.remove("ui-normal", "ui-glass", "ui-hidden");
+    body.classList.remove("ui-normal", "ui-glass");
     body.classList.add(`ui-${activityState}`);
   }, [activityState]);
 

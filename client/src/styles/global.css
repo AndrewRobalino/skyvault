@@ -40,14 +40,6 @@ body.ui-glass .hero {
   filter: blur(0) saturate(0.9);
   transition: opacity 600ms ease, filter 600ms ease;
 }
-body.ui-hidden .panel,
-body.ui-hidden .controls-strip,
-body.ui-hidden .header,
-body.ui-hidden .footer,
-body.ui-hidden .hero {
-  opacity: 0;
-  transition: opacity 800ms ease;
-}
 
 /* Intro animation keyframes */
 @keyframes galaxyFadeIn {

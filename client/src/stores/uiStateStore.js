@@ -5,25 +5,23 @@ import { create } from "zustand";
  * re-render semantic consumers.
  *
  *   introState   — "pending" | "playing" | "done"
- *   activityState — "normal" | "glass" | "hidden"
- *   lastActivityAt — epoch ms of the last meaningful user input
+ *   activityState — "normal" | "glass" (idle dims the chrome; it never hides it)
  *   prefersReducedMotion — reflects @media (prefers-reduced-motion: reduce)
  *   showConstellations — constellation overlay toggle (default off)
  */
 export const useUiStateStore = create((set) => ({
   introState: "pending",
   activityState: "normal",
-  lastActivityAt: Date.now(),
   prefersReducedMotion: false,
 
   setIntroState: (introState) => set({ introState }),
 
+  // Called on every mousemove: returning the same state object when nothing
+  // changes means Zustand notifies no one.
   markActive: () =>
-    set({ activityState: "normal", lastActivityAt: Date.now() }),
+    set((s) => (s.activityState === "normal" ? s : { activityState: "normal" })),
 
   markGlass: () => set({ activityState: "glass" }),
-
-  markHidden: () => set({ activityState: "hidden" }),
 
   setReducedMotion: (prefersReducedMotion) => set({ prefersReducedMotion }),
 
