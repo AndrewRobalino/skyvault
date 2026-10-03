@@ -376,3 +376,33 @@ describe("drawPlanet Moon (procedural icon)", () => {
     expect(cy).toBe(50);
   });
 });
+
+describe("marker scale (small charts look like a shrunk laptop chart)", () => {
+  const radii = (ctx) => ctx.arc.mock.calls.map((c) => c[2]);
+
+  it("drawStar scales the dot radius", () => {
+    const full = makeMockCtx();
+    const half = makeMockCtx();
+    drawStar(full, { x: 10, y: 10, magnitude: 4, bp_rp: 0.5, alt: 60 });
+    drawStar(half, { x: 10, y: 10, magnitude: 4, bp_rp: 0.5, alt: 60 }, 0.5);
+    expect(radii(half)[0]).toBeCloseTo(radii(full)[0] / 2, 6);
+  });
+
+  it("drawStar scales a bright star's glow halo", () => {
+    const full = makeMockCtx();
+    const half = makeMockCtx();
+    drawStar(full, { x: 10, y: 10, magnitude: -1.46, bp_rp: 0, alt: 60 });
+    drawStar(half, { x: 10, y: 10, magnitude: -1.46, bp_rp: 0, alt: 60 }, 0.5);
+    expect(radii(half)[0]).toBeCloseTo(radii(full)[0] / 2, 6);
+  });
+
+  it("drawPlanet shrinks planets but keeps them visible (>= 3 px across)", () => {
+    const ctx = makeMockCtx();
+    drawPlanet(ctx, { x: 10, y: 10, name: "Mercury", displaySize: 4 }, 0.35);
+    // The body's edge stroke is the last arc drawn (icon details like
+    // Mercury's craters are smaller arcs inside it).
+    const r = radii(ctx);
+    expect(r[r.length - 1]).toBeGreaterThanOrEqual(1.5);
+    expect(r[r.length - 1]).toBeLessThan(2); // 4 px * 0.35 = 1.4 -> floored to 3 px across
+  });
+});

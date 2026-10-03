@@ -4,6 +4,7 @@ import SkyCanvas from "../components/hero/SkyCanvas.jsx";
 
 const calls = [];
 const gradientStub = { addColorStop: vi.fn() };
+const arcRadii = [];
 const ctxStub = {
   setTransform: vi.fn(),
   clearRect: vi.fn(),
@@ -11,7 +12,10 @@ const ctxStub = {
   moveTo: vi.fn(),
   lineTo: vi.fn(),
   stroke: () => calls.push("stroke"),
-  arc: () => calls.push("arc"),
+  arc: (_x, _y, r) => {
+    calls.push("arc");
+    arcRadii.push(r);
+  },
   fill: vi.fn(),
   save: vi.fn(),
   restore: vi.fn(),
@@ -25,6 +29,7 @@ const ctxStub = {
 
 beforeEach(() => {
   calls.length = 0;
+  arcRadii.length = 0;
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(ctxStub);
 });
 
@@ -45,5 +50,30 @@ describe("SkyCanvas constellation lines", () => {
     const firstArc = calls.indexOf("arc");
     expect(firstStroke).toBeGreaterThanOrEqual(0);
     expect(firstArc).toBeGreaterThan(firstStroke);
+  });
+});
+
+describe("SkyCanvas marker scale", () => {
+  function starRadiusAt(size) {
+    arcRadii.length = 0;
+    render(
+      <SkyCanvas
+        projectedStars={[{ x: size / 2, y: size / 2, magnitude: 4, alt: 60 }]}
+        projectedPlanets={[]}
+        projectedDsos={[]}
+        projectedLines={[]}
+        width={size}
+        height={size}
+        dpr={1}
+      />
+    );
+    return arcRadii[0];
+  }
+
+  it("draws the same star smaller on a phone-sized chart than on a laptop-sized one", () => {
+    const laptop = starRadiusAt(800);
+    const phone = starRadiusAt(290);
+    expect(phone).toBeLessThan(laptop);
+    expect(phone / laptop).toBeCloseTo(290 / 560, 2);
   });
 });

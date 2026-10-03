@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { drawStar, drawPlanet, drawConstellationLines } from "../../utils/drawing.js";
 import { drawDso } from "../../utils/dsoDrawing.js";
+import { markerScale } from "../../utils/markerScale.js";
 
 export default function SkyCanvas({ projectedStars, projectedPlanets, projectedDsos, projectedLines, width, height, dpr }) {
   const canvasRef = useRef(null);
@@ -20,6 +21,10 @@ export default function SkyCanvas({ projectedStars, projectedPlanets, projectedD
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
 
+    // Smaller-than-laptop charts draw markers proportionally smaller, so a
+    // phone looks like the laptop chart shrunk rather than coarse speckle.
+    const scale = markerScale(Math.min(width, height));
+
     // Layer order: constellation lines first (behind DSOs/stars/planets).
     drawConstellationLines(ctx, projectedLines ?? [], dpr);
 
@@ -27,19 +32,19 @@ export default function SkyCanvas({ projectedStars, projectedPlanets, projectedD
     for (const d of projectedDsos ?? []) {
       if (d.x < -200 || d.x > width + 200) continue;
       if (d.y < -200 || d.y > height + 200) continue;
-      drawDso(ctx, d);
+      drawDso(ctx, d, scale);
     }
 
     for (const s of projectedStars) {
       if (s.x < -32 || s.x > width + 32) continue;
       if (s.y < -32 || s.y > height + 32) continue;
-      drawStar(ctx, s);
+      drawStar(ctx, s, scale);
     }
 
     for (const p of projectedPlanets) {
       if (p.x < -32 || p.x > width + 32) continue;
       if (p.y < -32 || p.y > height + 32) continue;
-      drawPlanet(ctx, p);
+      drawPlanet(ctx, p, scale);
     }
   }, [projectedStars, projectedPlanets, projectedDsos, projectedLines, width, height, dpr]);
 

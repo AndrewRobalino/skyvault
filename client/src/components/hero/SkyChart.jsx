@@ -10,7 +10,6 @@ import { useCanvasSize } from "../../hooks/useCanvasSize.js";
 import { projectStars, projectPlanets, projectDsos, projectConstellations } from "../../utils/projection.js";
 import { findNearestWithinRadius } from "../../utils/hitTest.js";
 import { useDelayedFlag } from "../../hooks/useDelayedFlag.js";
-import { renderMagLimit } from "../../utils/renderMagLimit.js";
 import SkyCanvas from "./SkyCanvas.jsx";
 import CardinalLabels from "./CardinalLabels.jsx";
 import SelectionRing from "./SelectionRing.jsx";
@@ -63,11 +62,7 @@ export default function SkyChart() {
   const { width, height, dpr } = useCanvasSize(containerRef);
 
   const projected = useMemo(() => {
-    // Same star density at any chart size (see renderMagLimit): a phone
-    // draws fewer, brighter stars instead of speckle.
-    const magLimit = renderMagLimit(Math.min(width, height));
-    const visibleStars = (skyQuery.data?.stars ?? []).filter((s) => s.magnitude <= magLimit);
-    const stars = projectStars(visibleStars, width, height);
+    const stars = projectStars(skyQuery.data?.stars ?? [], width, height);
     // The API includes below-horizon bodies for the info panels; the chart
     // draws (and hit-tests) only what is up.
     const upPlanets = (planetsQuery.data?.planets ?? []).filter((p) => p.alt >= 0);

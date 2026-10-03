@@ -111,9 +111,12 @@ export const PLANET_TEXTURE_URLS = {
   Moon:    "/textures/planets/moon.jpg",
 };
 
-export function drawStar(ctx, star) {
+// `scale` shrinks markers on charts smaller than a laptop's (see markerScale).
+export function drawStar(ctx, star, scale = 1) {
   const { x, y, magnitude, bp_rp, alt } = star;
-  const { core, halo } = magnitudeToGlow(magnitude);
+  const glow = magnitudeToGlow(magnitude);
+  const core = glow.core * scale;
+  const halo = glow.halo * scale;
   const baseColor = bvToHex(bp_rp);
 
   // Color amplification: blend toward white for dim stars.
@@ -168,17 +171,27 @@ function toHex2(n) {
   return n.toString(16).padStart(2, "0");
 }
 
-export function drawPlanet(ctx, planet) {
+// Planets shrink with the chart too, but never below this (visible, tappable).
+const MIN_PLANET_PX = 3;
+
+function scaledSize(size, scale) {
+  return Math.max(MIN_PLANET_PX, size * scale);
+}
+
+export function drawPlanet(ctx, planet, scale = 1) {
   if (planet.name === "Moon") {
-    drawMoon(ctx, planet);
+    drawMoon(ctx, planet, scale);
     return;
   }
   if (planet.name === "Sun") {
-    drawSun(ctx, planet);
+    drawSun(ctx, planet, scale);
     return;
   }
 
-  const size = planet.displaySize ?? PLANET_SIZES[planet.name] ?? PLANET_SIZE_DEFAULT;
+  const size = scaledSize(
+    planet.displaySize ?? PLANET_SIZES[planet.name] ?? PLANET_SIZE_DEFAULT,
+    scale
+  );
   const tint = PLANET_TINTS[planet.name] ?? PLANET_TINT_DEFAULT;
   const { x, y } = planet;
   const r = size / 2;
@@ -218,9 +231,9 @@ export function drawPlanet(ctx, planet) {
   ctx.restore();
 }
 
-function drawSun(ctx, planet) {
+function drawSun(ctx, planet, scale) {
   const { x, y } = planet;
-  const size = planet.displaySize ?? PLANET_SIZES.Sun;
+  const size = scaledSize(planet.displaySize ?? PLANET_SIZES.Sun, scale);
   const r = size / 2;
   const glowRadius = r * 1.6;
 
@@ -272,9 +285,9 @@ function drawSun(ctx, planet) {
   ctx.restore();
 }
 
-function drawMoon(ctx, planet) {
+function drawMoon(ctx, planet, scale) {
   const { x, y, illumination, phase_name } = planet;
-  const size = planet.displaySize ?? PLANET_SIZES.Moon;
+  const size = scaledSize(planet.displaySize ?? PLANET_SIZES.Moon, scale);
   const r = size / 2;
   const frac = illumination ?? 1.0;
   const isWaning =
