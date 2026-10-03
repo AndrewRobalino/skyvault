@@ -21,15 +21,15 @@ export default function Header() {
       : "Enter a location to begin";
 
   return (
-    <header className="header mb-10 border-b border-rule pb-8 text-center">
+    <header className="header mb-6 border-b border-rule pb-5 text-center md:mb-10 md:pb-8">
       <div className="flex items-center justify-center gap-4">
-        <span className="h-px w-16 bg-accent-dim" />
+        <span className="h-px w-8 bg-accent-dim md:w-16" />
         <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent">
           OBSERVATORIUM · SKYVAULT
         </span>
-        <span className="h-px w-16 bg-accent-dim" />
+        <span className="h-px w-8 bg-accent-dim md:w-16" />
       </div>
-      <h1 className="mt-5 font-serif italic text-ink text-[clamp(32px,6vw,58px)] leading-tight">
+      <h1 className="mt-3 md:mt-5 font-serif italic text-ink text-[clamp(32px,6vw,58px)] leading-tight">
         {titlePlace ? `The Sky over ${titlePlace}` : "The Sky"}
       </h1>
       <p className="mt-3 font-mono text-xs uppercase tracking-widest text-ink-dim">

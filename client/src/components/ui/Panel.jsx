@@ -7,7 +7,7 @@
 export default function Panel({ title, children, className = "" }) {
   return (
     <section
-      className={`panel border border-rule bg-[color:var(--bg-panel)] backdrop-blur-sm p-6 ${className}`}
+      className={`panel border border-rule bg-[color:var(--bg-panel)] backdrop-blur-sm p-4 md:p-6 ${className}`}
     >
       {title && (
         <header className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-accent">

@@ -60,7 +60,7 @@ describe("<App> smoke test", () => {
     window.history.pushState({}, "", "/");
   });
 
-  it("renders the EXPLORE IN 3D stub button", () => {
+  it("does not show the Explore in 3D placeholder until Phase 4 exists", () => {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } },
     });
@@ -69,6 +69,6 @@ describe("<App> smoke test", () => {
         <App />
       </QueryClientProvider>
     );
-    expect(screen.getByText(/EXPLORE IN 3D/i)).toBeInTheDocument();
+    expect(screen.queryByText(/EXPLORE IN 3D/i)).not.toBeInTheDocument();
   });
 });

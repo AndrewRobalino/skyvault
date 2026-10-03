@@ -10,6 +10,7 @@ import { useCanvasSize } from "../../hooks/useCanvasSize.js";
 import { projectStars, projectPlanets, projectDsos, projectConstellations } from "../../utils/projection.js";
 import { findNearestWithinRadius } from "../../utils/hitTest.js";
 import { useDelayedFlag } from "../../hooks/useDelayedFlag.js";
+import { renderMagLimit } from "../../utils/renderMagLimit.js";
 import SkyCanvas from "./SkyCanvas.jsx";
 import CardinalLabels from "./CardinalLabels.jsx";
 import SelectionRing from "./SelectionRing.jsx";
@@ -62,7 +63,11 @@ export default function SkyChart() {
   const { width, height, dpr } = useCanvasSize(containerRef);
 
   const projected = useMemo(() => {
-    const stars = projectStars(skyQuery.data?.stars ?? [], width, height);
+    // Same star density at any chart size (see renderMagLimit): a phone
+    // draws fewer, brighter stars instead of speckle.
+    const magLimit = renderMagLimit(Math.min(width, height));
+    const visibleStars = (skyQuery.data?.stars ?? []).filter((s) => s.magnitude <= magLimit);
+    const stars = projectStars(visibleStars, width, height);
     // The API includes below-horizon bodies for the info panels; the chart
     // draws (and hit-tests) only what is up.
     const upPlanets = (planetsQuery.data?.planets ?? []).filter((p) => p.alt >= 0);
@@ -230,7 +235,9 @@ export default function SkyChart() {
         </div>
       )}
 
-      <div className="absolute right-3 top-3 z-10 flex gap-2">
+      {/* Stacked in the top-right corner on phones (outside the horizon circle
+          of the square chart); side by side from md up. */}
+      <div className="absolute right-2 top-2 z-10 flex flex-col items-end gap-1.5 md:right-3 md:top-3 md:flex-row md:gap-2">
         {status === "ready" && <SaveImageButton onSave={handleSave} />}
         <ConstellationToggle />
       </div>
