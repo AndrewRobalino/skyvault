@@ -24,4 +24,4 @@ jobs:
           API_URL: ${{ vars.RENDER_API_URL }}
         run: |
           test -n "$API_URL" || { echo "RENDER_API_URL variable is not set"; exit 1; }
-          python server/scripts/smoke_test_live.py "$API_URL" --origin https://skyvault.pages.dev
+          python server/scripts/smoke_test_live.py "$API_URL" --origin https://skyvault-25r.pages.dev

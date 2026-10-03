@@ -1,8 +1,9 @@
-"""CORS in the production configuration (render.yaml env values).
+"""CORS in the production configuration, read from render.yaml.
 
-Runs in a subprocess: the app reads its settings at import time, and
-reloading app.main inside this process would swap module globals (e.g. the
-rate limiters) out from under other tests.
+Reading the deployed env values (instead of copying them here) means the
+test fails if render.yaml ever drifts. The app runs in a subprocess: it reads
+its settings at import time, and reloading app.main inside this process would
+swap module globals (e.g. the rate limiters) out from under other tests.
 """
 
 from __future__ import annotations
@@ -13,16 +14,16 @@ import subprocess
 import sys
 from pathlib import Path
 
-PROD = "https://skyvault.pages.dev"
-REGEX = r"https://[a-z0-9-]+\.skyvault\.pages\.dev"
+import yaml
 
-ORIGINS = {
-    PROD: True,
-    "https://4f2a9c1e.skyvault.pages.dev": True,  # PR preview deploy
-    "https://evil.example": False,
-    "https://skyvault.pages.dev.evil.example": False,  # look-alike
-    "http://skyvault.pages.dev": False,  # not https
-}
+SERVER = Path(__file__).resolve().parent.parent
+RENDER_YAML = SERVER.parent / "render.yaml"
+
+
+def _prod_env() -> dict[str, str]:
+    service = yaml.safe_load(RENDER_YAML.read_text(encoding="utf-8"))["services"][0]
+    return {v["key"]: v["value"] for v in service["envVars"]}
+
 
 PROBE = """
 import json, sys
@@ -36,14 +37,24 @@ print(json.dumps(out))
 
 
 def test_cors_allows_only_our_pages_origins():
-    env = {**os.environ, "CORS_ORIGINS": f'["{PROD}"]', "CORS_ORIGIN_REGEX": REGEX}
+    env = _prod_env()
+    prod = json.loads(env["CORS_ORIGINS"])[0]  # e.g. https://skyvault-25r.pages.dev
+    host = prod.removeprefix("https://")
+    origins = {
+        prod: True,
+        f"https://4f2a9c1e.{host}": True,  # PR preview deploy
+        "https://evil.example": False,
+        f"https://{host}.evil.example": False,  # look-alike suffix
+        f"https://x.{host.replace('.', '-')}": False,  # unescaped-dot regex would match
+        f"http://{host}": False,  # not https
+    }
     result = subprocess.run(
-        [sys.executable, "-c", PROBE, json.dumps(list(ORIGINS))],
-        cwd=Path(__file__).resolve().parent.parent,
-        env=env,
+        [sys.executable, "-c", PROBE, json.dumps(list(origins))],
+        cwd=SERVER,
+        env={**os.environ, **env},
         capture_output=True,
         text=True,
         timeout=120,
         check=True,
     )
-    assert json.loads(result.stdout.strip().splitlines()[-1]) == ORIGINS
+    assert json.loads(result.stdout.strip().splitlines()[-1]) == origins

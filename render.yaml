@@ -14,11 +14,12 @@ services:
     # Only commits whose GitHub checks (CI backend + frontend) pass get deployed.
     autoDeployTrigger: checksPass
     envVars:
-      # If the Cloudflare Pages project isn't named "skyvault", update both.
+      # The Pages project "skyvault" got the address skyvault-25r.pages.dev.
+      # Change both lines (and smoke.yml --origin) if it ever moves.
       - key: CORS_ORIGINS
-        value: '["https://skyvault.pages.dev"]'
+        value: '["https://skyvault-25r.pages.dev"]'
       - key: CORS_ORIGIN_REGEX
-        value: 'https://[a-z0-9-]+\.skyvault\.pages\.dev'
+        value: 'https://[a-z0-9-]+\.skyvault-25r\.pages\.dev'
       # Render's proxy puts the client IP in X-Forwarded-For; the position is
       # verified on the live service (plan Task 15).
       - key: TRUST_FORWARDED_FOR
