@@ -52,7 +52,7 @@ export default function SkyStatusOverlay({ state, placeName, error, onRetry, slo
         </p>
         {slow && (
           <p className="max-w-xs font-mono text-[10px] uppercase tracking-[0.2em] text-ink-dim">
-            Waking up the observatory — the first load after a quiet period takes a few seconds.
+            Waking up the observatory — the first load after a quiet period can take up to a minute.
           </p>
         )}
       </div>

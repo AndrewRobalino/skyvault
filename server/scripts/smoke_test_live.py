@@ -31,7 +31,8 @@ def main() -> int:
             failures.append(name)
 
     try:
-        with httpx.Client(timeout=60, headers={"Accept-Encoding": "gzip"}) as c:
+        # 150 s: a Render free instance takes ~1 min to wake from idle.
+        with httpx.Client(timeout=150, headers={"Accept-Encoding": "gzip"}) as c:
             r = c.get(f"{base}/health")
             check("health 200", r.status_code == 200, r.text[:200])
 

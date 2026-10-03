@@ -6,6 +6,8 @@ describe("<SkyStatusOverlay> launch states", () => {
   it("explains a cold start once loading is slow", () => {
     render(<SkyStatusOverlay state="loading" placeName="Tokyo" slow />);
     expect(screen.getByText(/waking up the observatory/i)).toBeInTheDocument();
+    // Render free spins down after 15 min idle and takes ~1 min to wake.
+    expect(screen.getByText(/up to a minute/i)).toBeInTheDocument();
   });
 
   it("does not mention waking up for a normal fast load", () => {
