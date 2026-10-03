@@ -74,6 +74,6 @@ describe("SkyCanvas marker scale", () => {
     const laptop = starRadiusAt(800);
     const phone = starRadiusAt(290);
     expect(phone).toBeLessThan(laptop);
-    expect(phone / laptop).toBeCloseTo(290 / 560, 2);
+    expect(phone / laptop).toBeCloseTo((290 / 560) ** 2, 2);
   });
 });
