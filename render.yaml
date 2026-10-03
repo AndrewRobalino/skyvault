@@ -1,0 +1,29 @@
+# Render Blueprint for the SkyVault API (Phase 5, Render pivot 2026-10-02).
+# Free web service: no payment method on the account, so hitting a limit
+# suspends the service for the month instead of billing anything.
+services:
+  - name: skyvault-api
+    type: web
+    runtime: docker
+    plan: free
+    region: virginia
+    branch: main
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: ./server
+    healthCheckPath: /health
+    # Only commits whose GitHub checks (CI backend + frontend) pass get deployed.
+    autoDeployTrigger: checksPass
+    envVars:
+      # If the Cloudflare Pages project isn't named "skyvault", update both.
+      - key: CORS_ORIGINS
+        value: '["https://skyvault.pages.dev"]'
+      - key: CORS_ORIGIN_REGEX
+        value: 'https://[a-z0-9-]+\.skyvault\.pages\.dev'
+      # Render's proxy puts the client IP in X-Forwarded-For; the position is
+      # verified on the live service (plan Task 15).
+      - key: TRUST_FORWARDED_FOR
+        value: "true"
+      - key: FORWARDED_FOR_INDEX
+        value: "-1"
+      - key: LOG_FORWARDED_FOR
+        value: "false"

@@ -1,4 +1,4 @@
-"""CORS in the production configuration (deploy/cloudrun.env.yaml values).
+"""CORS in the production configuration (render.yaml env values).
 
 Runs in a subprocess: the app reads its settings at import time, and
 reloading app.main inside this process would swap module globals (e.g. the
