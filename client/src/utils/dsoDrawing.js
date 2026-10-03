@@ -22,7 +22,9 @@ const DEFAULT_COLOR = "rgba(220, 220, 220, 1)";
  * @param {CanvasRenderingContext2D} ctx
  * @param {object} dso - { x, y, type, angular_size_arcmin, minor_axis_arcmin?, position_angle_deg?, pxPerArcmin }
  */
-export function drawDso(ctx, dso) {
+// `scale` shrinks the minimum glow and the nucleus on small charts (the glow's
+// real angular size already scales via pxPerArcmin).
+export function drawDso(ctx, dso, scale = 1) {
   const {
     x, y, type,
     angular_size_arcmin,
@@ -41,8 +43,9 @@ export function drawDso(ctx, dso) {
 
   // Clamp to keep tiny objects visible and giant ones from dominating.
   // Min radius bumped from 2 → 5 so distant DSOs are noticeable click targets.
-  const rxClamped = Math.max(5, Math.min(majorPx, 120));
-  const ryClamped = Math.max(5, Math.min(minorPx, 120));
+  const minR = 5 * scale;
+  const rxClamped = Math.max(minR, Math.min(majorPx, 120));
+  const ryClamped = Math.max(minR, Math.min(minorPx, 120));
 
   const angleRad = ((position_angle_deg ?? 0) * Math.PI) / 180;
 
@@ -72,7 +75,7 @@ export function drawDso(ctx, dso) {
   // the sky. Scientifically honest: real galaxies have bright cores, real
   // nebulae have illuminated centers, real clusters have dense cores.
   // Tinted by type so the type info isn't lost when icons go away.
-  drawDsoNucleus(ctx, x, y, color);
+  drawDsoNucleus(ctx, x, y, color, scale);
 }
 
 /**
@@ -80,9 +83,9 @@ export function drawDso(ctx, dso) {
  * near-white core fading through the type color to transparent. Additive
  * blend so it lifts the brightness rather than punching a hole.
  */
-function drawDsoNucleus(ctx, x, y, color) {
-  const CORE_R = 1.8;
-  const HALO_R = 5;
+function drawDsoNucleus(ctx, x, y, color, scale) {
+  const CORE_R = 1.8 * scale;
+  const HALO_R = 5 * scale;
 
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
