@@ -1,7 +1,7 @@
 """Post-deploy smoke test (Phase 5 spec §8.1). Usage:
 
     python scripts/smoke_test_live.py https://skyvault-api-xxxx.run.app \
-        --origin https://skyvault.pages.dev
+        --origin https://skyvault-25r.pages.dev
 
 Needs only httpx, so CI can run it without the app's dependencies.
 Exit 0 when every check passes, 1 otherwise.
