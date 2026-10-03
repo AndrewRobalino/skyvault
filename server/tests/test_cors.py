@@ -41,6 +41,8 @@ def test_cors_allows_only_our_pages_origins():
     prod = json.loads(env["CORS_ORIGINS"])[0]  # e.g. https://skyvault-25r.pages.dev
     host = prod.removeprefix("https://")
     origins = {
+        **{o: True for o in json.loads(env["CORS_ORIGINS"])},  # every listed origin
+        "https://skyvault.is-a.dev": True,  # the short public URL
         prod: True,
         f"https://4f2a9c1e.{host}": True,  # PR preview deploy
         "https://evil.example": False,

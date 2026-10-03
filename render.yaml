@@ -14,10 +14,11 @@ services:
     # Only commits whose GitHub checks (CI backend + frontend) pass get deployed.
     autoDeployTrigger: checksPass
     envVars:
-      # The Pages project "skyvault" got the address skyvault-25r.pages.dev.
-      # Change both lines (and smoke.yml --origin) if it ever moves.
+      # Public URL: skyvault.is-a.dev (free is-a.dev subdomain -> Pages).
+      # The Pages project's own address, skyvault-25r.pages.dev, keeps working.
+      # The regex covers that project's preview deploys.
       - key: CORS_ORIGINS
-        value: '["https://skyvault-25r.pages.dev"]'
+        value: '["https://skyvault-25r.pages.dev", "https://skyvault.is-a.dev"]'
       - key: CORS_ORIGIN_REGEX
         value: 'https://[a-z0-9-]+\.skyvault-25r\.pages\.dev'
       # Render's proxy puts the client IP in X-Forwarded-For; the position is
