@@ -81,6 +81,12 @@ npm test
 
 See [`CLAUDE.md`](./CLAUDE.md) for architecture, conventions, and the accuracy guardrails.
 
+## Deployment
+
+- **API:** Render free web service, defined in [`render.yaml`](./render.yaml) (Docker image from `server/Dockerfile`). It deploys only after CI passes on `main`. The account has no payment method, so hitting a free-tier limit suspends the service; it can never bill.
+- **Frontend:** Cloudflare Pages builds `client/` with `VITE_API_BASE` pointing at the API.
+- **Merging a PR ships it.** A monthly rebuild refreshes the Earth-orientation data, and a post-deploy smoke test checks the live API.
+
 ## Author
 
 Andrew Robalino Garcia — CS @ FIU. Building toward the space industry via CS.
