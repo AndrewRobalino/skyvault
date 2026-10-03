@@ -33,10 +33,8 @@ describe("phone layout", () => {
     expect(hero.className).toMatch(/md:aspect-auto/);
   });
 
-  it("the disabled 'Explore in 3D' placeholder is hidden on phones so it can't cover the sky", () => {
-    const { getByText } = renderHero();
-    const wrapper = getByText(/explore in 3d/i).closest("div.absolute");
-    expect(wrapper.className).toMatch(/(^|\s)hidden(\s|$)/);
-    expect(wrapper.className).toMatch(/md:block/);
+  it("no Explore in 3D placeholder covers the sky (removed until Phase 4)", () => {
+    const { queryByText } = renderHero();
+    expect(queryByText(/explore in 3d/i)).toBeNull();
   });
 });
